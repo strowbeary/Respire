@@ -1,45 +1,37 @@
-import rock_sound_url from "./assets/sounds/RŮDE - Forever Lotus EP - 01 Forever Lotus.wav";
-import heart_sound_url from "./assets/sounds/crowd.wav";
+import peter_sound_url from "./assets/sounds/music.wav";
 import {Sound} from "./lib/SoundKit";
-import {AssetLoader} from "./lib/AssetKit";
 
-(async function() {
-    const loader = AssetLoader();
-    loader.addEventListener("progress", (e) => console.log(e.detail));
-    const [
-        test_sound,
-        heart_sound
-    ] = await loader
-        .load([
-        Sound({
-            url: rock_sound_url,
-            spacialized: true,
-            loop: true,
-            volume: 0.5,
-        }),
-        Sound({
-            url: heart_sound_url,
-            loop: true,
-            position: [0.5, 0.5, 0],
-            spacialized: true,
-            oriented: true,
-            volume: 0.5,
-        })
-    ]);
-    test_sound.play();
-    heart_sound.play();
+(async function () {
+
+    const peter_sound = await Sound({
+        url: peter_sound_url,
+        spacialized: true,
+        oriented: true,
+        orientation: [0, 0, 1],
+        loop: true,
+        volume: 0.5,
+    });
+    peter_sound.play();
+    document
+        .getElementById("play")
+        .addEventListener("click", () => peter_sound.play());
 
     const canvas = document.getElementById("viewer");
     const ctx = canvas.getContext("2d");
-
+    const dpr = window.devicePixelRatio || 1;
+    console.log("SPR", dpr);
+    ctx.scale(dpr, dpr);
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
 
     (function loop(t) {
-        ctx.clearRect(0, 0, 300, 500);
-        const freq = 1 / 500;
-        const pos = [
-            Math.cos(2 * Math.PI * t * freq),
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const freq_peter = 1 / 500;
+        const pos_peter = [
+            Math.cos(2 * Math.PI * t * freq_peter),
             0,
-            Math.sin(2 * Math.PI * t * freq),
+            Math.sin(2 * Math.PI * t * freq_peter),
         ];
 
 
@@ -49,11 +41,9 @@ import {AssetLoader} from "./lib/AssetKit";
         ctx.fill();
         ctx.closePath();
 
-        test_sound.set_position(pos);
-        test_sound.set_orientation([-pos[0], 0, -pos[2]]);
-        heart_sound.set_orientation([-pos[0], 0, -pos[2]]);
-        test_sound.canvas_helper(ctx);
-        heart_sound.canvas_helper(ctx);
+        peter_sound.set_position(pos_peter);
+        //peter_sound.set_orientation([-pos_peter[0], 0, -pos_peter[2]]);
+        peter_sound.canvas_helper(ctx);
 
         requestAnimationFrame(loop.bind({}, t + 1));
     })(0);
