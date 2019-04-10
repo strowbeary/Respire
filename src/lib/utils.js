@@ -18,40 +18,29 @@ export function angle_vector(vec1, vec2) {
     return -Math.acos(dot_product) * Math.sign(vec2[2]);
 }
 
-export function concat_typed_buffer( a, b ) {
-    const c = new Int8Array(a.byteLength + b.byteLength);
-    c.set(a, 0);
-    c.set(b, a.byteLength);
-    return c;
+function appendBuffer( buffer1, buffer2 ) {
+    const tmp = new Uint8Array( buffer1.byteLength + buffer2.byteLength );
+    tmp.set( new Uint8Array( buffer1 ), 0 );
+    tmp.set( new Uint8Array( buffer2 ), buffer1.byteLength );
+    return tmp.buffer;
 }
 export async function read_raw_stream(stream, onDataCB) {
     let is_done = false;
     let header = null;
-    let is_first_chunk = true;
-    const buffer_pile = new Proxy([], {
-        set(target, p, value) {
-            if(p !== "length") {
-                if(!is_first_chunk) {
-                    onDataCB(concat_typed_buffer(header, value).buffer);
-                } else {
-                    onDataCB(value.buffer);
-                }
-            }
-
-
-            target[p] = value;
-            return true;
-        }
-    });
-
+    let order = 0;
     while (!is_done) {
         const {value, done} = await stream.read();
         if (!done) {
             if (header === null) {
-                header = value.slice(0, 44);
-                is_first_chunk = false;
+                header = value.buffer.slice(0, 44);
+                value.buffer.order = order;
+                onDataCB(value.buffer);
+            } else {
+                const buffer = appendBuffer(header, value.buffer);
+                buffer.order = order;
+                onDataCB(buffer);
             }
-                buffer_pile.push(value);
+            order++;
         }
         is_done = done;
     }

@@ -25,18 +25,10 @@ export async function Sound(options) {
         oriented: false,
         ...options
     };
-
-
-    const source = audio_context.createBufferSource();
-    source.buffer = audio_context.createBuffer(2, 4096, audio_context.sampleRate);
-    source.loop = default_options.loop;
+    let next_time = 0;
 
     const gain_node = audio_context.createGain();
     const panner = audio_context.createPanner();
-    const scheduler_node = audio_context.createScriptProcessor(4096, 2, 2);
-
-    source.connect(scheduler_node);
-    scheduler_node.connect(gain_node);
 
     if (options.spacialized) {
         panner.panningModel = 'HRTF';
@@ -58,35 +50,36 @@ export async function Sound(options) {
     gain_node.gain.setValueAtTime(default_options.volume, audio_context.currentTime);
 
     const loaded_chunks = [];
+    function schedule_chunk(t) {
+        const chunk = loaded_chunks.shift();
+        const source = chunk.source;
+        source.connect(gain_node);
+        source.start(t);
+        if(loaded_chunks.length > 0) {
+            schedule_chunk(t + source.buffer.duration);
+        }
+    }
     const response = await fetch(options.url);
     const stream = await response.body.getReader();
-    await read_raw_stream(stream, async function (buffer) {
-        const audio_buffer = await audio_context.decodeAudioData(buffer);
-        loaded_chunks.push(audio_buffer);
+    read_raw_stream(stream,  function (buffer) {
+        audio_context.decodeAudioData(buffer).then((audio_buffer) => {
+            const source = audio_context.createBufferSource();
+            source.buffer = audio_buffer;
+
+            loaded_chunks.push({
+                source,
+                order: buffer.order
+            });
+            loaded_chunks.sort((a, b) => a.order-b.order);
+        });
     });
 
-    let chunk_index = 0;
-    let consumed_data = 0;
 
-    scheduler_node.onaudioprocess = async function (e) {
 
-        const channel_left_data = e.outputBuffer.getChannelData(0);
-        const channel_right_data = e.outputBuffer.getChannelData(1);
-        for(let i = 0; i < channel_left_data.length; i++) {
-            const chunk = loaded_chunks[chunk_index];
-            channel_left_data[i] = chunk.getChannelData(0)[consumed_data];
-            channel_right_data[i] = chunk.getChannelData(1)[consumed_data];
-            consumed_data++;
-            if(consumed_data > chunk.length) {
-                chunk_index++;
-                consumed_data = 0;
-            }
-        }
-    };
 
     return {
         async play() {
-            source.start(audio_context.currentTime);
+            schedule_chunk(audio_context.currentTime + 0.01);
         },
         set_position(position) {
             if (options.spacialized) {
