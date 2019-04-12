@@ -1,42 +1,53 @@
-import peter_sound_url from "./assets/sounds/peter pan.wav";
+import peter_sound_url from "./assets/sounds/spacialized_crowd.wav";
 import music_sound_url from "./assets/sounds/music.wav";
-import {Scene, Sound, SoundKit_debugger} from "./lib/SoundKit";
+import {Scene, Sound, Vector3} from "./lib/SoundKit";
 
 (async function () {
-    const scene = Scene();
-    const peter_sound = await Sound({
-        url: music_sound_url,
-        spacialized: true,
-        oriented: true,
-        orientation: [0, 0, 1],
-        loop: true,
-        volume: 0.8,
+    const scene = await Scene({
+        debug: true
     });
-    const music_sound = await Sound({
-        url: peter_sound_url,
-        loop: true,
-        volume: 0.3,
-    });
-    scene.add_child(peter_sound);
-    scene.add_child(music_sound);
-    const sk_debugger = SoundKit_debugger(scene);
+
+    scene.add(
+        Sound("music", {
+            url: music_sound_url,
+            spacialized: true,
+            oriented: true,
+            loop: true,
+            volume: 0.5,
+        }),
+        Sound("crowd", {
+            url: peter_sound_url,
+            volume: 1,
+        })
+    );
+
+    const init_scene = await scene.init();
+    const crowd_sound = init_scene.get_children_by_name("crowd");
+    const music_sound = init_scene.get_children_by_name("music");
+
     document
         .getElementById("play")
         .addEventListener("click", () => {
-            peter_sound.play();
+            crowd_sound.play();
             music_sound.play();
-            sk_debugger.play();
         });
+
+    document
+        .getElementById("stop")
+        .addEventListener("click", () => {
+            crowd_sound.stop();
+            music_sound.stop();
+        });
+
     const freq_peter = 1 / 500;
     (function loop(t) {
-        const pos_peter = [
+        const pos_peter = Vector3(
             Math.cos(2 * Math.PI * t * freq_peter),
             0,
             Math.sin(2 * Math.PI * t * freq_peter),
-        ];
+        );
 
-        peter_sound.set_position(pos_peter);
-        peter_sound.set_orientation([Math.cos(t / 2), 0, Math.sin(t / 2)]);
+        music_sound.set_position(pos_peter);
         requestAnimationFrame(loop.bind({}, t + 1));
     })(0);
 

@@ -32,6 +32,7 @@
     "sass": "^1.17.2"
   },
   "dependencies": {
+    "dat.gui": "^0.7.6",
     "lighterhtml": "^0.9.2",
     "postcss-modules": "^1.4.1",
     "string-css": "0.0.2"
