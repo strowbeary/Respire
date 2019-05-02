@@ -77,11 +77,11 @@ export function Sound(name, options) {
             read_raw_stream(stream, async buffer => {
                 const audio_buffer = await audio_context.decodeAudioData(buffer);
                 audio_buffer_list.push(audio_buffer);
+                audio_buffer_list.sort((a, b) => a.order < b.order);
             });
 
             streamer.onaudioprocess = function (audioProcessingEvent) {
                 const output_buffer = audioProcessingEvent.outputBuffer;
-                const input_buffer = audio_buffer_list[buffer_to_read];
 
                 const output_data = output_buffer.getChannelData(0);
 

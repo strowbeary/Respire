@@ -26,7 +26,7 @@ export function append_buffer(buffer1, buffer2) {
 }
 
 export function read_raw_stream(stream, onDataCB) {
-    return new Promise(async function (resolve) {
+    (async function () {
         let is_done = false;
         let header = null;
         let order = 0;
@@ -37,7 +37,6 @@ export function read_raw_stream(stream, onDataCB) {
                     header = value.buffer.slice(0, 44);
                     value.buffer.order = order;
                     await onDataCB(value.buffer);
-                    resolve();
                 } else {
                     const buffer = append_buffer(header, value.buffer);
                     buffer.order = order;
@@ -48,7 +47,7 @@ export function read_raw_stream(stream, onDataCB) {
             is_done = done;
 
         }
-    })
+    })();
 }
 
 export function* claim_chunk(tableau){
