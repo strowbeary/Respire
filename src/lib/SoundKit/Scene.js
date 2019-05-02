@@ -27,10 +27,11 @@ export async function Scene(options) {
     const listener = Listener(audio_context);
     const main_gain_node = audio_context.createGain();
     const children = [];
+    main_gain_node.connect(audio_context.destination);
 
     async function init() {
-        const initialized_children = await Promise.all(children.map(async function(c) {
-            return c.init(audio_context);
+        const initialized_children = await Promise.all(children.map(async function (c) {
+            return c.init(audio_context, main_gain_node);
         }));
 
         function set_volume(volume) {
@@ -49,7 +50,7 @@ export async function Scene(options) {
             return initialized_children.find(c => c.name === name);
         }
 
-        if(options.debug) {
+        if (options.debug) {
             const {sk_debugger} = await import('./Debugger.js');
             sk_debugger(audio_context, listener, initialized_children);
         }
@@ -75,12 +76,10 @@ export async function Scene(options) {
         children.push(...child);
     }
 
-
     return {
         add,
         init
     }
-
 }
 
 export function scene_debugger(ctx, canvas, listener) {
@@ -90,8 +89,9 @@ export function scene_debugger(ctx, canvas, listener) {
         .add(canvas_center);
 
     ctx.beginPath();
-    ctx.fillStyle = "rgb(255,0,0)";
-    ctx.ellipse(listener_position.x, listener_position.z, 5, 5, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = `rgb(255, ${(Math.abs(listener_position.y) * 255)}, ${(Math.abs(listener_position.y) * 255)})`;
+    const diameter = (3 + listener_position.y) * 2;
+    ctx.ellipse(listener_position.x, listener_position.z, diameter, diameter, 0, 0, 2 * Math.PI);
     ctx.fill();
     ctx.closePath();
 

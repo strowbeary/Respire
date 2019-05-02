@@ -40,8 +40,48 @@ function coord_controller(folder, v) {
 export function sk_debugger(audio_context, listener, children) {
     const sk_id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
     document.body.appendChild(html`
+        <style>
+            .sk_helper {
+                border: 1px solid #333;
+                border-radius: 8px;
+                position: fixed;
+                top: 16px;
+                right: 16px;
+                overflow: hidden;
+                width: 300px;
+                display: flex;
+                flex-direction: column;
+                background: black;
+            }
+            .sk_helper .inspector {
+                border-top: 1px solid #333;
+            }
+            .sk_helper .scene_controls {
+                padding: 8px;
+                background: black;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+            .sk_helper .scene_controls button {
+                border: none;
+                color: white;
+                font-size: 10pt;
+                border-radius: 4px;
+                background: transparent;
+                padding: 6px 12px;
+            }
+            .sk_helper .scene_controls button:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        </style>
         <div id="${'sk_helper_' + sk_id}" class="sk_helper">
+            <div class="scene_controls">
+                <button onclick="${() => audio_context.resume()}">Play</button>
+                <button onclick="${() => audio_context.suspend()}">Pause</button>
+            </div>
             <canvas id="${'sk_canvas_' + sk_id}" width="300" height="300"></canvas>
+            <div class="inspector"></div>
         </div>
     `);
 
@@ -55,13 +95,16 @@ export function sk_debugger(audio_context, listener, children) {
     gui.domElement.style.margin = 0;
     document
         .getElementById('sk_helper_' + sk_id)
+        .children[2]
         .appendChild(gui.domElement);
-    const scene_folder = gui.addFolder("Scene");
+    gui.width = 301;
+    const inspector = gui.addFolder("Inspector");
+    const scene_folder = inspector.addFolder("Scene");
     coord_controller(scene_folder, listener.position)
         .onChange((v) => {
             listener.set_position(v);
         });
-    const children_folder = gui.addFolder("Children");
+    const children_folder = inspector.addFolder("Children");
     children.forEach(c => {
         const child_folder = children_folder.addFolder(`${c.name} ${c.options.spacialized ? '(Spacialized)' : ''}`);
         const volume = child_folder.add(c.options, 'volume', 0, 1, 0.01);
