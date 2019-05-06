@@ -20,6 +20,7 @@ function Listener(audio_context) {
 export async function Scene(options) {
     options = {
         debug: false,
+        volume: 1,
         ...options
     };
 
@@ -35,7 +36,8 @@ export async function Scene(options) {
         }));
 
         function set_volume(volume) {
-            main_gain_node.gain.setValueAtTime(volume, audio_context.currentTime)
+            main_gain_node.gain.setValueAtTime(volume, audio_context.currentTime);
+            options.volume = volume;
         }
 
         async function play() {
@@ -52,7 +54,10 @@ export async function Scene(options) {
 
         if (options.debug) {
             const {sk_debugger} = await import('./Debugger.js');
-            sk_debugger(audio_context, listener, initialized_children);
+            sk_debugger(audio_context, listener, initialized_children, {
+                options,
+                set_volume
+            });
         }
 
         return {

@@ -21,7 +21,6 @@
     ]
   },
   "devDependencies": {
-    "lighterhtml": "^0.9.0",
     "@babel/core": "^7.4.3",
     "@babel/plugin-proposal-pipeline-operator": "^7.3.2",
     "babel-plugin-transform-dynamic-import": "^2.1.0",

@@ -1,5 +1,5 @@
 import {Vector3} from "./Vector3";
-import {angle_vector, canvas_arrow, read_raw_stream} from "./utils";
+import {angle_vector, canvas_arrow} from "./utils";
 
 export function Sound(name, options) {
     options = {
@@ -17,8 +17,9 @@ export function Sound(name, options) {
 
     async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-        const streamer = audio_context.createScriptProcessor(4096, 0, 1);
         const source = audio_context.createBufferSource();
+        source.connect(gain_node);
+
         let panner = null;
 
         if (options.spacialized) {
@@ -41,75 +42,15 @@ export function Sound(name, options) {
         }
         gain_node.gain.setValueAtTime(options.volume, audio_context.currentTime);
 
-        source.connect(streamer);
-        streamer.connect(gain_node);
 
-
-        function schedule_chunks(iterator, t) {
-            const {value, done} = iterator.next();
-            !done && (() => {
-                const chunk = value[1];
-                const source = audio_context.createBufferSource();
-                source.buffer = chunk.audio_buffer;
-                source.connect(gain_node);
-                source.start(t);
-                t += chunk.audio_buffer.duration;
-                schedule_chunks(iterator, t);
-            })();
-        }
-
-        async function play() {
-            const response = await fetch(options.url);
-            const wave_header_length = 44;
-            source.buffer = audio_context.createBuffer(
-                2,
-                parseInt(response.headers.get("Content-Length")) - wave_header_length,
-                audio_context.sampleRate
-            );
-            source.buffer.getChannelData(0).map(() => 0);
-            source.buffer.getChannelData(1).map(() => 0);
-
-            const stream = await response.body.getReader();
-            const audio_buffer_list = [];
-            let buffer_to_read = 0;
-            let read_buffer_length = 0;
-
-            read_raw_stream(stream, async buffer => {
-                const audio_buffer = await audio_context.decodeAudioData(buffer);
-                audio_buffer_list.push(audio_buffer);
-                audio_buffer_list.sort((a, b) => a.order < b.order);
-            });
-
-            streamer.onaudioprocess = function (audioProcessingEvent) {
-                const output_buffer = audioProcessingEvent.outputBuffer;
-
-                const output_data = output_buffer.getChannelData(0);
-
-                if (audio_buffer_list.length === 0) {
-                    for (let sample = 0; sample < output_data.length; sample++) {
-                        output_data[sample] = 0;
-                    }
-                    return;
-                }
-
-                const remaining_length_to_read = audio_buffer_list[buffer_to_read].length - read_buffer_length;
-                for (let sample = 0; sample < output_data.length; sample++) {
-                    // make output equal to the same as the input
-                    output_data[sample] = audio_buffer_list[buffer_to_read].getChannelData(0)[read_buffer_length];
-                    read_buffer_length++;
-                    if (remaining_length_to_read === sample) {
-                        buffer_to_read++;
-                        read_buffer_length = 0;
-                    }
-                }
-
-                console.log(buffer_to_read, audio_buffer_list.length);
-            };
-            source.start();
-        }
+        const response = await fetch(options.url);
+        const audio_raw_data = await response.arrayBuffer();
+        source.buffer = await audio_context.decodeAudioData(audio_raw_data);
 
         return {
-            play,
+            play() {
+                source.start(0);
+            },
             stop() {
                 let t = audio_context.currentTime - 0.01;
                 sources.forEach(source => {
@@ -136,6 +77,7 @@ export function Sound(name, options) {
             },
             set_loop(loop) {
                 options.loop = loop;
+                source.loop = loop;
             },
             get name() {
                 return name;

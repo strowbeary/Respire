@@ -37,7 +37,7 @@ function coord_controller(folder, v) {
     }
 }
 
-export function sk_debugger(audio_context, listener, children) {
+export function sk_debugger(audio_context, listener, children, scene_volume) {
     const sk_id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
     document.body.appendChild(html`
         <style>
@@ -100,6 +100,10 @@ export function sk_debugger(audio_context, listener, children) {
     gui.width = 301;
     const inspector = gui.addFolder("Inspector");
     const scene_folder = inspector.addFolder("Scene");
+    const volume = scene_folder.add(scene_volume.options, 'volume', 0, 1, 0.01);
+    volume.onChange(v => {
+        scene_volume.set_volume(v);
+    });
     coord_controller(scene_folder, listener.position)
         .onChange((v) => {
             listener.set_position(v);
