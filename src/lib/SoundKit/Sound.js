@@ -1,5 +1,5 @@
 import {Vector3} from "./Vector3";
-import {angle_vector, canvas_arrow, read_raw_stream} from "./utils";
+import {angle_vector, canvas_arrow} from "./utils";
 
 export function Sound(name, options) {
     options = {
@@ -15,11 +15,15 @@ export function Sound(name, options) {
         ...options
     };
 
-    async function init(audio_context) {
+    async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-        const panner = audio_context.createPanner();
+        const source = audio_context.createBufferSource();
+        source.connect(gain_node);
+
+        let panner = null;
 
         if (options.spacialized) {
+            panner = audio_context.createPanner();
             panner.panningModel = 'HRTF';
             panner.distanceModel = 'inverse';
             panner.rolloffFactor = 1;
@@ -29,49 +33,24 @@ export function Sound(name, options) {
             }
 
             gain_node.connect(panner);
-            panner.connect(audio_context.destination);
+            panner.connect(main_node);
 
             panner.setPosition(...options.position.to_array());
             panner.setOrientation(...options.orientation.to_array());
         } else {
-            gain_node.connect(audio_context.destination);
+            gain_node.connect(main_node);
         }
         gain_node.gain.setValueAtTime(options.volume, audio_context.currentTime);
 
+
         const response = await fetch(options.url);
-        const stream = await response.body.getReader();
-
-        const loaded_chunks = [];
-        read_raw_stream(stream, function (buffer) {
-            audio_context.decodeAudioData(buffer).then((audio_buffer) => {
-                loaded_chunks.push({
-                    audio_buffer,
-                    order: buffer.order
-                });
-                loaded_chunks.sort((a, b) => a.order - b.order);
-            });
-        });
-
-        let sources = [];
-        function play() {
-            let t = audio_context.currentTime + 0.01;
-            sources = loaded_chunks.map(chunk => {
-                const source = audio_context.createBufferSource();
-                source.buffer = chunk.audio_buffer;
-                source.connect(gain_node);
-                source.start(t);
-                t += chunk.audio_buffer.duration;
-                return source;
-            });
-            sources[sources.length - 1].onended = () => {
-                if(options.loop) {
-                    play();
-                }
-            }
-        }
+        const audio_raw_data = await response.arrayBuffer();
+        source.buffer = await audio_context.decodeAudioData(audio_raw_data);
 
         return {
-            play,
+            play() {
+                source.start(0);
+            },
             stop() {
                 let t = audio_context.currentTime - 0.01;
                 sources.forEach(source => {
@@ -98,6 +77,7 @@ export function Sound(name, options) {
             },
             set_loop(loop) {
                 options.loop = loop;
+                source.loop = loop;
             },
             get name() {
                 return name;
@@ -125,9 +105,9 @@ export function sound_debugger(ctx, canvas, options, name) {
         .multiply_scalar(canvas.width / 3 - 5)
         .add(canvas_center);
 
-    ctx.strokeStyle = "rgb(0, 0, 0)";
+    ctx.strokeStyle = "rgb(255, 255, 255)";
     ctx.lineWidth = 2;
-    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.fillStyle = "rgb(255, 255, 255)";
 
     if (options.spacialized) {
         if (options.oriented) {
@@ -143,23 +123,24 @@ export function sound_debugger(ctx, canvas, options, name) {
             ctx.closePath();
         }
         ctx.beginPath();
-        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.ellipse(sound_position.x, sound_position.z, 5, 5, 0, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
         ctx.beginPath();
         ctx.font = "14px 'Fira Sans'";
+        ctx.textAlign = "center";
         ctx.fillText(name, sound_position.x, sound_position.z + 30);
         ctx.fill();
         ctx.closePath();
     } else {
         ctx.beginPath();
-        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
         ctx.ellipse(sound_position.x, sound_position.z, 20, 20, 0, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
         ctx.beginPath();
-        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.font = "14px 'Fira Sans'";
         ctx.textAlign = "center";
         ctx.fillText(name, sound_position.x + 45, sound_position.z + 5);
