@@ -1,4 +1,10 @@
-#[no_mangle]
-pub fn add(a: i32, b: i32) -> i32 {
-    return a + b
+extern crate wasm_bindgen;
+use wasm_bindgen::prelude::*;
+extern crate js_sys;
+use js_sys::ImageData;
+
+#[wasm_bindgen]
+pub fn update() -> ImageData {
+    let frame = ImageData::new_with_sw(300, 300).unwrap();
+    return frame
 }

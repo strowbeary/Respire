@@ -2,9 +2,9 @@ import peter_sound_url from "./assets/sounds/peter pan.wav";
 import music_sound_url from "./assets/sounds/music.wav";
 import {Scene, Sound, Vector3} from "./lib/SoundKit";
 
-import { add } from './rust_wasm/src/lib.rs'
+import { update } from './rust_wasm/src/lib.rs'
 
-console.log(add(2, 3));
+console.log(update());
 
 (async function () {
 
