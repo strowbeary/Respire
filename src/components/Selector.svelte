@@ -6,8 +6,8 @@
     import Sand from "components/experiments/Sand.svelte";
 
     const options = [
-        {name: 'Sand', component: Sand},
     	{name: 'TrailSwipe', component: TrailSwipe},
+        {name: 'Sand', component: Sand},
     	{name: 'OpenEye', component: OpenEye},
     	{name: 'Fog', component: Fog},
     	{name: 'Cartons', component: Cartons},
