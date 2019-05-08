@@ -1,7 +1,6 @@
 <script>
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
-    import peopleImg from "assets/images/silhouette.png";
     import Camille from "assets/images/foule/Camille.png";
     import Melanie from "assets/images/foule/Melanie.png";
     import Remi from "assets/images/foule/Remi.png";
@@ -17,18 +16,43 @@
         // we want to track the movement of this particular touch
         this.data = event.data;
         this.dragging = true;
+
+        this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
+        let spritePos = this.sprite.position.x;
+        this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
     }
 
     function onDragEnd() {
         this.dragging = false;
         // set the interaction data to null
         this.data = null;
+        let spritePos = this.sprite.position.x;
+        if (Math.abs(spritePos - interactiveCurrentFinalPos) < 10 ||
+            (this.direction === "left" && spritePos < interactiveCurrentFinalPos) ||
+            (this.direction === "right" && spritePos > interactiveCurrentFinalPos)
+           ) {
+            this.sprite.position.set(interactiveCurrentFinalPos, this.sprite.position.y);
+            this.sprite.interactive = false;
+            if (interactiveCurrentIndex+1 < interactiveOrder.length) {
+                interactiveCurrentIndex++;
+                setInteractive();
+            }
+        } else {
+            this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
+        }
     }
 
     function onDragMove(event) {
         if (this.dragging) {
-            this.x +=  event.data.originalEvent.movementX;
-            this.y += event.data.originalEvent.movementY;
+            let spritePos = this.sprite.position.x;
+            if (this.direction === "left" && spritePos >= interactiveCurrentFinalPos && event.data.originalEvent.movementX < 0) {
+                this.x +=  event.data.originalEvent.movementX;
+                //this.y += event.data.originalEvent.movementY;
+            }
+            if (this.direction === "right" && spritePos <= interactiveCurrentFinalPos && event.data.originalEvent.movementX > 0) {
+                this.x +=  event.data.originalEvent.movementX;
+                //this.y += event.data.originalEvent.movementY;
+            }
         }
     }
     import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
@@ -57,9 +81,15 @@
       "P1": P1,
       "Camille": Camille,
       "Remi": Remi,
-      "P2": P2,
       "Melanie": Melanie,
+      "P2": P2
     };
+
+    const interactiveOrder = Object.keys(imgAssets).reverse();
+    let positions = [];
+    let interactiveCurrentIndex = 0;
+    let interactiveCurrentFinalPos;
+    let interactiveStartingPos;
 
     function init(data) {
         app = data.detail.app;
@@ -79,45 +109,63 @@
 
     let scale;
 
+    function setInteractive() {
+        let person = people[interactiveOrder[interactiveCurrentIndex]];
+        interactiveCurrentFinalPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].end);
+        interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
+        person.interactive = true;
+        person.buttonMode = true;
+        person.on('pointerdown', onDragStart)
+              .on('pointerup', onDragEnd)
+              .on('pointerupoutside', onDragEnd)
+              .on('pointermove', onDragMove);
+    }
+
     function generatePeople(resourceKey) {
         let texture = resources[resourceKey].texture;
         let {width} = texture.baseTexture;
         scale = canvasWidth/width * 0.8;
-        let person = new Sprite(texture, app);
+        let person = new MaskedSprite(texture, app);
         person.anchor.x = 0.5;
         person.anchor.y = 0.5;
         person.scale.set(scale);
-        person.interactive = true;
-        person.buttonMode = true;
-        person.on('pointerdown', onDragStart)
-                      .on('pointerup', onDragEnd)
-                      .on('pointerupoutside', onDragEnd)
-                      .on('pointermove', onDragMove);
+
         return person;
+    }
+
+    function positionFromCanvasWidth(number) {
+        return number * canvasWidth;
     }
 
     function setPosition(keyName) {
         switch (keyName) {
             case "P2":
-                people[keyName].position.set(canvasWidth * 0.7, canvasHeight);
+                positions.unshift({start: 0.7, end: 0.9});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight);
                 break;
             case "Melanie":
-                people[keyName].position.set(canvasWidth * 0.2, canvasHeight * 0.9);
+                positions.unshift({start: 0.2, end: 0.1});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.9);
                 break;
             case "Remi":
-                people[keyName].position.set(canvasWidth * 0.5, canvasHeight * 0.7);
+                positions.unshift({start: 0.5, end: 0.9});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.7);
                 break;
             case "Camille":
-                people[keyName].position.set(canvasWidth * 0.2, canvasHeight * 0.6);
+                positions.unshift({start: 0.2, end: 0.1});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.6);
                 break;
             case "P1":
-                people[keyName].position.set(canvasWidth * 0.8, canvasHeight * 0.6);
+                positions.unshift({start: 0.8, end: 0.9});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.6);
                 break;
             case "P4":
-                people[keyName].position.set(canvasWidth * 0.6, canvasHeight * 0.45);
+                positions.unshift({start: 0.6, end: 0.9});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.45);
                 break;
             case "P3":
-                people[keyName].position.set(canvasWidth * 0.25, canvasHeight * 0.55);
+                positions.unshift({start: 0.25, end: 0.1});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
                 break;
             default:
                 break;
@@ -130,12 +178,11 @@
             let person = generatePeople(key);
             people[keyName] = person;
             setPosition(keyName);
+            if (keyName === "P2") {
+                setInteractive();
+            }
             app.stage.addChild(person);
         });
-    }
-
-    function gameLoop(delta) {
-
     }
 </script>
 
