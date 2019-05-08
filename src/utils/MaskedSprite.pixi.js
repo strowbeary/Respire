@@ -10,7 +10,6 @@ export class MaskedSprite extends PIXI.Sprite {
             Math.min(Math.max(0, Math.round(point.x * 1/this.scale.x)), this._texture.orig.width),
             Math.min(Math.max(0, Math.round(point.y  * 1/this.scale.y)), this._texture.orig.height)
         );
-        console.log(alpha_pixel);
         return alpha_pixel > 20;
     }
 
