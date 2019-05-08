@@ -19,6 +19,7 @@ export function Sound(name, options) {
         const gain_node = audio_context.createGain();
         const source = audio_context.createBufferSource();
         source.connect(gain_node);
+        source.loop = options.loop;
 
         let panner = null;
 
@@ -38,6 +39,9 @@ export function Sound(name, options) {
             panner.setPosition(...options.position.to_array());
             panner.setOrientation(...options.orientation.to_array());
         } else {
+
+            options.position = Vector3(0, 0, 0);
+            options.orientation = Vector3(0, 0, 0);
             gain_node.connect(main_node);
         }
         gain_node.gain.setValueAtTime(options.volume, audio_context.currentTime);

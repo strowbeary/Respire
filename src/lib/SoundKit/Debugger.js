@@ -36,17 +36,21 @@ function coord_controller(folder, v) {
         }
     }
 }
-
+let debugger_number = 0;
 export function sk_debugger(audio_context, listener, children, scene_volume) {
     const sk_id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+    const debbuger_index = debugger_number.valueOf();
+    console.log(sk_id, debbuger_index);
     document.body.appendChild(html`
         <style>
-            .sk_helper {
+            ${() => {
+                return `
+                #${'sk_helper_' + sk_id}.sk_helper {
                 border: 1px solid #333;
                 border-radius: 8px;
                 position: fixed;
                 top: 16px;
-                right: 16px;
+                right: ${16 + 316 * debbuger_index}px;
                 overflow: hidden;
                 width: 300px;
                 display: flex;
@@ -74,6 +78,8 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
             .sk_helper .scene_controls button:hover {
                 background: rgba(255, 255, 255, 0.3);
             }
+                `;
+    }}
         </style>
         <div id="${'sk_helper_' + sk_id}" class="sk_helper">
             <div class="scene_controls">
@@ -85,6 +91,8 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
         </div>
     `);
 
+
+    debugger_number++;
     const canvas = document.getElementById("sk_canvas_" + sk_id);
     const ctx = canvas.getContext("2d");
 
@@ -121,11 +129,14 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
             c.set_loop(loop);
         });
         if (c.options.spacialized) {
-            const orientation = child_folder.add({orientation: 0}, 'orientation', -Math.PI, Math.PI, 0.01);
-            orientation.onChange(angle => {
-                const new_orientation = Vector3(0, 0, -1).rotate(angle);
-                c.set_orientation(new_orientation);
-            });
+            if(c.options.oriented) {
+                const orientation = child_folder.add({orientation: 0}, 'orientation', -Math.PI, Math.PI, 0.01);
+                orientation.onChange(angle => {
+                    const new_orientation = Vector3(0, 0, -1).rotate(angle);
+                    c.set_orientation(new_orientation);
+                });
+            }
+
             coord_controller(child_folder, c.options.position)
                 .onChange((v) => {
                     c.set_position(v);
@@ -149,4 +160,5 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
             cancelAnimationFrame(raf);
         }
     }
+
 }
