@@ -5,33 +5,32 @@
     import * as PIXI from "pixi.js";
 
     function onDragStart(event) {
-                     // store a reference to the data
-                     // the reason for this is because of multitouch
-                     // we want to track the movement of this particular touch
-                     this.data = event.data;
-                     console.log(event);
-                     this.alpha = 0.5;
-                     this.dragging = true;
-                 }
+        // store a reference to the data
+        // the reason for this is because of multitouch
+        // we want to track the movement of this particular touch
+        this.data = event.data;
+        this.alpha = 0.5;
+        this.dragging = true;
+    }
 
-                 function onDragEnd() {
-                     this.alpha = 1;
-                     this.dragging = false;
-                     // set the interaction data to null
-                     this.data = null;
-                 }
+    function onDragEnd() {
+        this.alpha = 1;
+        this.dragging = false;
+        // set the interaction data to null
+        this.data = null;
+    }
 
-                 function onDragMove(event) {
-
-                     if (this.dragging) {
-                         this.x +=  event.data.originalEvent.movementX;
-                         this.y += event.data.originalEvent.movementY;
-                     }
-                 }
+    function onDragMove(event) {
+        if (this.dragging) {
+            this.x +=  event.data.originalEvent.movementX;
+            this.y += event.data.originalEvent.movementY;
+        }
+    }
 
     import peter_sound_url from "assets/sounds/peter pan.wav";
     import music_sound_url from "assets/sounds/music.wav";
     import {Scene, Sound, Vector3} from "lib/SoundKit";
+    import {MaskedSprite} from "../../utils/MaskedSprite.pixi";
 
 
 
@@ -119,7 +118,7 @@
         let {width} = resources[peopleImg].texture.baseTexture;
         scale = canvasWidth/width;
 
-        people = new Sprite(resources[peopleImg].texture);
+        people = new MaskedSprite(resources[peopleImg].texture, app);
         people.anchor.x = 0.5;
         people.alpha = 0.5;
         people.scale.set(scale + scale/2);
@@ -127,7 +126,8 @@
         container.push(people);
         app.stage.addChild(people);
 
-        people = new Sprite(resources[peopleImg].texture);
+        people = new MaskedSprite(resources[peopleImg].texture, app);
+
         people.anchor.x = 0.5;
         people.anchor.y = 0.3;
         people.alpha = 0.5;
