@@ -1,5 +1,5 @@
 <script>
-    import TrailSwipe from "components/experiments/TrailSwipe.svelte";
+    import TrailSwipe from "components/experiments/Foule/Foule.svelte";
     import OpenEye from "components/experiments/OpenEye.svelte";
     import Fog from "components/experiments/Fog.svelte";
     import Cartons from "components/Cartons.svelte";
