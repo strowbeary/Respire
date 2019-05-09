@@ -29,7 +29,7 @@
 	{/each}
 </select>
 
-<Sand/>
+<!--<Sand/>-->
 {#if selected.name === 'TrailSwipe'}
 	<TrailSwipe/>
 {:else if selected.name === 'OpenEye'}

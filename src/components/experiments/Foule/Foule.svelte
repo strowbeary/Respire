@@ -9,52 +9,6 @@
     import P3 from "assets/images/foule/P3.png";
     import P4 from "assets/images/foule/P4.png";
     import * as PIXI from "pixi.js";
-
-    function onDragStart(event) {
-        // store a reference to the data
-        // the reason for this is because of multitouch
-        // we want to track the movement of this particular touch
-        this.data = event.data;
-        this.dragging = true;
-
-        this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
-        let spritePos = this.sprite.position.x;
-        this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
-    }
-
-    function onDragEnd() {
-        this.dragging = false;
-        // set the interaction data to null
-        this.data = null;
-        let spritePos = this.sprite.position.x;
-        if (Math.abs(spritePos - interactiveCurrentFinalPos) < 10 ||
-            (this.direction === "left" && spritePos < interactiveCurrentFinalPos) ||
-            (this.direction === "right" && spritePos > interactiveCurrentFinalPos)
-           ) {
-            this.sprite.position.set(interactiveCurrentFinalPos, this.sprite.position.y);
-            this.sprite.interactive = false;
-            if (interactiveCurrentIndex+1 < interactiveOrder.length) {
-                interactiveCurrentIndex++;
-                setInteractive();
-            }
-        } else {
-            this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
-        }
-    }
-
-    function onDragMove(event) {
-        if (this.dragging) {
-            let spritePos = this.sprite.position.x;
-            if (this.direction === "left" && spritePos >= interactiveCurrentFinalPos && event.data.originalEvent.movementX < 0) {
-                this.x +=  event.data.originalEvent.movementX;
-                //this.y += event.data.originalEvent.movementY;
-            }
-            if (this.direction === "right" && spritePos <= interactiveCurrentFinalPos && event.data.originalEvent.movementX > 0) {
-                this.x +=  event.data.originalEvent.movementX;
-                //this.y += event.data.originalEvent.movementY;
-            }
-        }
-    }
     import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
 
 
@@ -66,23 +20,18 @@
     };
 
     let loader = PIXI.loader,
-        resources = PIXI.loader.resources,
-        Sprite = PIXI.Sprite;
+        resources = PIXI.loader.resources;
 
-
-    let container = [];
-    let initialPos = [];
-    let initialScale = [];
     let app, canvasWidth, canvasHeight;
     let people = {};
     const imgAssets = {
-      "P3": P3,
-      "P4": P4,
-      "P1": P1,
-      "Camille": Camille,
-      "Remi": Remi,
-      "Melanie": Melanie,
-      "P2": P2
+      P1,
+      P4,
+      P3,
+      Camille,
+      Remi,
+      Melanie,
+      P2
     };
 
     const interactiveOrder = Object.keys(imgAssets).reverse();
@@ -115,10 +64,53 @@
         interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
         person.interactive = true;
         person.buttonMode = true;
-        person.on('pointerdown', onDragStart)
-              .on('pointerup', onDragEnd)
-              .on('pointerupoutside', onDragEnd)
-              .on('pointermove', onDragMove);
+
+        function onDragEnd() {
+                this.dragging = false;
+                // set the interaction data to null
+                this.data = null;
+                let spritePos = this.sprite.position.x;
+                if (Math.abs(spritePos - interactiveCurrentFinalPos) < 10 ||
+                    (this.direction === "left" && spritePos < interactiveCurrentFinalPos) ||
+                    (this.direction === "right" && spritePos > interactiveCurrentFinalPos)
+                   ) {
+                    this.sprite.position.set(interactiveCurrentFinalPos, this.sprite.position.y);
+                    this.sprite.interactive = false;
+                    if (interactiveCurrentIndex+1 < interactiveOrder.length) {
+                        interactiveCurrentIndex++;
+                        setInteractive();
+                    }
+                } else {
+                    this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
+                }
+            }
+
+        person.on('pointerdown', function (event) {
+                // store a reference to the data
+                // the reason for this is because of multitouch
+                // we want to track the movement of this particular touch
+                this.data = event.data;
+                this.dragging = true;
+
+                this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
+                let spritePos = this.sprite.position.x;
+                this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
+            })
+            .on('pointerup', onDragEnd)
+            .on('pointerupoutside', onDragEnd)
+            .on('pointermove', function (event) {
+                if (this.dragging) {
+                    let spritePos = this.sprite.position.x;
+                    if (this.direction === "left" && spritePos >= interactiveCurrentFinalPos && event.data.originalEvent.movementX < 0) {
+                        this.x +=  event.data.originalEvent.movementX;
+                        //this.y += event.data.originalEvent.movementY;
+                    }
+                    if (this.direction === "right" && spritePos <= interactiveCurrentFinalPos && event.data.originalEvent.movementX > 0) {
+                        this.x +=  event.data.originalEvent.movementX;
+                        //this.y += event.data.originalEvent.movementY;
+                    }
+                }
+            });
     }
 
     function generatePeople(resourceKey) {
@@ -155,16 +147,16 @@
                 positions.unshift({start: 0.2, end: 0.1});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.6);
                 break;
-            case "P1":
-                positions.unshift({start: 0.8, end: 0.9});
+            case "P3":
+                positions.unshift({start: 0.7, end: 0.9});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.6);
                 break;
             case "P4":
-                positions.unshift({start: 0.6, end: 0.9});
+                positions.unshift({start: 0.3, end: 0.1});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.45);
                 break;
-            case "P3":
-                positions.unshift({start: 0.25, end: 0.1});
+            case "P1":
+                positions.unshift({start: 0.5, end: 0.1});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
                 break;
             default:

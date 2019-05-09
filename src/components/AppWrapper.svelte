@@ -33,7 +33,7 @@
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        background-color: white;
+        background-color: black;
     }
 </style>
 

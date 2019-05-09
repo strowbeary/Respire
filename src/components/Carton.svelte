@@ -37,6 +37,8 @@
         font-family: 'Arial', 'sans-serif';
         padding: calc(var(--scaleFactor) * 35px);
         position: relative;
+        background-color: black;
+        color: #D2B48C;
     }
 
     .carton__titleName {
