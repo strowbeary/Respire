@@ -11,7 +11,7 @@
     import P4 from "assets/images/foule/P4.png";
     import * as PIXI from "pixi.js";
     import {MaskedSprite} from "../../../utils/MaskedSprite.pixi"; import {EasingFunctions} from "lib/easing";
-
+    import icon from "assets/images/logo-gobelins.png";
 
     export let canvasProps;
 
@@ -22,6 +22,7 @@
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
+        Sprite = PIXI.Sprite,
         Container = PIXI.Container;
 
     let app, canvasWidth, canvasHeight;
@@ -51,7 +52,6 @@
         app.stage.addChild(container);
 
         let imgToAdd = Object.values(imgAssets).filter(key => !Object.keys(resources).includes(key));
-
         if (imgToAdd.length > 0) {
             loader
                 .add(imgToAdd)
@@ -69,6 +69,8 @@
         interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
         person.interactive = true;
         person.buttonMode = true;
+        interactiveIcon.position.set(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
+        interactiveIconAlpha = 1;
 
         function onDragEnd() {
                 this.dragging = false;
@@ -92,6 +94,7 @@
                     }
                 } else {
                     this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
+                    interactiveIconAlpha = 1;
                 }
             }
 
@@ -105,6 +108,7 @@
                 this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
                 let spritePos = this.sprite.position.x;
                 this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
+                interactiveIconAlpha = 0;
             })
             .on('pointerup', onDragEnd)
             .on('pointerupoutside', onDragEnd)
@@ -174,7 +178,16 @@
         }
     }
 
+    let interactiveIcon;
+    let interactiveIconAlpha = 0;
+
     function setup() {
+        interactiveIcon = new Sprite(resources[icon].texture);
+        interactiveIcon.anchor.x = 0.5;
+        interactiveIcon.anchor.y = 0.5;
+        interactiveIcon.scale.set(0.5);
+        interactiveIcon.alpha = interactiveIconAlpha;
+        app.stage.addChild(interactiveIcon);
         Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let person = generatePeople(key);
@@ -201,6 +214,18 @@
                 setInteractive();
                 increment = 0;
                 isFinished = true;
+            }
+        }
+        if (interactiveIconAlpha === 1 && interactiveIcon.alpha < 1) {
+            interactiveIcon.alpha += 0.1;
+            if (interactiveIcon.alpha + 0.1 >= interactiveIconAlpha) {
+                interactiveIcon.alpha = 1;
+            }
+        }
+        if (interactiveIconAlpha === 0 && interactiveIcon.alpha > 0) {
+            interactiveIcon.alpha -= 0.1;
+            if (interactiveIcon.alpha - 0.1 <= interactiveIconAlpha) {
+                interactiveIcon.alpha = 0;
             }
         }
     }
