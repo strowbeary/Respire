@@ -78,7 +78,7 @@
                     if (this.dragging) {
                         this.x +=  event.data.originalEvent.movementX;
                         this.y += event.data.originalEvent.movementY;
-                        set_z_position(this.y / canvasHeight - 1)
+                        set_z_position(Math.min(Math.max(0, (canvasHeight - this.y) / canvasHeight), 1));
                     }
                 });
 
@@ -111,7 +111,7 @@
             if (this.dragging) {
                 this.x +=  event.data.originalEvent.movementX;
                 this.y += event.data.originalEvent.movementY;
-                set_z_position(this.y / canvasHeight)
+                set_z_position(Math.max(0, (canvasHeight - this.y) / canvasHeight));
             }
         });
 
