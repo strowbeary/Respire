@@ -5,8 +5,9 @@ let pixData, particles;
 const times = [];
 let fps;
 
-export function Game(canvas) {
+export function Game(canvas, debug = false) {
     this.canvas = canvas;
+    this.debug = debug;
     this.gameWidth = this.canvas.width;
     this.gameHeight = this.canvas.height;
     this.context = this.canvas.getContext('2d');
@@ -32,7 +33,9 @@ export function Game(canvas) {
         if (this.worker && !this.started) {
             this.worker.postMessage({name: "update"});
         }
-        fps = this.getFramePerSeconds();
+        if (this.debug) {
+            fps = this.getFramePerSeconds();
+        }
         window.requestAnimationFrame(setupDraw);
     };
 
@@ -50,9 +53,11 @@ Game.prototype.getFramePerSeconds = function () {
 
 Game.prototype.draw = function () {
     this.draw2d.doneDraw();
-    this.context.fillStyle = "rgb(0,0,0)";
-    this.draw2d.text("Objects: " + particles, 0, 24);
-    this.draw2d.text("FPS: " + fps, 0, 12);
+    if (this.debug) {
+        this.context.fillStyle = "rgb(0,0,0)";
+        this.draw2d.text("Objects: " + particles, 0, 24);
+        this.draw2d.text("FPS: " + fps, 0, 12);
+    }
 };
 
 Game.prototype.setup = function () {

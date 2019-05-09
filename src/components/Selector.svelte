@@ -7,7 +7,6 @@
 
     const options = [
     	{name: 'TrailSwipe', component: TrailSwipe},
-        {name: 'Sand', component: Sand},
     	{name: 'OpenEye', component: OpenEye},
     	{name: 'Fog', component: Fog},
     	{name: 'Cartons', component: Cartons},
@@ -30,9 +29,8 @@
 	{/each}
 </select>
 
-{#if selected.name === 'Sand'}
-    <Sand/>
-{:else if selected.name === 'TrailSwipe'}
+<Sand/>
+{#if selected.name === 'TrailSwipe'}
 	<TrailSwipe/>
 {:else if selected.name === 'OpenEye'}
 	<OpenEye/>

@@ -2,11 +2,13 @@
 
 <style>
     #game {
+        position: absolute;
         width: 56.25vh;
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        background-color: white;
+        z-index: 1;
+        pointer-events: none;
     }
 </style>
 

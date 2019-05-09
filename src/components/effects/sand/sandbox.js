@@ -13,7 +13,7 @@ const materials = {
     },
     sand: {
         color: [210, 180, 140],
-        density: 15
+        density: 100
     }
 };
 
@@ -152,8 +152,15 @@ const fill_square = function (x, y, w, h, s) {
 };
 
 const emit = function () {
-    fill_square(0, 0, 20, 20, 2);
-    fill_square(gameWidth - 20, 0, 20, 20, 2);
+    if (Math.random() < 0.5) {
+        fill_square(gameWidth/3, 0, 10, 10, 2);
+    }
+    if (Math.random() < 0.5) {
+        fill_square(0, 0, 20, 20, 2);
+    }
+    if (Math.random() < 0.5) {
+        fill_square(gameWidth - 20, 0, 20, 20, 2);
+    }
 };
 
 /*Game.prototype.handle_mouse = function() {
