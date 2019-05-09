@@ -4,12 +4,13 @@
     import Camille from "assets/images/foule/Camille.png";
     import Melanie from "assets/images/foule/Melanie.png";
     import Remi from "assets/images/foule/Remi.png";
+    import anim_bg from "assets/images/animated_background.png";
     import P1 from "assets/images/foule/P1.png";
     import P2 from "assets/images/foule/P2.png";
     import P3 from "assets/images/foule/P3.png";
     import P4 from "assets/images/foule/P4.png";
     import * as PIXI from "pixi.js";
-    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
+    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi"; import {EasingFunctions} from "lib/easing";
 
 
     export let canvasProps;
@@ -20,9 +21,12 @@
     };
 
     let loader = PIXI.loader,
-        resources = PIXI.loader.resources;
+        resources = PIXI.loader.resources,
+        Container = PIXI.Container;
 
     let app, canvasWidth, canvasHeight;
+    let container = new Container();
+    let containerNextPos = 0;
     let people = {};
     const imgAssets = {
       P1,
@@ -44,6 +48,7 @@
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
+        app.stage.addChild(container);
 
         let imgToAdd = Object.values(imgAssets).filter(key => !Object.keys(resources).includes(key));
 
@@ -78,7 +83,12 @@
                     this.sprite.interactive = false;
                     if (interactiveCurrentIndex+1 < interactiveOrder.length) {
                         interactiveCurrentIndex++;
-                        setInteractive();
+                        if (interactiveCurrentIndex % 2 === 0) {
+                            isFinished = false;
+                            containerNextPos = container.position.y + (canvasHeight * 0.1);
+                        } else {
+                            setInteractive();
+                        }
                     }
                 } else {
                     this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
@@ -173,14 +183,42 @@
             if (keyName === "P2") {
                 setInteractive();
             }
-            app.stage.addChild(person);
+            container.addChild(person);
         });
+        app.ticker.add(delta => gameLoop(delta));
+    }
+    let increment = 0;
+    let isFinished = true;
+    let offset = 0;
+
+    function gameLoop() {
+        if(!isFinished) {
+            if(increment <= 1) {
+                container.position.set(0, offset + EasingFunctions.easeOutQuart(increment) * (canvasHeight * 0.1));
+                increment += 0.02;
+            } else {
+                offset = containerNextPos;
+                setInteractive();
+                increment = 0;
+                isFinished = true;
+            }
+        }
     }
 </script>
+
+<style>
+.overlay {
+    position: absolute;
+    width: 100%;
+    mix-blend-mode: difference;
+    pointer-events: none;
+}
+</style>
 
 <AppWrapper>
     <span slot="canvas" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
+            <img class="overlay" src={anim_bg}>
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}
     </span>
