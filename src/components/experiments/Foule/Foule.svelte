@@ -52,7 +52,9 @@
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
-
+        if (!resources[icon]) {
+           loader.add(icon)
+        }
         let imgToAdd = Object.values(imgAssets).filter(key => !Object.keys(resources).includes(key));
         if (imgToAdd.length > 0) {
             loader
