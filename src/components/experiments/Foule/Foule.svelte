@@ -10,11 +10,13 @@
     import P3 from "assets/images/foule/P3.png";
     import P4 from "assets/images/foule/P4.png";
     import * as PIXI from "pixi.js";
-    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi"; import {EasingFunctions} from "lib/easing";
+    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
+    import {init_foule_sound_scene} from "./Foule.sound";
+    import {Animate, Easing} from "../../../lib/TimingKit";
 
 
     export let canvasProps;
-
+    let set_z_position = () => {};
     const appProperties = {
        transparent: true,
        antialias: true
@@ -150,7 +152,7 @@
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.9);
                 break;
             case "Remi":
-                positions.unshift({start: 0.5, end: 0.9});
+                positions.unshift({start: 0.5, end: 0.8});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.7);
                 break;
             case "Camille":
@@ -166,7 +168,7 @@
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.45);
                 break;
             case "P1":
-                positions.unshift({start: 0.5, end: 0.1});
+                positions.unshift({start: 0.5, end: 0.9});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
                 break;
             default:
@@ -174,7 +176,8 @@
         }
     }
 
-    function setup() {
+    async function setup() {
+        set_z_position = (await init_foule_sound_scene()).set_z_position;
         Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let person = generatePeople(key);
@@ -191,10 +194,14 @@
     let isFinished = true;
     let offset = 0;
 
+    const anim_test = Animate(100, 10, Easing.easeInCubic, 0.01);
+    anim_test.start();
     function gameLoop() {
+        console.log(anim_test.isRunning && anim_test.tick());
         if(!isFinished) {
             if(increment <= 1) {
-                container.position.set(0, offset + EasingFunctions.easeOutQuart(increment) * (canvasHeight * 0.1));
+                container.position.set(0, offset + Easing.easeOutQuart(increment) * (canvasHeight * 0.1));
+                set_z_position(1.5 - (1/0.3) * (( offset + Easing.easeOutQuart(increment) * (canvasHeight * 0.1)) / canvasHeight));
                 increment += 0.02;
             } else {
                 offset = containerNextPos;

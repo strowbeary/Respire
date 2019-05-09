@@ -26,7 +26,7 @@
         height: 100vh;
         width: 100vw;
         overflow: hidden;
-        background-color: darkgrey;
+        background-color: black;
     }
     .appWrapper { /* canvas with 9/16 ratio */
         width: 56.25vh;
