@@ -11,9 +11,8 @@
     import P4 from "assets/images/foule/P4.png";
     import * as PIXI from "pixi.js";
     import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
-    import {init_foule_sound_scene} from "./Foule.sound";
     import {Animate, Easing} from "../../../lib/TimingKit";
-	import icon from "assets/images/logo-gobelins.png";
+	import icon from "assets/images/logo-gobelins.png"; import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
 
     export let canvasProps;
     let set_z_position = () => {};
@@ -191,9 +190,10 @@
     }
     let interactiveIcon;
     let interactiveIconAlpha = 0;
+
     async function setup() {
-        const a = await init_foule_sound_scene();
-        set_z_position = a.set_z_position;
+
+        set_z_position = (await init_foule_sound_scene()).set_z_position;
 
         interactiveIcon = new Sprite(resources[icon].texture);
         interactiveIcon.anchor.x = 0.5;
