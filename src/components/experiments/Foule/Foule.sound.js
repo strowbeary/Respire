@@ -17,9 +17,6 @@ export async function init_foule_sound_scene() {
             volume: 0.5,
             spacialized: true,
             oriented: true,
-            loop: true,
-            position: Vector3(-0.5, 0, -1.5),
-            orientation: Vector3(1, 0, 0)
         }),
         Sound("crowd_right", {
             url: crowd_right_sound_url,

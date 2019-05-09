@@ -280,6 +280,8 @@
         app.ticker.add(delta => gameLoop(delta));
     }
 
+    const anim_test = Animate(100, 10, Easing.easeInCubic, 0.01);
+    anim_test.start();
     function gameLoop() {
         const container_offset = container_anim.tick();
         container.position.set(0, container_offset);
