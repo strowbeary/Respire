@@ -31,6 +31,7 @@ export function Animate(from_value, to_value, easing_function, step) {
         },
         start() {
             is_running = true;
+            increment = 0;
         },
         tick() {
             if(is_running) {

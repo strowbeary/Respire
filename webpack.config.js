@@ -5,8 +5,11 @@ const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
 module.exports = {
+    devServer: {
+        host: '0.0.0.0'
+    },
     entry: {
-        bundle: ['./src/index.js']
+        bundle: "./src/index.js"
     },
     resolve: {
         extensions: ['.mjs', '.js', '.svelte', '.wasm'],
@@ -24,42 +27,34 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.js?$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: [
-                            "@babel/preset-env"
-                        ],
+                        cacheDirectory: true,
+                        babelrc: false,
                         plugins: [
                             "transform-dynamic-import",
-                            "@babel/plugin-syntax-dynamic-import"
+                            "@babel/plugin-syntax-dynamic-import",
+                            ["@babel/transform-runtime", {
+                                "regenerator": true
+                            }]
+                        ],
+                        presets: [
+                            ['@babel/env', {
+                                targets: {
+                                    browsers: ['last 2 versions']
+                                }
+                            }]
                         ]
-                    }
-                }
+                    },
+                },
             },
             {
                 test: /\.svelte$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: 'svelte-loader',
-                    options: {
-                        emitCss: true,
-                        hotReload: true
-                    }
-                }
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    /**
-                     * MiniCssExtractPlugin doesn't support HMR.
-                     * For developing, use 'style-loader' instead.
-                     * */
-                    prod ? MiniCssExtractPlugin.loader : 'style-loader',
-                    'css-loader'
-                ]
+                use: 'svelte-loader'
             },
             {
                 test: /\.(png|svg|jpg|gif|wav)$/,

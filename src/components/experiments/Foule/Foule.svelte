@@ -31,6 +31,11 @@
     let container = new Container();
     let containerNextPos = 0;
     let people = {};
+    function create_logo_anim(from_value, to_value) {
+        return Animate(from_value, to_value, Easing.easeInCubic, 0.1)
+    }
+    let logo_anim = create_logo_anim(0, 1);
+    logo_anim.start();
     const imgAssets = {
       P1,
       P4,
@@ -74,7 +79,8 @@
         person.interactive = true;
         person.buttonMode = true;
         interactiveIcon.position.set(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
-        interactiveIconAlpha = 1;
+        logo_anim = create_logo_anim(0, 1);
+        logo_anim.start();
 
         function onDragEnd() {
                 this.dragging = false;
@@ -98,7 +104,8 @@
                     }
                 } else {
                     this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
-                    interactiveIconAlpha = 1;
+                    logo_anim = create_logo_anim(0, 1);
+                    logo_anim.start();
                 }
             }
 
@@ -112,7 +119,8 @@
                 this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
                 let spritePos = this.sprite.position.x;
                 this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
-                interactiveIconAlpha = 0;
+                logo_anim = create_logo_anim(1, 0);
+                logo_anim.start();
             })
             .on('pointerup', onDragEnd)
             .on('pointerupoutside', onDragEnd)
@@ -184,7 +192,8 @@
     let interactiveIcon;
     let interactiveIconAlpha = 0;
     async function setup() {
-        set_z_position = (await init_foule_sound_scene()).set_z_position;
+        const a = await init_foule_sound_scene();
+        set_z_position = a.set_z_position;
 
         interactiveIcon = new Sprite(resources[icon].texture);
         interactiveIcon.anchor.x = 0.5;
@@ -208,10 +217,7 @@
     let isFinished = true;
     let offset = 0;
 
-    const anim_test = Animate(100, 10, Easing.easeInCubic, 0.01);
-    anim_test.start();
     function gameLoop() {
-        console.log(anim_test.isRunning && anim_test.tick());
         if(!isFinished) {
             if(increment <= 1) {
                 container.position.set(0, offset + Easing.easeOutQuart(increment) * (canvasHeight * 0.1));
@@ -224,18 +230,8 @@
                 isFinished = true;
             }
         }
-        if (interactiveIconAlpha === 1 && interactiveIcon.alpha < 1) {
-            interactiveIcon.alpha += 0.1;
-            if (interactiveIcon.alpha + 0.1 >= interactiveIconAlpha) {
-                interactiveIcon.alpha = 1;
-            }
-        }
-        if (interactiveIconAlpha === 0 && interactiveIcon.alpha > 0) {
-            interactiveIcon.alpha -= 0.1;
-            if (interactiveIcon.alpha - 0.1 <= interactiveIconAlpha) {
-                interactiveIcon.alpha = 0;
-            }
-        }
+
+        interactiveIcon.alpha = logo_anim.tick();
     }
 </script>
 
