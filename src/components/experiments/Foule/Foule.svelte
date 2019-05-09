@@ -4,33 +4,9 @@
     import peopleImg from "assets/images/silhouette.png";
     import * as PIXI from "pixi.js";
 
-    function onDragStart(event) {
-        // store a reference to the data
-        // the reason for this is because of multitouch
-        // we want to track the movement of this particular touch
-        this.data = event.data;
-        this.alpha = 0.5;
-        this.dragging = true;
-    }
-
-    function onDragEnd() {
-        this.alpha = 1;
-        this.dragging = false;
-        // set the interaction data to null
-        this.data = null;
-    }
-
-    function onDragMove(event) {
-        if (this.dragging) {
-            this.x +=  event.data.originalEvent.movementX;
-            this.y += event.data.originalEvent.movementY;
-        }
-    }
-    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
 
 
-
-
+    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi"; import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
 
     export let canvasProps;
 
@@ -50,11 +26,12 @@
     let container = [];
     let initialPos = [];
     let initialScale = [];
-    let app, people, canvasWidth;
+    let app, people, canvasWidth, canvasHeight;
 
     function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
+        canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(graphics);
 
         if (!resources[peopleImg]) {
@@ -66,10 +43,10 @@
         }
     }
 
-
     let scale;
 
-    function setup() {
+    async function setup() {
+        const {set_z_position} = await init_foule_sound_scene();
         graphics.beginFill(0xFFFFFF, 0.1);
         graphics.drawRect(0, 0, app.renderer.width, app.renderer.height);
         graphics.endFill();
@@ -77,27 +54,67 @@
         let {width} = resources[peopleImg].texture.baseTexture;
         scale = canvasWidth/width;
 
-        people = new MaskedSprite(resources[peopleImg].texture, app);
+        people = new MaskedSprite(resources[peopleImg].texture, app, "prem");
         people.anchor.x = 0.5;
-        people.alpha = 0.5;
-        people.scale.set(scale + scale/2);
+        people.scale.set(1);
         people.position.set(0, 0);
+         people.interactive = true;
+                people.buttonMode = true;
+                people.on('pointerdown', function(event) {
+                    this.data = event.data;
+                    this.dragging = true;
+                    container.forEach(child => child.zIndex = 1);
+                    this.zIndex = 2;
+                })
+                .on('pointerup', function() {
+                    this.dragging = false;
+                    this.data = null;
+                })
+                .on('pointerupoutside', function(){
+                    this.dragging = false;
+                    this.data = null;
+                })
+                .on('pointermove', function(event){
+                    if (this.dragging) {
+                        this.x +=  event.data.originalEvent.movementX;
+                        this.y += event.data.originalEvent.movementY;
+                        set_z_position(this.y / canvasHeight - 1)
+                    }
+                });
+
         container.push(people);
         app.stage.addChild(people);
 
-        people = new MaskedSprite(resources[peopleImg].texture, app);
+        people = new MaskedSprite(resources[peopleImg].texture, app, "sec");
 
         people.anchor.x = 0.5;
         people.anchor.y = 0.3;
-        people.alpha = 0.5;
-        people.scale.set(scale);
+        people.scale.set(1);
         people.position.set(canvasWidth, people.height/2);
         people.interactive = true;
         people.buttonMode = true;
-        people.on('pointerdown', onDragStart)
-              .on('pointerup', onDragEnd)
-              .on('pointerupoutside', onDragEnd)
-              .on('pointermove', onDragMove);
+        people.on('pointerdown', function(event) {
+            this.data = event.data;
+            this.dragging = true;
+            container.forEach(child => child.zIndex = 1);
+            this.zIndex = 2;
+        })
+        .on('pointerup', function() {
+            this.dragging = false;
+            this.data = null;
+        })
+        .on('pointerupoutside', function(){
+            this.dragging = false;
+            this.data = null;
+        })
+        .on('pointermove', function(event){
+            if (this.dragging) {
+                this.x +=  event.data.originalEvent.movementX;
+                this.y += event.data.originalEvent.movementY;
+                set_z_position(this.y / canvasHeight)
+            }
+        });
+
 
 
 
