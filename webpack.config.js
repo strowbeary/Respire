@@ -37,6 +37,7 @@ module.exports = {
                         plugins: [
                             "transform-dynamic-import",
                             "@babel/plugin-syntax-dynamic-import",
+                            "@babel/plugin-proposal-object-rest-spread",
                             ["@babel/transform-runtime", {
                                 "regenerator": true
                             }]
