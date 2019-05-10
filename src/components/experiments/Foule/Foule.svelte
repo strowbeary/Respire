@@ -43,7 +43,7 @@
     let container = new Container();
     let people = {};
     function create_container_anim(from_value, to_value) {
-        return Animate(from_value, to_value, Easing.easeOutCubic, 0.01)
+        return Animate(from_value, to_value, Easing.easeOutCubic, 0.03)
     }
     let container_anim = create_container_anim(0, 1);
     const imgAssets = {
@@ -52,6 +52,7 @@
         P8,
         P7,
         Xindi,
+        //interactive
         P1,
         P4,
         P3,
@@ -89,7 +90,7 @@
 
     let scale;
 
-    function setInteractive() {
+    async function setInteractive() {
         let person = people[interactiveOrder[interactiveCurrentIndex]];
 
         if (interactiveCurrentIndex < 7) {
@@ -157,6 +158,18 @@
                     }
                 });
         } else {
+            await Promise.all(["P5", "P6", "P8", "P7", "Xindi"]
+                .reverse()
+                .map(k => people[k])
+                .map((p, i) => {
+                    return new Promise(resolve => setTimeout(() => {
+                        p.anim.start()
+                        resolve();
+                    }, Math.random() * 200 + i * 400));
+                }));
+
+            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.005)
+            container_anim.start();
 
         }
     }
@@ -214,22 +227,32 @@
             case "Xindi":
                 positions.unshift({start: 0.25, end: 0.1});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.35);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P7":
                 positions.unshift({start: 0.7, end: 0.9});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.3);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P8":
                 positions.unshift({start: 0.4, end: 0.15});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.1);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P6":
                 positions.unshift({start: 0.6, end: 0.9});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P5":
                 positions.unshift({start: 0.3, end: 0.1});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             default:
                 break;
@@ -275,8 +298,12 @@
         if(container_anim.is_ended_signal) {
             setInteractive();
         }
-
         dragIcon.loop();
+        ["P5", "P6", "P8", "P7", "Xindi"]
+        .map(k => people[k])
+        .forEach(p => {
+            p.position.set(p.anim.tick(), p.position.y)
+        })
     }
 </script>
 
@@ -302,7 +329,6 @@
 <AppWrapper>
     <span slot="canvas" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
-            <div class="rond"></div>
             <img class="overlay" src={anim_bg}>
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}

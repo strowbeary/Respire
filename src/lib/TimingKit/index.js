@@ -26,6 +26,7 @@ export function Animate(from_value, to_value, easing_function, step) {
     let increment = 0;
     let is_running = false;
     let is_ended = false;
+    let internal_is_ended = false;
     return {
         get is_running() {
             return is_running
@@ -38,6 +39,7 @@ export function Animate(from_value, to_value, easing_function, step) {
         start() {
             is_running = true;
             is_ended = false;
+            internal_is_ended = false;
             increment = 0;
         },
         tick() {
@@ -50,9 +52,10 @@ export function Animate(from_value, to_value, easing_function, step) {
                 } else {
                     is_running = false;
                     is_ended = true;
+                    internal_is_ended = true;
                 }
             }
-            return to_value;
+            return internal_is_ended ? to_value : from_value;
         }
     }
 }
