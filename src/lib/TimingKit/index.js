@@ -25,12 +25,19 @@ export function Sequence() {
 export function Animate(from_value, to_value, easing_function, step) {
     let increment = 0;
     let is_running = false;
+    let is_ended = false;
     return {
         get is_running() {
             return is_running
         },
+        get is_ended_signal() {
+            const old =  is_ended;
+            is_ended = false;
+            return old;
+        },
         start() {
             is_running = true;
+            is_ended = false;
             increment = 0;
         },
         tick() {
@@ -42,6 +49,7 @@ export function Animate(from_value, to_value, easing_function, step) {
                     return new_value;
                 } else {
                     is_running = false;
+                    is_ended = true;
                 }
             }
             return to_value;

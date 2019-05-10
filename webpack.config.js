@@ -1,6 +1,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
+const WorkboxPlugin = require('workbox-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
@@ -16,6 +17,7 @@ module.exports = {
         alias: {
             components: path.resolve(__dirname, 'src/components/'),
             assets: path.resolve(__dirname, 'src/assets/'),
+            utils: path.resolve(__dirname, 'src/utils/'),
             lib: path.resolve(__dirname, 'src/lib/')
         }
     },
@@ -26,6 +28,10 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader'],
+            },
             {
                 test: /\.svelte$/,
                 exclude: /node_modules/,
@@ -60,7 +66,12 @@ module.exports = {
             {
                 test: /\.(png|svg|jpg|gif|wav)$/,
                 use: [
-                    'file-loader'
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            outputPath: 'assets',
+                        },
+                    },
                 ]
             }
         ]
@@ -69,7 +80,28 @@ module.exports = {
     plugins: [
         new MiniCssExtractPlugin({
             filename: '[name].css'
+        }),
+        new HtmlWebpackPlugin({
+            hash: true,
+            filename: './index.html' //relative to root of the application
+        }),
+        new WorkboxPlugin.GenerateSW({
+            include: [/\.(?:png|jpg|jpeg|svg|wav)$/],
+            importsDirectory: "assets",
+            // Define runtime caching rules.
+            runtimeCaching: [{
+                urlPattern: /\.(?:png|jpg|jpeg|svg|wav)$/,
+
+                // Apply a cache-first strategy.
+                handler: 'CacheFirst',
+
+                options: {
+                    // Use a custom cache name.
+                    cacheName: 'assets'
+                },
+            }],
         })
+
     ],
     devtool: prod ? false : 'source-map'
 };

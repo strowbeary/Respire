@@ -1,6 +1,18 @@
 <script>
+    /*
+    * MODULES
+    * */
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
+    import * as PIXI from "pixi.js";
+    import {MaskedSprite} from "utils/MaskedSprite.pixi.js";
+    import {Animate, Easing} from "lib/TimingKit";
+	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
+
+	/*
+	* RESSOURCES
+	* */
+	import icon from "assets/images/logo-gobelins.png";
     import Camille from "assets/images/foule/Camille.png";
     import Melanie from "assets/images/foule/Melanie.png";
     import Remi from "assets/images/foule/Remi.png";
@@ -9,10 +21,6 @@
     import P2 from "assets/images/foule/P2.png";
     import P3 from "assets/images/foule/P3.png";
     import P4 from "assets/images/foule/P4.png";
-    import * as PIXI from "pixi.js";
-    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
-    import {Animate, Easing} from "../../../lib/TimingKit";
-	import icon from "assets/images/logo-gobelins.png"; import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
 
     export let canvasProps;
     let set_z_position = () => {};
@@ -28,13 +36,16 @@
 
     let app, canvasWidth, canvasHeight;
     let container = new Container();
-    let containerNextPos = 0;
     let people = {};
     function create_logo_anim(from_value, to_value) {
         return Animate(from_value, to_value, Easing.easeInCubic, 0.1)
     }
+    function create_container_anim(from_value, to_value) {
+        return Animate(from_value, to_value, Easing.easeOutCubic, 0.01)
+    }
     let logo_anim = create_logo_anim(0, 1);
     logo_anim.start();
+    let container_anim = create_container_anim(0, 1);
     const imgAssets = {
       P1,
       P4,
@@ -77,7 +88,7 @@
         interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
         person.interactive = true;
         person.buttonMode = true;
-        interactiveIcon.position.set(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
+        interactiveIcon.position.set(person.position.x, person.position.y - person.height * 0.3 + container.position.y);
         logo_anim = create_logo_anim(0, 1);
         logo_anim.start();
 
@@ -95,8 +106,8 @@
                     if (interactiveCurrentIndex+1 < interactiveOrder.length) {
                         interactiveCurrentIndex++;
                         if (interactiveCurrentIndex % 2 === 0) {
-                            isFinished = false;
-                            containerNextPos = container.position.y + (canvasHeight * 0.1);
+                            container_anim = create_container_anim(container.position.y, container.position.y + (canvasHeight * 0.1));
+                            container_anim.start();
                         } else {
                             setInteractive();
                         }
@@ -218,17 +229,11 @@
     let offset = 0;
 
     function gameLoop() {
-        if(!isFinished) {
-            if(increment <= 1) {
-                container.position.set(0, offset + Easing.easeOutQuart(increment) * (canvasHeight * 0.1));
-                set_z_position(1.5 - (1/0.3) * (( offset + Easing.easeOutQuart(increment) * (canvasHeight * 0.1)) / canvasHeight));
-                increment += 0.02;
-            } else {
-                offset = containerNextPos;
-                setInteractive();
-                increment = 0;
-                isFinished = true;
-            }
+        const container_offset = container_anim.tick();
+        container.position.set(0, container_offset);
+        set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
+        if(container_anim.is_ended_signal) {
+            setInteractive();
         }
 
         interactiveIcon.alpha = logo_anim.tick();
@@ -236,17 +241,30 @@
 </script>
 
 <style>
+
+
 .overlay {
     position: absolute;
     width: 100%;
     mix-blend-mode: difference;
     pointer-events: none;
 }
+.rond {
+    position: absolute;
+    border: 1px solid #ffcf00;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    left: 50px;
+    bottom: 250px;
+    animation: wiggle 1s infinite;
+}
 </style>
 
 <AppWrapper>
     <span slot="canvas" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
+            <div class="rond"></div>
             <img class="overlay" src={anim_bg}>
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}
