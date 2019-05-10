@@ -13,7 +13,6 @@
 	/*
 	* RESSOURCES
 	* */
-	import icon from "assets/images/logo-gobelins.png";
     import Camille from "assets/images/foule/Camille.png";
     import Melanie from "assets/images/foule/Melanie.png";
     import Remi from "assets/images/foule/Remi.png";
@@ -24,7 +23,7 @@
     import P4 from "assets/images/foule/P4.png";
     import P5 from "assets/images/foule/P5.png";
     import P6 from "assets/images/foule/P6.png";
-    import P7 from "assets/images/foule/P2.png";
+    import P7 from "assets/images/foule/P7.png";
     import P8 from "assets/images/foule/P8.png";
     import Xindi from "assets/images/foule/Xindi.png";
 
@@ -48,13 +47,18 @@
     }
     let container_anim = create_container_anim(0, 1);
     const imgAssets = {
-      P1,
-      P4,
-      P3,
-      Camille,
-      Remi,
-      Melanie,
-      P2
+        P5,
+        P6,
+        P8,
+        P7,
+        Xindi,
+        P1,
+        P4,
+        P3,
+        Camille,
+        Remi,
+        Melanie,
+        P2
     };
 
     const interactiveOrder = Object.keys(imgAssets).reverse();
@@ -87,69 +91,78 @@
 
     function setInteractive() {
         let person = people[interactiveOrder[interactiveCurrentIndex]];
-        interactiveCurrentFinalPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].end);
-        interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
-        person.interactive = true;
-        person.buttonMode = true;
-        dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
-        dragIcon.initIconAnim(0, 1);
-        dragIcon.startIconAnim();
 
-        function onDragEnd() {
-                this.dragging = false;
-                // set the interaction data to null
-                this.data = null;
-                let spritePos = this.sprite.position.x;
-                if (Math.abs(spritePos - interactiveCurrentFinalPos) < 10 ||
-                    (this.direction === "left" && spritePos < interactiveCurrentFinalPos) ||
-                    (this.direction === "right" && spritePos > interactiveCurrentFinalPos)
-                   ) {
-                    this.sprite.position.set(interactiveCurrentFinalPos, this.sprite.position.y);
-                    this.sprite.interactive = false;
-                    if (interactiveCurrentIndex+1 < interactiveOrder.length) {
-                        interactiveCurrentIndex++;
-                        if (interactiveCurrentIndex % 2 === 0) {
-                            container_anim = create_container_anim(container.position.y, container.position.y + (canvasHeight * 0.1));
-                            container_anim.start();
-                        } else {
-                            setInteractive();
+        if (interactiveCurrentIndex < 7) {
+            interactiveCurrentFinalPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].end);
+            interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
+            person.interactive = true;
+            person.buttonMode = true;
+            dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
+            dragIcon.initIconAnim(0, 1);
+            dragIcon.startIconAnim();
+
+            function onDragEnd() {
+                    this.dragging = false;
+                    // set the interaction data to null
+                    this.data = null;
+                    let spritePos = this.sprite.position.x;
+                    if (Math.abs(spritePos - interactiveCurrentFinalPos) < 10 ||
+                        (this.direction === "left" && spritePos < interactiveCurrentFinalPos) ||
+                        (this.direction === "right" && spritePos > interactiveCurrentFinalPos)
+                       ) {
+                        this.sprite.position.set(interactiveCurrentFinalPos, this.sprite.position.y);
+                        this.sprite.interactive = false;
+                        if (interactiveCurrentIndex+1 < interactiveOrder.length) {
+                            interactiveCurrentIndex++;
+                            if (interactiveCurrentIndex % 2 === 0) {
+                                container_anim = create_container_anim(container.position.y, container.position.y + (canvasHeight * 0.1));
+                                container_anim.start();
+                            } else {
+                                setInteractive();
+                            }
+                        }
+                    } else {
+                        this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
+                        dragIcon.initIconAnim(0, 1);
+                        dragIcon.startIconAnim();
+                    }
+                }
+
+            person.on('pointerdown', function (event) {
+                    // store a reference to the data
+                    // the reason for this is because of multitouch
+                    // we want to track the movement of this particular touch
+                    this.data = event.data;
+                    this.dragging = true;
+
+                    this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
+                    let spritePos = this.sprite.position.x;
+                    this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
+                    dragIcon.initIconAnim(1, 0);
+                    dragIcon.startIconAnim();
+                })
+                .on('pointerup', onDragEnd)
+                .on('pointerupoutside', onDragEnd)
+                .on('pointermove', function (event) {
+                    if (this.dragging) {
+                        let spritePos = this.sprite.position.x;
+                        if (this.direction === "left" && spritePos >= interactiveCurrentFinalPos && event.data.originalEvent.movementX < 0) {
+                            this.x +=  event.data.originalEvent.movementX;
+                            //this.y += event.data.originalEvent.movementY;
+                        }
+                        if (this.direction === "right" && spritePos <= interactiveCurrentFinalPos && event.data.originalEvent.movementX > 0) {
+                            this.x +=  event.data.originalEvent.movementX;
+                            //this.y += event.data.originalEvent.movementY;
                         }
                     }
-                } else {
-                    this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
-                    dragIcon.initIconAnim(0, 1);
-                    dragIcon.startIconAnim();
-                }
-            }
+                });
+        } else {
 
-        person.on('pointerdown', function (event) {
-                // store a reference to the data
-                // the reason for this is because of multitouch
-                // we want to track the movement of this particular touch
-                this.data = event.data;
-                this.dragging = true;
+        }
+    }
 
-                this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
-                let spritePos = this.sprite.position.x;
-                this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
-                dragIcon.initIconAnim(1, 0);
-                dragIcon.startIconAnim();
-            })
-            .on('pointerup', onDragEnd)
-            .on('pointerupoutside', onDragEnd)
-            .on('pointermove', function (event) {
-                if (this.dragging) {
-                    let spritePos = this.sprite.position.x;
-                    if (this.direction === "left" && spritePos >= interactiveCurrentFinalPos && event.data.originalEvent.movementX < 0) {
-                        this.x +=  event.data.originalEvent.movementX;
-                        //this.y += event.data.originalEvent.movementY;
-                    }
-                    if (this.direction === "right" && spritePos <= interactiveCurrentFinalPos && event.data.originalEvent.movementX > 0) {
-                        this.x +=  event.data.originalEvent.movementX;
-                        //this.y += event.data.originalEvent.movementY;
-                    }
-                }
-            });
+    function moveStaticPeople() {
+
     }
 
     function generatePeople(resourceKey) {
@@ -198,6 +211,26 @@
                 positions.unshift({start: 0.5, end: 0.9});
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
                 break;
+            case "Xindi":
+                positions.unshift({start: 0.25, end: 0.1});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.35);
+                break;
+            case "P7":
+                positions.unshift({start: 0.7, end: 0.9});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.3);
+                break;
+            case "P8":
+                positions.unshift({start: 0.4, end: 0.15});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.1);
+                break;
+            case "P6":
+                positions.unshift({start: 0.6, end: 0.9});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+                break;
+            case "P5":
+                positions.unshift({start: 0.3, end: 0.1});
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+                break;
             default:
                 break;
         }
@@ -209,14 +242,24 @@
 
         dragIcon.setup(app);
 
-        Object.values(imgAssets).forEach((key) => {
+        Object.values(imgAssets).forEach((key, index) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let person = generatePeople(key);
+
             people[keyName] = person;
             setPosition(keyName);
             if (keyName === "P2") {
                 setInteractive();
             }
+
+            /*if (index > 4) {
+                people[keyName] = person;
+                setPosition(keyName);
+                if (keyName === "P2") {
+                    setInteractive();
+                }
+            }*/
+
             container.addChild(person);
         });
         app.ticker.add(delta => gameLoop(delta));

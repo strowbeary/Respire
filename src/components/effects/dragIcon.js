@@ -39,7 +39,7 @@ DragIcon.prototype.setup = function(app) {
 };
 
 DragIcon.prototype.loop = function() {
-    if (this.iconAnim.is_running) {
+    if (this.iconAnim && this.iconAnim.is_running) {
         this.interactiveIcon.alpha = this.iconAnim.tick();
     }
 };
