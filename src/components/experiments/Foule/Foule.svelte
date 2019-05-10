@@ -9,6 +9,11 @@
     import P2 from "assets/images/foule/P2.png";
     import P3 from "assets/images/foule/P3.png";
     import P4 from "assets/images/foule/P4.png";
+    import P5 from "assets/images/foule/P5.png";
+    import P6 from "assets/images/foule/P6.png";
+    import P7 from "assets/images/foule/P2.png";
+    import P8 from "assets/images/foule/P8.png";
+    import Xindi from "assets/images/foule/Xindi.png";
     import * as PIXI from "pixi.js";
     import {MaskedSprite} from "../../../utils/MaskedSprite.pixi";
     import {Animate, Easing} from "../../../lib/TimingKit";
@@ -58,7 +63,7 @@
 
         dragIcon = new DragIcon();
 
-        let imgToAdd = Object.values(imgAssets).filter(key => !Object.keys(resources).includes(key));
+        let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
             loader
                 .add(imgToAdd)
