@@ -174,10 +174,6 @@
         }
     }
 
-    function moveStaticPeople() {
-
-    }
-
     function generatePeople(resourceKey) {
         let texture = resources[resourceKey].texture;
         let {width} = texture.baseTexture;
@@ -265,7 +261,7 @@
 
         dragIcon.setup(app);
 
-        Object.values(imgAssets).forEach((key, index) => {
+        Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let person = generatePeople(key);
 
@@ -275,21 +271,10 @@
                 setInteractive();
             }
 
-            /*if (index > 4) {
-                people[keyName] = person;
-                setPosition(keyName);
-                if (keyName === "P2") {
-                    setInteractive();
-                }
-            }*/
-
             container.addChild(person);
         });
         app.ticker.add(delta => gameLoop(delta));
     }
-    let increment = 0;
-    let isFinished = true;
-    let offset = 0;
 
     function gameLoop() {
         const container_offset = container_anim.tick();
