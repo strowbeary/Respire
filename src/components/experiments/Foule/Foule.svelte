@@ -8,6 +8,7 @@
     import {MaskedSprite} from "utils/MaskedSprite.pixi.js";
     import {Animate, Easing} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
+    import {DragIcon} from "components/effects/dragIcon";
 
 	/*
 	* RESSOURCES
@@ -21,6 +22,11 @@
     import P2 from "assets/images/foule/P2.png";
     import P3 from "assets/images/foule/P3.png";
     import P4 from "assets/images/foule/P4.png";
+    import P5 from "assets/images/foule/P5.png";
+    import P6 from "assets/images/foule/P6.png";
+    import P7 from "assets/images/foule/P2.png";
+    import P8 from "assets/images/foule/P8.png";
+    import Xindi from "assets/images/foule/Xindi.png";
 
     export let canvasProps;
     let set_z_position = () => {};
@@ -37,14 +43,9 @@
     let app, canvasWidth, canvasHeight;
     let container = new Container();
     let people = {};
-    function create_logo_anim(from_value, to_value) {
-        return Animate(from_value, to_value, Easing.easeInCubic, 0.1)
-    }
     function create_container_anim(from_value, to_value) {
         return Animate(from_value, to_value, Easing.easeOutCubic, 0.01)
     }
-    let logo_anim = create_logo_anim(0, 1);
-    logo_anim.start();
     let container_anim = create_container_anim(0, 1);
     const imgAssets = {
       P1,
@@ -62,15 +63,17 @@
     let interactiveCurrentFinalPos;
     let interactiveStartingPos;
 
+    let dragIcon;
+
     function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
-        if (!resources[icon]) {
-           loader.add(icon)
-        }
-        let imgToAdd = Object.values(imgAssets).filter(key => !Object.keys(resources).includes(key));
+
+        dragIcon = new DragIcon();
+
+        let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
             loader
                 .add(imgToAdd)
@@ -88,9 +91,9 @@
         interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
         person.interactive = true;
         person.buttonMode = true;
-        interactiveIcon.position.set(person.position.x, person.position.y - person.height * 0.3 + container.position.y);
-        logo_anim = create_logo_anim(0, 1);
-        logo_anim.start();
+        dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
+        dragIcon.initIconAnim(0, 1);
+        dragIcon.startIconAnim();
 
         function onDragEnd() {
                 this.dragging = false;
@@ -114,8 +117,8 @@
                     }
                 } else {
                     this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
-                    logo_anim = create_logo_anim(0, 1);
-                    logo_anim.start();
+                    dragIcon.initIconAnim(0, 1);
+                    dragIcon.startIconAnim();
                 }
             }
 
@@ -129,8 +132,8 @@
                 this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
                 let spritePos = this.sprite.position.x;
                 this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
-                logo_anim = create_logo_anim(1, 0);
-                logo_anim.start();
+                dragIcon.initIconAnim(1, 0);
+                dragIcon.startIconAnim();
             })
             .on('pointerup', onDragEnd)
             .on('pointerupoutside', onDragEnd)
@@ -199,19 +202,13 @@
                 break;
         }
     }
-    let interactiveIcon;
-    let interactiveIconAlpha = 0;
 
     async function setup() {
 
         set_z_position = (await init_foule_sound_scene()).set_z_position;
 
-        interactiveIcon = new Sprite(resources[icon].texture);
-        interactiveIcon.anchor.x = 0.5;
-        interactiveIcon.anchor.y = 0.5;
-        interactiveIcon.scale.set(0.5);
-        interactiveIcon.alpha = interactiveIconAlpha;
-        app.stage.addChild(interactiveIcon);
+        dragIcon.setup(app);
+
         Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let person = generatePeople(key);
@@ -236,13 +233,11 @@
             setInteractive();
         }
 
-        interactiveIcon.alpha = logo_anim.tick();
+        dragIcon.loop();
     }
 </script>
 
 <style>
-
-
 .overlay {
     position: absolute;
     width: 100%;

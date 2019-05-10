@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import icon from "assets/images/logo-gobelins.png";
+import {Animate, Easing} from "lib/TimingKit";
 
 let loader = PIXI.loader,
     resources = PIXI.loader.resources,
@@ -12,6 +13,22 @@ export function DragIcon() {
     this.alpha = 0;
 }
 
+DragIcon.prototype.initIconAnim = function(from_value, to_value) {
+    this.iconAnim = this.createIconAnim(from_value, to_value);
+};
+
+DragIcon.prototype.startIconAnim = function() {
+    this.iconAnim.start();
+};
+
+DragIcon.prototype.createIconAnim = function(from_value, to_value) {
+    return Animate(from_value, to_value, Easing.easeInCubic, 0.1);
+};
+
+DragIcon.prototype.setPosition = function(x, y) {
+    this.interactiveIcon.position.set(x, y);
+};
+
 DragIcon.prototype.setup = function(app) {
     this.interactiveIcon = new Sprite(resources[icon].texture);
     this.interactiveIcon.anchor.x = 0.5;
@@ -22,16 +39,7 @@ DragIcon.prototype.setup = function(app) {
 };
 
 DragIcon.prototype.loop = function() {
-    if (this.alpha === 1 && this.interactiveIcon.alpha < 1) {
-        this.interactiveIcon.alpha += 0.1;
-        if (this.interactiveIcon.alpha + 0.1 >= this.alpha) {
-            this.interactiveIcon.alpha = 1;
-        }
-    }
-    if (this.interactiveIcon === 0 && this.interactiveIcon.alpha > 0) {
-        this.interactiveIcon.alpha -= 0.1;
-        if (this.interactiveIcon.alpha - 0.1 <= this.alpha) {
-            this.interactiveIcon.alpha = 0;
-        }
+    if (this.iconAnim.is_running) {
+        this.interactiveIcon.alpha = this.iconAnim.tick();
     }
 };
