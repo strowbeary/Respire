@@ -27,6 +27,11 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.svelte$/,
+                exclude: /node_modules/,
+                use: 'svelte-loader'
+            },
+            {
                 test: /\.js?$/,
                 exclude: /node_modules/,
                 use: {
@@ -53,16 +58,10 @@ module.exports = {
                 },
             },
             {
-                test: /\.svelte$/,
-                exclude: /node_modules/,
-                use: 'svelte-loader'
-            },
-            {
                 test: /\.(png|svg|jpg|gif|wav)$/,
                 use: [
                     'file-loader'
                 ]
-
             }
         ]
     },
