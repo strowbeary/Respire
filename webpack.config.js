@@ -12,7 +12,7 @@ module.exports = {
         bundle: "./src/index.js"
     },
     resolve: {
-        extensions: ['.mjs', '.js', '.svelte', '.wasm'],
+        extensions: ['.mjs', '.js', '.svelte'],
         alias: {
             components: path.resolve(__dirname, 'src/components/'),
             assets: path.resolve(__dirname, 'src/assets/'),
