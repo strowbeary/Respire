@@ -153,9 +153,12 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
 
     (function loop(t) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        let non_spacialized_debbuger_id = 0;
         children.forEach(c => {
-            sound_debugger(ctx, canvas, c.options, c.name);
+            sound_debugger(ctx, canvas, c.options, c.name, non_spacialized_debbuger_id);
+            if(!c.options.spacialized){
+                non_spacialized_debbuger_id++;
+            }
         });
 
         scene_debugger(ctx, canvas, listener);

@@ -77,7 +77,7 @@
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
 
-        dragIcon = new DragIcon();
+        dragIcon = DragIcon(app);
 
         let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
@@ -265,8 +265,6 @@
            const sound_scene = await init_foule_sound_scene();
         set_z_position = sound_scene.set_z_position;
         play_interaction_sound = sound_scene.play_interaction_sound;
-
-        dragIcon.setup(app);
 
         Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);

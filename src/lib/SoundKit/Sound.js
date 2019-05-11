@@ -105,7 +105,7 @@ export function Sound(name, options) {
     }
 }
 
-export function sound_debugger(ctx, canvas, options, name) {
+export function sound_debugger(ctx, canvas, options, name, non_spacialized_debbuger_id) {
     const canvas_center = Vector3(canvas.width / 2, 0, canvas.height / 2);
     const sound_position = options.position
         .multiply_scalar(canvas.width / 3 - 5)
@@ -148,8 +148,8 @@ export function sound_debugger(ctx, canvas, options, name) {
         ctx.beginPath();
         ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.font = "14px 'Fira Sans'";
-        ctx.textAlign = "center";
-        ctx.fillText(name, sound_position.x + 45, sound_position.z + 5);
+        ctx.textAlign = "left";
+        ctx.fillText("- " + name, sound_position.x + 25, sound_position.z + 5 + (non_spacialized_debbuger_id * 15));
         ctx.fill();
         ctx.closePath();
     }
