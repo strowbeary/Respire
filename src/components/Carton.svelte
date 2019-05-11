@@ -24,18 +24,22 @@
 
 <style>
     .carton {
+        position: absolute;
         height: calc(100% - 2 * calc(var(--scaleFactor) * 35px));
         max-width: 100%;
+
+        font-family: 'Arial', 'sans-serif';
+        padding: calc(var(--scaleFactor) * 35px);
+        background-color: black;
+        color: white;
+        z-index: 1000;
+    }
+    .carton div {
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        font-family: 'Arial', 'sans-serif';
-        padding: calc(var(--scaleFactor) * 35px);
-        position: relative;
-        background-color: black;
-        color: white;
-        z-index: 1000;
     }
 
     .carton__titleName {
@@ -59,12 +63,15 @@
 <svelte:window bind:innerHeight="{innerHeight}"/>
 
 {#if visible}
-<div class="carton" in:fly="{{ y: 20, duration: 1000, delay: 500 }}" out:fade style="--scaleFactor:{scaleFactor}">
-    <p  out:fade class="carton__timeContext">{timeContext}</p>
-    <h3  out:fade class="carton__titleName">{titleName}</h3>
-    <p  out:fade class="carton__spaceContext">{spaceContext}</p>
-    {#if ready}
-        <button  out:fade on:click="{nextCarton}" >next</button>
-    {/if}
+<div class="carton"  out:fade style="--scaleFactor:{scaleFactor}">
+    <div in:fly="{{ y: 20, duration: 1000, delay: 500 }}">
+        <p class="carton__timeContext">{timeContext}</p>
+        <h3 class="carton__titleName">{titleName}</h3>
+        <p class="carton__spaceContext">{spaceContext}</p>
+        {#if ready}
+            <button on:click="{nextCarton}" >next</button>
+        {/if}
+    </div>
+
 </div>
 {/if}
