@@ -103,15 +103,16 @@
             dragIcon.startIconAnim();
 
             function onDragEnd() {
+                if (this.dragging) {
                     this.dragging = false;
                     // set the interaction data to null
                     this.data = null;
-                    let spritePos = this.sprite.position.x;
-                    if (Math.abs(spritePos - interactiveCurrentFinalPos) < 10 ||
-                        (this.direction === "left" && spritePos < interactiveCurrentFinalPos) ||
-                        (this.direction === "right" && spritePos > interactiveCurrentFinalPos)
+                    this.offset = 0;
+                    if (Math.abs(this.x - interactiveCurrentFinalPos) < 10 ||
+                        (this.direction === "left" && this.x < interactiveCurrentFinalPos) ||
+                        (this.direction === "right" && this.x > interactiveCurrentFinalPos)
                        ) {
-                        this.sprite.position.set(interactiveCurrentFinalPos, this.sprite.position.y);
+                        this.x = interactiveCurrentFinalPos;
                         this.sprite.interactive = false;
                         if (interactiveCurrentIndex+1 < interactiveOrder.length) {
                             interactiveCurrentIndex++;
@@ -123,47 +124,45 @@
                             }
                         }
                     } else {
-                        this.sprite.position.set(interactiveStartingPos, this.sprite.position.y);
+                        this.x = interactiveStartingPos;
                         dragIcon.initIconAnim(0, 1);
                         dragIcon.startIconAnim();
                     }
                 }
+            }
 
             person.on('pointerdown', function (event) {
-                    // store a reference to the data
-                    // the reason for this is because of multitouch
-                    // we want to track the movement of this particular touch
-                    this.data = event.data;
-                    this.dragging = true;
-
-                    this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
-                    let spritePos = this.sprite.position.x;
-                    this.direction = spritePos > interactiveCurrentFinalPos? "left": "right";
-                    dragIcon.initIconAnim(1, 0);
-                    dragIcon.startIconAnim();
-                })
-                .on('pointerup', onDragEnd)
-                .on('pointerupoutside', onDragEnd)
-                .on('pointermove', function (event) {
-                    if (this.dragging) {
-                        let spritePos = this.sprite.position.x;
-                        if (this.direction === "left" && spritePos >= interactiveCurrentFinalPos && event.data.originalEvent.movementX < 0) {
-                            this.x +=  event.data.originalEvent.movementX;
-                            //this.y += event.data.originalEvent.movementY;
+                        // store a reference to the data
+                        // the reason for this is because of multitouch
+                        // we want to track the movement of this particular touch
+                        this.data = event.data;
+                        this.dragging = true;
+                        this.offset = this.x - this.data.getLocalPosition(this.parent).x;
+                        this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
+                        this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
+                        dragIcon.initIconAnim(1, 0);
+                        dragIcon.startIconAnim();
+                    })
+                    .on('pointerup', onDragEnd)
+                    .on('pointerupoutside', onDragEnd)
+                    .on('pointermove', function () {
+                        if (this.dragging) {
+                            let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
+                            if (this.direction === "left" && this.x >= interactiveCurrentFinalPos && this.x > newPos) {
+                                this.x = newPos;
+                            }
+                            if (this.direction === "right" && this.x <= interactiveCurrentFinalPos && this.x < newPos) {
+                                this.x = newPos;
+                            }
                         }
-                        if (this.direction === "right" && spritePos <= interactiveCurrentFinalPos && event.data.originalEvent.movementX > 0) {
-                            this.x +=  event.data.originalEvent.movementX;
-                            //this.y += event.data.originalEvent.movementY;
-                        }
-                    }
-                });
+                    });
         } else {
             await Promise.all(["P5", "P6", "P8", "P7", "Xindi"]
                 .reverse()
                 .map(k => people[k])
                 .map((p, i) => {
                     return new Promise(resolve => setTimeout(() => {
-                        p.anim.start()
+                        p.anim.start();
                         resolve();
                     }, Math.random() * 200 + i * 400));
                 }));
@@ -178,7 +177,7 @@
         let texture = resources[resourceKey].texture;
         let {width} = texture.baseTexture;
         scale = canvasWidth/width * 0.8;
-        let person = new MaskedSprite(texture, app);
+        let person = new Sprite(texture);
         person.anchor.x = 0.5;
         person.anchor.y = 0.5;
         person.scale.set(scale);
@@ -256,7 +255,6 @@
     }
 
     async function setup() {
-
         set_z_position = (await init_foule_sound_scene()).set_z_position;
 
         dragIcon.setup(app);
