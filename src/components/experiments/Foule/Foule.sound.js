@@ -1,6 +1,6 @@
-import crowd_left_sound_url from "assets/sounds/Foule/STE-001.wav";
-import crowd_right_sound_url from "assets/sounds/Foule/STE-002.wav";
-import excuse_sound_url from "assets/sounds/Foule/excusez_moi_clean.wav";
+import crowd_left_sound_url from "assets/sounds/Foule/crowd_left.wav";
+import crowd_right_sound_url from "assets/sounds/Foule/crowd_right.wav";
+import excuse_sound_url from "assets/sounds/Foule/excusez_moi.wav";
 import pardon_sound_url from "assets/sounds/Foule/Pardon.wav";
 import ouch_sound_url from "assets/sounds/Foule/Ouch.wav";
 import { Scene, Sound, Vector3 } from "lib/SoundKit";
