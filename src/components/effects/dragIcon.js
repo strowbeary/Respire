@@ -9,7 +9,10 @@ function createIconAnim(from_value, to_value) {
 }
 
 function createSlideAnim(from_value, to_value) {
-    return Animate(from_value, to_value, Easing.easeInCubic, 0.01);
+    return Animate(from_value, to_value, (t) => {
+        console.log(t);
+        return Easing.easeInCubic(t) + Easing.easeInCubic(1 - t)
+    }, 0.01);
 }
 
 
@@ -77,5 +80,4 @@ export function DragIcon(app) {
             }
         }
     }
-
 }
