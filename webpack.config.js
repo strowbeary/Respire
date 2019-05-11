@@ -1,3 +1,4 @@
+const webpack = require("webpack");
 const path = require("path");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
@@ -10,7 +11,8 @@ module.exports = {
         host: '0.0.0.0'
     },
     entry: {
-        bundle: "./src/index.js"
+        bundle: "./src/index.js",
+        SoundKitDebugger: "./src/lib/SoundKit/Debugger.js"
     },
     resolve: {
         extensions: ['.mjs', '.js', '.svelte'],
@@ -24,61 +26,82 @@ module.exports = {
     output: {
         path: __dirname + '/public',
         filename: '[name].js',
-        chunkFilename: '[name].[id].js'
+        chunkFilename: '[name].[contenthash].js'
     },
-    module: {
-        rules: [
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
-            },
-            {
-                test: /\.svelte$/,
-                exclude: /node_modules/,
-                use: 'svelte-loader'
-            },
-            {
-                test: /\.js?$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        cacheDirectory: true,
-                        babelrc: false,
-                        plugins: [
-                            "transform-dynamic-import",
-                            "@babel/plugin-syntax-dynamic-import",
-                            "@babel/plugin-proposal-object-rest-spread",
-                            ["@babel/transform-runtime", {
-                                "regenerator": true
-                            }]
-                        ],
-                        presets: [
-                            ['@babel/env', {
-                                targets: {
-                                    browsers: ['last 2 versions']
-                                }
-                            }]
-                        ]
+    optimization: {
+        runtimeChunk: 'single',
+        splitChunks: {
+            chunks: 'all',
+            maxInitialRequests: Infinity,
+            minSize: 0,
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name(module) {
+                        // get the name. E.g. node_modules/packageName/not/this/part.js
+                        // or node_modules/packageName
+                        const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+                        // npm package names are URL-safe, but some servers don't like @ symbols
+                        return `modules/${packageName.replace('@', '-')}.npm`;
                     },
                 },
             },
+        },
+    },
+    module: {
+        rules: [
+        {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+        },
+        {
+            test: /\.svelte$/,
+            exclude: /node_modules/,
+            use: 'svelte-loader'
+        },
+        {
+            test: /\.js?$/,
+            exclude: /node_modules/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true,
+                    babelrc: false,
+                    plugins: [
+                    "transform-dynamic-import",
+                    "@babel/plugin-syntax-dynamic-import",
+                    "@babel/plugin-proposal-object-rest-spread",
+                    ["@babel/transform-runtime", {
+                        "regenerator": true
+                    }]
+                    ],
+                    presets: [
+                    ['@babel/env', {
+                        targets: {
+                            browsers: ['last 2 versions']
+                        }
+                    }]
+                    ]
+                },
+            },
+        },
+        {
+            test: /\.(png|svg|jpg|gif|wav)$/,
+            use: [
             {
-                test: /\.(png|svg|jpg|gif|wav)$/,
-                use: [
-                    {
-                        loader: 'file-loader?name=[name].[sha512:hash:base64:7].[ext]',
-                        options: {
-                            outputPath: 'assets',
-                            name: '[name].[hash].[ext]',
-                        },
-                    },
-                ]
-            }
+                loader: 'file-loader?name=[name].[sha512:hash:base64:7].[ext]',
+                options: {
+                    outputPath: 'assets',
+                    name: '[name].[hash].[ext]',
+                },
+            },
+            ]
+        }
         ]
     },
     mode,
     plugins: [
+        new webpack.HashedModuleIdsPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css'
         }),
@@ -89,7 +112,7 @@ module.exports = {
         new WorkboxPlugin.GenerateSW({
             include: [/\.(?:png|jpg|jpeg|svg|wav)$/],
             importsDirectory: "assets",
-            // Define runtime caching rules.
+                // Define runtime caching rules.
             runtimeCaching: [{
                 urlPattern: /\.(?:png|jpg|jpeg|svg|wav)$/,
 
@@ -102,7 +125,6 @@ module.exports = {
                 },
             }],
         })
-
     ],
     devtool: prod ? false : 'source-map'
 };

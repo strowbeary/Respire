@@ -4,7 +4,7 @@
   "description": "",
   "main": "public/index.html",
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "rm -rf ./public; NODE_ENV=production webpack",
     "start": "webpack-dev-server --content-base public"
   },
   "author": "StrowBeary <remicaillot5@gmail.com>",
