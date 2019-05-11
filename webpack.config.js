@@ -67,9 +67,10 @@ module.exports = {
                 test: /\.(png|svg|jpg|gif|wav)$/,
                 use: [
                     {
-                        loader: 'file-loader',
+                        loader: 'file-loader?name=[name].[sha512:hash:base64:7].[ext]',
                         options: {
                             outputPath: 'assets',
+                            name: '[name].[hash].[ext]',
                         },
                     },
                 ]

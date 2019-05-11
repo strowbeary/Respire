@@ -17,7 +17,7 @@ export function Sound(name, options) {
 
     async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-        const source = audio_context.createBufferSource();
+        let source = audio_context.createBufferSource();
         source.connect(gain_node);
         source.loop = options.loop;
 
@@ -49,21 +49,21 @@ export function Sound(name, options) {
 
         const response = await fetch(options.url);
         const audio_raw_data = await response.arrayBuffer();
-         audio_context.decodeAudioData(audio_raw_data, (buffer) => {
-             source.buffer = buffer
-         });
+        audio_context.decodeAudioData(audio_raw_data, (buffer) => {
+            source.buffer = buffer
+        });
 
         return {
             play() {
                 source.start(0);
             },
-            stop() {
-                let t = audio_context.currentTime - 0.01;
-                sources.forEach(source => {
-                    source.stop(t);
-                    source.disconnect();
-                    t += source.buffer.duration;
-                });
+            async stop(cb) {
+                const buffer = source.buffer;
+                source.disconnect();
+                source = audio_context.createBufferSource();
+                source.loop = options.loop;
+                source.buffer = buffer;
+                await source.connect(gain_node);
             },
             set_position(position) {
                 if (options.spacialized) {

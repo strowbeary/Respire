@@ -29,6 +29,7 @@
 
     export let canvasProps;
     let set_z_position = () => {};
+    let play_interaction_sound = () => {};
     const appProperties = {
        transparent: true,
        antialias: true
@@ -116,6 +117,7 @@
                         this.sprite.interactive = false;
                         if (interactiveCurrentIndex+1 < interactiveOrder.length) {
                             interactiveCurrentIndex++;
+                            play_interaction_sound();
                             if (interactiveCurrentIndex % 2 === 0) {
                                 container_anim = create_container_anim(container.position.y, container.position.y + (canvasHeight * 0.1));
                                 container_anim.start();
@@ -255,7 +257,9 @@
     }
 
     async function setup() {
-        set_z_position = (await init_foule_sound_scene()).set_z_position;
+           const sound_scene = await init_foule_sound_scene();
+        set_z_position = sound_scene.set_z_position;
+        play_interaction_sound = sound_scene.play_interaction_sound;
 
         dragIcon.setup(app);
 
