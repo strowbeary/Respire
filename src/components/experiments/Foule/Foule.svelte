@@ -98,6 +98,11 @@
             interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
             person.interactive = true;
             person.buttonMode = true;
+            if (interactiveCurrentFinalPos > interactiveStartingPos) {
+                dragIcon.setDirection(1);
+            } else {
+                dragIcon.setDirection(-1);
+            }
             dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
             dragIcon.initIconAnim(0, 1);
             dragIcon.startIconAnim();
@@ -167,7 +172,7 @@
                     }, Math.random() * 200 + i * 400));
                 }));
 
-            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.005)
+            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.005);
             container_anim.start();
 
         }
@@ -268,7 +273,6 @@
             if (keyName === "P2") {
                 setInteractive();
             }
-
             container.addChild(person);
         });
         app.ticker.add(delta => gameLoop(delta));
@@ -296,16 +300,6 @@
     width: 100%;
     mix-blend-mode: difference;
     pointer-events: none;
-}
-.rond {
-    position: absolute;
-    border: 1px solid #ffcf00;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    left: 50px;
-    bottom: 250px;
-    animation: wiggle 1s infinite;
 }
 </style>
 
