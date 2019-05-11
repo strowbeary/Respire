@@ -1,9 +1,11 @@
 <script>
-    import {fly} from 'svelte/transition';
+    import {fly, fade} from 'svelte/transition';
     import { onMount, afterUpdate, createEventDispatcher} from 'svelte';
     export let timeContext;
     export let titleName ;
     export let spaceContext;
+
+    export let ready;
     export let visible;
 
     const dispatch = createEventDispatcher();
@@ -17,12 +19,6 @@
 
     onMount(() => {
         visible = true;
-    });
-
-    afterUpdate(() => {
-        if (!visible) {
-            visible = true;
-        }
     });
 </script>
 
@@ -38,7 +34,8 @@
         padding: calc(var(--scaleFactor) * 35px);
         position: relative;
         background-color: black;
-        color: #D2B48C;
+        color: white;
+        z-index: 1000;
     }
 
     .carton__titleName {
@@ -62,9 +59,12 @@
 <svelte:window bind:innerHeight="{innerHeight}"/>
 
 {#if visible}
-	<div class="carton" in:fly="{{ y: 20, duration: 500 }}" on:click="{nextCarton}" style="--scaleFactor:{scaleFactor}">
-        <p class="carton__timeContext">{timeContext}</p>
-        <h3 class="carton__titleName">{titleName}</h3>
-        <p class="carton__spaceContext">{spaceContext}</p>
-    </div>
+<div class="carton" in:fly="{{ y: 20, duration: 1000, delay: 500 }}" out:fade style="--scaleFactor:{scaleFactor}">
+    <p  out:fade class="carton__timeContext">{timeContext}</p>
+    <h3  out:fade class="carton__titleName">{titleName}</h3>
+    <p  out:fade class="carton__spaceContext">{spaceContext}</p>
+    {#if ready}
+        <button  out:fade on:click="{nextCarton}" >next</button>
+    {/if}
+</div>
 {/if}

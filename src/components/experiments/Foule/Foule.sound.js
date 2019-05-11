@@ -50,6 +50,9 @@ export async function init_foule_sound_scene() {
     let sound_to_play = 0;
     let prev_sound = null;
     return {
+        async start_audio() {
+            await init_scene.play();
+        },
         async play_interaction_sound() {
             const sound = sounds[sound_to_play];
             sound.stop();

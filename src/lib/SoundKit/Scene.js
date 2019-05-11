@@ -25,6 +25,7 @@ export async function Scene(options) {
     };
 
     const audio_context = new (window.AudioContext || window.webkitAudioContext)();
+    audio_context.suspend();
     const listener = Listener(audio_context);
     const main_gain_node = audio_context.createGain();
     const children = [];

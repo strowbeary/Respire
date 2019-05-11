@@ -38,6 +38,5 @@
 </style>
 
 <div class="appWrapper" bind:offsetWidth="{width}" bind:offsetHeight="{height}" bind:this="{appWrapper}">
-    <slot {canvasSize} name="canvas"></slot>
-    <slot name="carton"></slot>
+    <slot {canvasSize} name="scene"></slot>
 </div>

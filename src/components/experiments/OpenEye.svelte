@@ -87,7 +87,7 @@
 </script>
 
 <AppWrapper>
-    <span slot="canvas" let:canvasSize={canvasSize}>
+    <span slot="scene" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}

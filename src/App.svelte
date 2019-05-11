@@ -6,6 +6,7 @@
 <style>
 .overlay {
     position: absolute; 
+    top: 0;
     left: 0;
     right: 0;
     margin: auto; 
@@ -13,9 +14,10 @@
     height: 100vh;
     mix-blend-mode: difference;
     pointer-events: none;
+    z-index: 10000
 }
 </style>
 
-<img class="overlay" src={anim_bg}>
+<img class="overlay" src={anim_bg} alt="animated background">
 <Selector/>
 

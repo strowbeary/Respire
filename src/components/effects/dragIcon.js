@@ -3,7 +3,6 @@ import {Animate, Easing} from "lib/TimingKit";
 
 let Graphics = PIXI.Graphics;
 
-
 function createIconAnim(from_value, to_value) {
     return Animate(from_value, to_value, Easing.easeInCubic, 0.05);
 }
@@ -13,7 +12,6 @@ function createSlideAnim(from_value, to_value) {
         return Easing.easeInCubic(t) + Easing.easeInCubic(1 - t)
     }, 0.01);
 }
-
 
 export function DragIcon(app) {
     const interactiveIcon = new Graphics();

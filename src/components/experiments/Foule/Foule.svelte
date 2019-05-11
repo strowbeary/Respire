@@ -9,6 +9,7 @@
     import {Animate, Easing} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
+    import Carton from "components/Carton.svelte";
 
 	/*
 	* RESSOURCES
@@ -16,7 +17,6 @@
     import Camille from "assets/images/foule/Camille.png";
     import Melanie from "assets/images/foule/Melanie.png";
     import Remi from "assets/images/foule/Remi.png";
-    import anim_bg from "assets/images/animated_background.png";
     import P1 from "assets/images/foule/P1.png";
     import P2 from "assets/images/foule/P2.png";
     import P3 from "assets/images/foule/P3.png";
@@ -27,9 +27,19 @@
     import P8 from "assets/images/foule/P8.png";
     import Xindi from "assets/images/foule/Xindi.png";
 
+    const carton_data ={
+        titleName: "A contre-courant",
+        timeContext: "18h avant l'examen",
+        spaceContext: "Amphithéâtre"
+    };
+
+    let display_carton = true;
+    let is_ready = false;
+
     export let canvasProps;
     let set_z_position = () => {};
     let play_interaction_sound = () => {};
+    let start_audio = () => {};
     const appProperties = {
        transparent: true,
        antialias: true
@@ -262,9 +272,12 @@
     }
 
     async function setup() {
-           const sound_scene = await init_foule_sound_scene();
+        const sound_scene = await init_foule_sound_scene();
         set_z_position = sound_scene.set_z_position;
         play_interaction_sound = sound_scene.play_interaction_sound;
+        start_audio = sound_scene.start_audio;
+        
+        
 
         Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
@@ -278,6 +291,9 @@
             container.addChild(person);
         });
         app.ticker.add(delta => gameLoop(delta));
+        setTimeout(() => {
+            is_ready = true;
+        }, 5000);
     }
 
     const anim_test = Animate(100, 10, Easing.easeInCubic, 0.01);
@@ -298,19 +314,15 @@
     }
 </script>
 
-<style>
-.overlay {
-    position: absolute;
-    width: 100%;
-    mix-blend-mode: difference;
-    pointer-events: none;
-}
-</style>
+
 
 <AppWrapper>
-    <span slot="canvas" let:canvasSize={canvasSize}>
+    <span slot="scene" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
-            <img class="overlay" src={anim_bg}>
+                <Carton {...carton_data} visible={display_carton} ready={is_ready} on:next={() => {
+                    display_carton = false;
+                    start_audio()
+                }}></Carton>
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}
     </span>
