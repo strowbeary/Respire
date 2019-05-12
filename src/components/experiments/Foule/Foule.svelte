@@ -317,7 +317,7 @@
 <AppWrapper>
     <span slot="scene" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} on:next={() => {
+                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
                     display_carton = false;
                     start_audio()
                 }}></Carton>

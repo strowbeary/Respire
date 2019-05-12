@@ -18,6 +18,6 @@
 }
 </style>
 
-<img class="overlay" src={anim_bg} alt="animated background">
+<!--<img class="overlay" src={anim_bg} alt="animated background">-->
 <Selector/>
 

@@ -1,11 +1,20 @@
 @keyframes wiggle {
     0% {
-        transform: translateX(-5px)
+        transform: translate3d(-5px, 0, 0)
     }
     80% {
-        transform: translateX(80px)
+        transform: translate3d(80px, 0, 0)
     }
     100% {
-        transform: translateX(-5px)
+        transform: translate3d(-5px, 0, 0)
+    }
+}
+
+@keyframes falling {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, 100%, 0);
     }
 }

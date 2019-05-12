@@ -1,12 +1,24 @@
 <script>
+    /*
+    * MODULES
+    * */
     import {fly, fade} from 'svelte/transition';
     import { onMount, afterUpdate, createEventDispatcher} from 'svelte';
+
+    /*
+    * RESSOURCES
+    * */
+    import SandVertical from "assets/images/carton/sandVerticalWhite.png";
+    import SandHorizontal from "assets/images/carton/sandHorizontalWhite.png";
+
     export let timeContext;
     export let titleName ;
     export let spaceContext;
 
     export let ready;
     export let visible;
+
+    export let sandLevel = 0;
 
     let icon;
     let isPointerDown = false;
@@ -17,7 +29,9 @@
 
     let innerHeight;
     $: scaleFactor = innerHeight/824;
-    $: circleTransform = `translateX(${circleTransformValue}px)`;
+    $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
+    $: sandVerticalImg = `url(${SandVertical})`;
+    $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
 
     onMount(() => {
         visible = true;
@@ -125,6 +139,39 @@
         width: 100%;
         z-index: -1;
     }
+
+    .sand {
+        position: absolute;
+        width: 100%;
+        pointer-events: none;
+    }
+
+    .sand--horizontal {
+        bottom: 0;
+        transform: var(--sandHorizontalLevel);
+        z-index: 2;
+        mix-blend-mode: difference;
+    }
+
+    .sand--container {
+        top: 0;
+        height: 100%;
+        overflow:hidden;
+        z-index: 3;
+    }
+
+    .sand--vertical {
+        position: absolute;
+        background-image: var(--sandVerticalImg);
+        background-size: 100%;
+        width: 100%;
+        height: 100%;
+        animation: falling linear 5s infinite;
+    }
+
+    .sand--vertical--top {
+        top: -100%;
+    }
 </style>
 
 <svelte:window bind:innerHeight="{innerHeight}"/>
@@ -142,5 +189,10 @@
             <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
+    <div class="sand sand--container">
+        <div class="sand--vertical sand--vertical--top" style="--sandVerticalImg:{sandVerticalImg}"></div>
+        <div class="sand--vertical" style="--sandVerticalImg:{sandVerticalImg}"></div>
+    </div>
+    <img src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
 </div>
 {/if}
