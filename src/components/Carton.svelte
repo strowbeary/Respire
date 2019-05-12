@@ -8,18 +8,56 @@
     export let ready;
     export let visible;
 
+    let icon;
+    let isPointerDown = false;
+    let circleTransformValue = 80;
+    let circleRadius = 20;
+
     const dispatch = createEventDispatcher();
 
     let innerHeight;
     $: scaleFactor = innerHeight/824;
-
-    function nextCarton() {
-    	dispatch('next');
-    }
+    $: circleTransform = `translateX(${circleTransformValue}px)`;
 
     onMount(() => {
         visible = true;
     });
+
+    function updateCirclePosition(e) {
+        let x = e.clientX;
+        let start = icon.getBoundingClientRect().left;
+        let end = icon.getBoundingClientRect().right;
+        if (x < start) {
+            circleTransformValue = -5;
+        } else if (x > end) {
+            circleTransformValue = 80;
+        } else {
+            circleTransformValue = x - start - circleRadius;
+        }
+    }
+
+    function onPointerDown(e) {
+        if (icon) {
+            isPointerDown = true;
+            updateCirclePosition(e);
+        }
+    }
+
+    function onPointerMove(e) {
+        if (isPointerDown) {
+            updateCirclePosition(e);
+        }
+    }
+
+    function onPointerUp() {
+        if (isPointerDown) {
+            if (circleTransformValue === 80) {
+                dispatch('next');
+            } else {
+                isPointerDown = false;
+            }
+        }
+    }
 </script>
 
 <style>
@@ -27,14 +65,15 @@
         position: absolute;
         height: calc(100% - 2 * calc(var(--scaleFactor) * 35px));
         max-width: 100%;
-
         font-family: 'Arial', 'sans-serif';
         padding: calc(var(--scaleFactor) * 35px);
         background-color: black;
         color: white;
-        z-index: 1000;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
     }
-    .carton div {
+    .carton__text {
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -58,20 +97,50 @@
         font-size: calc(var(--scaleFactor) * 16px);
         font-style: italic;
     }
+
+    .icon {
+        width: 100px;
+        position: absolute;
+        bottom: calc(var(--scaleFactor) * 35px * 2);
+    }
+
+    .loop {
+        animation: wiggle 3s infinite;
+    }
+
+    .icon__circle {
+        display: block;
+        border-radius: 50%;
+        border: solid 1px #fff;
+        background-color: black;
+        width: 30px;
+        height: 30px;
+        transform: var(--circleTransform);
+    }
+
+    .icon__line {
+        position: absolute;
+        top: 50%;
+        border: solid 1px #fff;
+        width: 100%;
+        z-index: -1;
+    }
 </style>
 
 <svelte:window bind:innerHeight="{innerHeight}"/>
 
 {#if visible}
-<div class="carton"  out:fade style="--scaleFactor:{scaleFactor}">
-    <div in:fly="{{ y: 20, duration: 1000, delay: 500 }}">
-        <p class="carton__timeContext">{timeContext}</p>
-        <h3 class="carton__titleName">{titleName}</h3>
-        <p class="carton__spaceContext">{spaceContext}</p>
-        {#if ready}
-            <button on:click="{nextCarton}" >next</button>
-        {/if}
+<div class="carton" out:fade style="--scaleFactor:{scaleFactor}" on:pointerup="{onPointerUp}">
+    <div class="carton__text">
+        <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1000, delay: 500 }}">{timeContext}</p>
+        <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1000, delay: 700 }}">{titleName}</h3>
+        <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1000, delay: 900 }}">{spaceContext}</p>
     </div>
-
+    {#if ready}
+       <div class="icon" bind:this="{icon}" out:fade on:pointerdown="{onPointerDown}" on:pointermove="{onPointerMove}">
+            <hr class="icon__line"/>
+            <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+       </div>
+    {/if}
 </div>
 {/if}

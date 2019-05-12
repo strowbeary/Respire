@@ -314,8 +314,6 @@
     }
 </script>
 
-
-
 <AppWrapper>
     <span slot="scene" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
