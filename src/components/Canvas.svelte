@@ -1,8 +1,7 @@
 <script>
 import {createEventDispatcher} from "svelte";
 import { afterUpdate } from 'svelte';
-
-    import * as PIXI from "pixi.js";
+import * as PIXI from "pixi.js";
 
 const dispatch = createEventDispatcher();
 export let appProperties;
@@ -28,7 +27,7 @@ $: {
     if (app) {
         let ratio = Math.min(currentWidth / canvasWidth, currentHeight / canvasHeight);
         app.stage.scale.set(ratio);
-        app.renderer.resize(Math.ceil(canvasWidth * ratio), Math.ceil(canvasHeight * ratio));
+        app.renderer.resize(canvasWidth * ratio, canvasHeight * ratio);
     }
 }
 </script>

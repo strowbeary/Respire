@@ -27,7 +27,7 @@
 
     const dispatch = createEventDispatcher();
 
-    $: scaleFactor = innerHeight ? Math.round(innerHeight/824) : Math.round(window.innerHeight/824);
+    $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleRadius = scaleFactor * 15;
     $: circleTransform = `translate3d(0, ${circleTransformValue}px, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
@@ -106,10 +106,11 @@
 
     .carton {
         position: absolute;
-        height: calc(100% - 2 * calc(var(--scaleFactor) * 35px));
-        max-width: 100%;
+        width: 56.25vh;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 177.78vw;
         font-family: 'Arial', 'sans-serif';
-        padding: calc(var(--scaleFactor) * 35px);
         background-color: black;
         color: white;
         z-index: 1;
@@ -118,6 +119,7 @@
     }
     .carton__text {
         height: 100%;
+        padding: calc(var(--scaleFactor) * 35px);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -143,6 +145,7 @@
 
     .icon {
         width: 100%;
+        height: calc(100 * var(--scaleFactor));
         position: absolute;
         display: flex;
         justify-content: center;
@@ -161,7 +164,6 @@
         display: block;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
-        //background-color: black;
         width: calc(var(--scaleFactor) * 30px);
         height: calc(var(--scaleFactor) * 30px);
         transform: var(--circleTransform);
@@ -182,10 +184,10 @@
         content: "";
         display: block;
         flex-shrink: 0;
-        width: 4px;
-        height: 4px;
+        width: calc(var(--scaleFactor) * 4px);
+        height: calc(var(--scaleFactor) * 4px);
         border-radius: 50%;
-        border: solid 2px #fff;
+        border: solid calc(var(--scaleFactor) * 2px) #fff;
         background-color: black;
     }
 
