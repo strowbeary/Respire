@@ -203,13 +203,15 @@
     }
 
     .sand--container {
-        top: -100%;
+        top: 0;
         height: 100%;
         overflow:hidden;
         z-index: 3;
+        opacity: 0;
+        transition: opacity linear 5s;
     }
-    .sand--container.falling {
-        animation: falling linear 5s both;
+    .sand--container.fadeIn {
+        opacity: 1;
     }
 
     .sand--vertical {
@@ -219,8 +221,9 @@
         width: 100%;
         height: 100%;
     }
+
     .sand--vertical.falling {
-        animation: falling linear 5s 5s infinite;
+        animation: falling linear 5s infinite;
     }
 
     .sand--vertical--top {
@@ -252,7 +255,7 @@
             <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
-    <div class="sand sand--container" class:falling={ready}>
+    <div class="sand sand--container" class:fadeIn="{ready}">
         <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
         <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
     </div>

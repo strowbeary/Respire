@@ -291,7 +291,7 @@
         play_interaction_sound = sound_scene.play_interaction_sound;
         start_audio = sound_scene.start_audio;
 
-        Object.values(imgAssets).forEach((key) => {
+        await Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let person = generatePeople(key);
 
@@ -303,9 +303,7 @@
             container.addChild(person);
         });
         app.ticker.add(delta => gameLoop(delta));
-        setTimeout(() => {
-            is_ready = true;
-        }, 5000);
+        is_ready = true;
     }
 
     const anim_test = Animate(100, 10, Easing.easeInCubic, 0.01);
