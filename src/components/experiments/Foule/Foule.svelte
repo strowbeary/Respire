@@ -10,8 +10,6 @@
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
-    import InlineWorker from "inline-worker";
-
 	/*
 	* RESSOURCES
 	* */

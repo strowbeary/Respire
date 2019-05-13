@@ -9,7 +9,7 @@
     * RESSOURCES
     * */
     import SandVertical from "assets/images/carton/sandVerticalWhite.png";
-    import SandHorizontal from "assets/images/carton/sandHorizontalWhite.png";
+    import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
 
     export let timeContext;
     export let titleName ;
