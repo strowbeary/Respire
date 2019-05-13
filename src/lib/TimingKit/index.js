@@ -27,6 +27,7 @@ export function Animate(from_value, to_value, easing_function, step) {
     let is_running = false;
     let is_ended = false;
     let internal_is_ended = false;
+    let last_value = from_value;
     return {
         get is_running() {
             return is_running
@@ -43,11 +44,12 @@ export function Animate(from_value, to_value, easing_function, step) {
             increment = 0;
         },
         tick() {
-            if(is_running) {
-                if(increment <= 1) {
+            if (is_running) {
+                if (increment <= 1) {
                     const progress = easing_function(increment);
                     const new_value = (1 - progress) * from_value + progress * to_value;
                     increment = Math.round((increment + step) * 1000) / 1000;
+                    last_value = new_value;
                     return new_value;
                 } else {
                     is_running = false;
@@ -55,11 +57,27 @@ export function Animate(from_value, to_value, easing_function, step) {
                     internal_is_ended = true;
                 }
             }
-            return internal_is_ended ? to_value : from_value;
+            return last_value;
         }
     }
 }
 
+export function Keyframes(keyframe_array, easing_function = (t) => t) {
+    function tween(t0, t1, t) {
+        return t0 * (1 - t) + t1 * t;
+    }
+
+    let current_key = 0;
+
+    return t => {
+        if (keyframe_array[current_key + 1].t < t) {
+            current_key = Math.min(current_key + 1, keyframe_array.length - 1);
+        }
+        let from_key = keyframe_array[current_key];
+        let to_key = keyframe_array[current_key + 1];
+        return tween(from_key.value, to_key.value, easing_function((t - from_key.t) * (1 / Math.abs(from_key.t - to_key.t))));
+    };
+}
 
 export const Easing = {
     // no easing, no acceleration

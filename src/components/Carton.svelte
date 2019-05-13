@@ -9,7 +9,7 @@
     * RESSOURCES
     * */
     import SandVertical from "assets/images/carton/sandVerticalWhite.png";
-    import SandHorizontal from "assets/images/carton/sandHorizontalWhite.png";
+    import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
 
     export let timeContext;
     export let titleName ;
@@ -142,51 +142,31 @@
     }
 
     .icon {
-        width: 100%;
+        width: calc(var(--scaleFactor) * 220px);
         position: absolute;
-        display: flex;
-        justify-content: center;
-        bottom: calc(var(--scaleFactor) * 35px);
+        bottom: calc(var(--scaleFactor) * 35px * 2);
     }
 
-    .loopCircle {
+    .loop {
         animation: wiggle 1.5s infinite ease-out;
-    }
-
-    .loopLine {
-        animation: drawLine 1.5s infinite ease-out;
     }
 
     .icon__circle {
         display: block;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
-        //background-color: black;
+        background-color: black;
         width: calc(var(--scaleFactor) * 30px);
         height: calc(var(--scaleFactor) * 30px);
         transform: var(--circleTransform);
     }
 
     .icon__line {
-        display: flex;
-        justify-content: center;
         position: absolute;
-        top: calc(var(--scaleFactor) * -85px);
-        background-color: #fff;
-        width: 2px;
-        height: var(--iconLineHeight);
+        top: 50%;
+        border-top: solid calc(var(--scaleFactor) * 2px) #fff;
+        width: 100%;
         z-index: -1;
-    }
-
-    .icon__line:before {
-        content: "";
-        display: block;
-        flex-shrink: 0;
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        border: solid 2px #fff;
-        background-color: black;
     }
 
     .sand {
@@ -203,15 +183,13 @@
     }
 
     .sand--container {
-        top: 0;
+        top: -100%;
         height: 100%;
         overflow:hidden;
         z-index: 3;
-        opacity: 0;
-        transition: opacity linear 5s;
     }
-    .sand--container.fadeIn {
-        opacity: 1;
+    .sand--container.falling {
+        animation: falling linear 5s both;
     }
 
     .sand--vertical {
@@ -221,9 +199,8 @@
         width: 100%;
         height: 100%;
     }
-
     .sand--vertical.falling {
-        animation: falling linear 5s infinite;
+        animation: falling linear 5s 5s infinite;
     }
 
     .sand--vertical--top {
@@ -231,7 +208,6 @@
     }
 </style>
 
-<svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
 <div class="carton"
     out:fade
@@ -251,11 +227,11 @@
             transition:fade
             on:pointerdown="{onPointerDown}"
             on:touchstart="{onPointerDown}">
-            <span class="icon__line" class:loopLine="{!isPointerDown}" style="--iconLineHeight:{iconLineHeight}"></span>
-            <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+            <hr class="icon__line"/>
+            <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
-    <div class="sand sand--container" class:fadeIn="{ready}">
+    <div class="sand sand--container" class:falling={ready}>
         <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
         <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
     </div>

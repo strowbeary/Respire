@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import {Animate, Easing} from "lib/TimingKit";
+import {Animate, Easing, Keyframes} from "lib/TimingKit";
 
 let Graphics = PIXI.Graphics;
 
@@ -8,9 +8,7 @@ function createIconAnim(from_value, to_value) {
 }
 
 function createSlideAnim(from_value, to_value) {
-    return Animate(from_value, to_value, (t) => {
-        return Easing.easeInCubic(t) + Easing.easeInCubic(1 - t)
-    }, 0.01);
+    return Animate(from_value, to_value, Easing.easeOutCubic, 0.01);
 }
 
 export function DragIcon(app) {
@@ -70,7 +68,8 @@ export function DragIcon(app) {
                 interactiveIcon.alpha = iconAnim.tick();
             }
             if (slideAnim && slideAnim.is_running) {
-                draw(finalPosition * slideAnim.tick());
+                const p = slideAnim.tick();
+                draw(finalPosition * p);
             } else {
                 slideAnim = createSlideAnim(0, 1);
                 slideAnim.start()
