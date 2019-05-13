@@ -59,11 +59,11 @@
     }
     let container_anim = create_container_anim(0, 1);
     const imgAssets = {
+        P8,
         P5,
         P6,
-        P8,
         P7,
-        Xindi,
+        P2,
         //interactive
         P1,
         P4,
@@ -71,7 +71,7 @@
         Camille,
         Remi,
         Melanie,
-        P2
+        Xindi
     };
 
     const interactiveOrder = Object.keys(imgAssets).reverse();
@@ -175,7 +175,7 @@
                         }
                     });
         } else {
-            await Promise.all(["P5", "P6", "P8", "P7", "Xindi"]
+            await Promise.all(["P8", "P5", "P6", "P7", "P2"]
                 .reverse()
                 .map(k => people[k])
                 .map((p, i) => {
@@ -192,14 +192,16 @@
 
     function generatePeople(resourceKey) {
         let texture = resources[resourceKey].texture;
-        let {width} = texture.baseTexture;
-        scale = canvasWidth/width * 0.8;
         let person = new Sprite(texture);
         person.anchor.x = 0.5;
         person.anchor.y = 0.5;
-        person.scale.set(scale);
-
         return person;
+    }
+
+    function scalePeople(sprite, scaleValue) {
+        let {width} = sprite._texture.baseTexture;
+        scale = canvasWidth/width * scaleValue;
+        sprite.scale.set(scale);
     }
 
     function positionFromCanvasWidth(number) {
@@ -208,61 +210,73 @@
 
     function setPosition(keyName) {
         switch (keyName) {
-            case "P2":
+            case "Xindi":
                 positions.unshift({start: 0.7, end: 0.9});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight);
+                scalePeople(people[keyName], 0.85);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.9);
                 break;
             case "Melanie":
                 positions.unshift({start: 0.2, end: 0.1});
+                scalePeople(people[keyName], 0.65);
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.9);
                 break;
             case "Remi":
                 positions.unshift({start: 0.5, end: 0.8});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.7);
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.75);
                 break;
             case "Camille":
                 positions.unshift({start: 0.2, end: 0.1});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.6);
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.75);
                 break;
             case "P3":
                 positions.unshift({start: 0.7, end: 0.9});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.6);
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.65);
                 break;
             case "P4":
                 positions.unshift({start: 0.3, end: 0.1});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.45);
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
                 break;
             case "P1":
                 positions.unshift({start: 0.5, end: 0.9});
+                scalePeople(people[keyName], 0.8);
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
                 break;
-            case "Xindi":
+            case "P2":
                 positions.unshift({start: 0.25, end: 0.1});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.35);
+                scalePeople(people[keyName], 0.55);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.4);
 
                 people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P7":
                 positions.unshift({start: 0.7, end: 0.9});
+                scalePeople(people[keyName], 0.7);
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.3);
-
-                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
-                break;
-            case "P8":
-                positions.unshift({start: 0.4, end: 0.15});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.1);
 
                 people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P6":
                 positions.unshift({start: 0.6, end: 0.9});
-                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+                scalePeople(people[keyName], 0.6);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.2);
 
                 people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
             case "P5":
                 positions.unshift({start: 0.3, end: 0.1});
+                scalePeople(people[keyName], 0.6);
                 people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
+                break;
+            case "P8":
+                positions.unshift({start: 0.4, end: 0.15});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.2);
 
                 people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
                 break;
@@ -283,7 +297,7 @@
 
             people[keyName] = person;
             setPosition(keyName);
-            if (keyName === "P2") {
+            if (keyName === "Xindi") {
                 setInteractive();
             }
             container.addChild(person);
@@ -304,7 +318,7 @@
             setInteractive();
         }
         dragIcon.loop();
-        ["P5", "P6", "P8", "P7", "Xindi"]
+        ["P8", "P5", "P6", "P7", "P2"]
         .map(k => people[k])
         .forEach(p => {
             p.position.set(p.anim.tick(), p.position.y)
