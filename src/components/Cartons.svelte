@@ -32,6 +32,7 @@
 
     let count = 0;
     $: chapter = chapters[count];
+    $: carton_data = chapter;
 
     function nextCarton() {
         if (count < chapters.length - 1) {
@@ -41,7 +42,7 @@
 </script>
 
 <AppWrapper>
-    <span slot="carton">
-        <Carton visible={false} on:next="{nextCarton}" {...chapter}></Carton>
+    <span slot="scene">
+        <Carton visible={true} on:next="{nextCarton}" {...carton_data}></Carton>
     </span>
 </AppWrapper>

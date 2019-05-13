@@ -24,10 +24,11 @@
     let isPointerDown = false;
     let circleTransformValue = 200 * window.innerHeight / 824;
     let circleRadius = 30 * window.innerHeight / 824;
+    let innerHeight;
 
     const dispatch = createEventDispatcher();
 
-    $: scaleFactor = window.innerHeight/824;
+    $: scaleFactor = innerHeight ? Math.round(innerHeight/824) : Math.round(window.innerHeight/824);
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
@@ -86,9 +87,7 @@
             transform: translateX(0);
             opacity: 1;
         }
-
         30% {
-
             opacity: 1;
         }
         100% {
@@ -201,6 +200,7 @@
     }
 </style>
 
+<svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
 <div class="carton"
     out:fade
