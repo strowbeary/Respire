@@ -28,10 +28,12 @@
     const dispatch = createEventDispatcher();
 
     $: scaleFactor = innerHeight ? Math.round(innerHeight/824) : Math.round(window.innerHeight/824);
-    $: circleRadius = scaleFactor * 30;
+    $: circleRadius = scaleFactor * 15;
     $: circleTransform = `translate3d(0, ${circleTransformValue}px, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
+    $: iconLineHeightValue = (100 * scaleFactor - circleRadius) + circleTransformValue;
+    $: iconLineHeight = `${iconLineHeightValue}px`;
 
     onMount(() => {
         visible = true;
@@ -46,11 +48,11 @@
         }
         let start = icon.getBoundingClientRect().top;
 
-        let end = start + (-100 + circleRadius) * scaleFactor;
+        let end = start - 100 * scaleFactor;
         if (y > start) {
             circleTransformValue = 0;
         } else if (y < end) {
-            circleTransformValue = (-100 + circleRadius) * scaleFactor;
+            circleTransformValue = -100 * scaleFactor;
         } else {
             circleTransformValue = y - start;
         }
@@ -73,10 +75,11 @@
     function onPointerUp(e) {
         if (isPointerDown) {
             e.preventDefault();
-            if (circleTransformValue === (-100 + circleRadius) * scaleFactor) {
+            if (circleTransformValue === -100 * scaleFactor) {
                 dispatch('next');
             } else {
                 isPointerDown = false;
+                circleTransformValue = 0;
             }
         }
     }
@@ -86,14 +89,18 @@
     @keyframes wiggle {
         0% {
             transform: translate3d(0, 0, 0);
-            opacity: 1;
-        }
-        30% {
-            opacity: 1;
         }
         100% {
-            transform: translate3d(0, calc(var(--scaleFactor) * (-100px + 15px)), 0);
-            opacity: 0;
+            transform: translate3d(0, calc(var(--scaleFactor) * -100px), 0);
+        }
+    }
+
+    @keyframes drawLine {
+        0% {
+            height: calc(var(--scaleFactor) * 85px);
+        }
+        80%, 100% {
+           height: 0;
         }
     }
 
@@ -142,28 +149,44 @@
         bottom: calc(var(--scaleFactor) * 35px);
     }
 
-    .loop {
+    .loopCircle {
         animation: wiggle 1.5s infinite ease-out;
+    }
+
+    .loopLine {
+        animation: drawLine 1.5s infinite ease-out;
     }
 
     .icon__circle {
         display: block;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
-        background-color: black;
+        //background-color: black;
         width: calc(var(--scaleFactor) * 30px);
         height: calc(var(--scaleFactor) * 30px);
         transform: var(--circleTransform);
     }
 
     .icon__line {
-        display: block;
+        display: flex;
+        justify-content: center;
         position: absolute;
-        top: -200%;
+        top: calc(var(--scaleFactor) * -85px);
         background-color: #fff;
         width: 2px;
-        height: 100px;
+        height: var(--iconLineHeight);
         z-index: -1;
+    }
+
+    .icon__line:before {
+        content: "";
+        display: block;
+        flex-shrink: 0;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        border: solid 2px #fff;
+        background-color: black;
     }
 
     .sand {
@@ -225,8 +248,8 @@
             transition:fade
             on:pointerdown="{onPointerDown}"
             on:touchstart="{onPointerDown}">
-            <span class="icon__line"></span>
-            <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+            <span class="icon__line" class:loopLine="{!isPointerDown}" style="--iconLineHeight:{iconLineHeight}"></span>
+            <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
     <div class="sand sand--container" class:falling={ready}>
