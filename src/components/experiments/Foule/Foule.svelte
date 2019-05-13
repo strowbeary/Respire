@@ -10,6 +10,7 @@
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
+    import InlineWorker from "inline-worker";
 
 	/*
 	* RESSOURCES
@@ -183,8 +184,7 @@
                         resolve();
                     }, Math.random() * 200 + i * 400));
                 }));
-
-            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.005);
+            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
             container_anim.start();
 
         }
@@ -276,8 +276,6 @@
         set_z_position = sound_scene.set_z_position;
         play_interaction_sound = sound_scene.play_interaction_sound;
         start_audio = sound_scene.start_audio;
-        
-        
 
         Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);

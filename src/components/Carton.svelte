@@ -22,13 +22,12 @@
 
     let icon;
     let isPointerDown = false;
-    let circleTransformValue = 80;
-    let circleRadius = 20;
+    let circleTransformValue = 200 * window.innerHeight / 824;
+    let circleRadius = 30 * window.innerHeight / 824;
 
     const dispatch = createEventDispatcher();
 
-    let innerHeight;
-    $: scaleFactor = innerHeight/824;
+    $: scaleFactor = window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
@@ -38,13 +37,18 @@
     });
 
     function updateCirclePosition(e) {
-        let x = e.clientX;
+        let x = 0;
+        if(e.touches) {
+            x = e.touches[0].clientX;
+        } else {
+            x = e.clientX;
+        }
         let start = icon.getBoundingClientRect().left;
         let end = icon.getBoundingClientRect().right;
         if (x < start) {
-            circleTransformValue = -5;
+            circleTransformValue = 0;
         } else if (x > end) {
-            circleTransformValue = 80;
+            circleTransformValue = 200 * window.innerHeight / 824;
         } else {
             circleTransformValue = x - start - circleRadius;
         }
@@ -52,6 +56,7 @@
 
     function onPointerDown(e) {
         if (icon) {
+            e.preventDefault();
             isPointerDown = true;
             updateCirclePosition(e);
         }
@@ -63,9 +68,10 @@
         }
     }
 
-    function onPointerUp() {
+    function onPointerUp(e) {
         if (isPointerDown) {
-            if (circleTransformValue === 80) {
+            e.preventDefault();
+            if (circleTransformValue === (200 * window.innerHeight / 824)) {
                 dispatch('next');
             } else {
                 isPointerDown = false;
@@ -75,6 +81,22 @@
 </script>
 
 <style>
+    @keyframes wiggle {
+        0% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        30% {
+
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(220px);
+            opacity: 0;
+        }
+    }
+
     .carton {
         position: absolute;
         height: calc(100% - 2 * calc(var(--scaleFactor) * 35px));
@@ -113,29 +135,29 @@
     }
 
     .icon {
-        width: 100px;
+        width: calc(var(--scaleFactor) * 220px);
         position: absolute;
         bottom: calc(var(--scaleFactor) * 35px * 2);
     }
 
     .loop {
-        animation: wiggle 3s infinite;
+        animation: wiggle 1.5s infinite ease-out;
     }
 
     .icon__circle {
         display: block;
         border-radius: 50%;
-        border: solid 1px #fff;
+        border: solid calc(var(--scaleFactor) * 2px) #fff;
         background-color: black;
-        width: 30px;
-        height: 30px;
+        width: calc(var(--scaleFactor) * 30px);
+        height: calc(var(--scaleFactor) * 30px);
         transform: var(--circleTransform);
     }
 
     .icon__line {
         position: absolute;
         top: 50%;
-        border: solid 1px #fff;
+        border-top: solid calc(var(--scaleFactor) * 2px) #fff;
         width: 100%;
         z-index: -1;
     }
@@ -154,10 +176,13 @@
     }
 
     .sand--container {
-        top: 0;
+        top: -100%;
         height: 100%;
         overflow:hidden;
         z-index: 3;
+    }
+    .sand--container.falling {
+        animation: falling linear 5s both;
     }
 
     .sand--vertical {
@@ -166,7 +191,9 @@
         background-size: 100%;
         width: 100%;
         height: 100%;
-        animation: falling linear 5s infinite;
+    }
+    .sand--vertical.falling {
+        animation: falling linear 5s 5s infinite;
     }
 
     .sand--vertical--top {
@@ -174,24 +201,32 @@
     }
 </style>
 
-<svelte:window bind:innerHeight="{innerHeight}"/>
-
 {#if visible}
-<div class="carton" out:fade style="--scaleFactor:{scaleFactor}" on:pointerup="{onPointerUp}">
+<div class="carton"
+    out:fade
+    style="--scaleFactor:{scaleFactor}"
+    on:pointermove="{onPointerMove}"
+    on:touchmove="{onPointerMove}"
+    on:pointerup="{onPointerUp}"
+    on:touchend="{onPointerUp}">
     <div class="carton__text">
         <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1000, delay: 500 }}">{timeContext}</p>
         <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1000, delay: 700 }}">{titleName}</h3>
         <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1000, delay: 900 }}">{spaceContext}</p>
     </div>
     {#if ready}
-       <div class="icon" bind:this="{icon}" out:fade on:pointerdown="{onPointerDown}" on:pointermove="{onPointerMove}">
+       <div class="icon"
+            bind:this="{icon}"
+            transition:fade
+            on:pointerdown="{onPointerDown}"
+            on:touchstart="{onPointerDown}">
             <hr class="icon__line"/>
             <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
-    <div class="sand sand--container">
-        <div class="sand--vertical sand--vertical--top" style="--sandVerticalImg:{sandVerticalImg}"></div>
-        <div class="sand--vertical" style="--sandVerticalImg:{sandVerticalImg}"></div>
+    <div class="sand sand--container" class:falling={ready}>
+        <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+        <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
     </div>
     <img src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
 </div>

@@ -32,7 +32,7 @@ export function Animate(from_value, to_value, easing_function, step) {
             return is_running
         },
         get is_ended_signal() {
-            const old =  is_ended;
+            const old = is_ended;
             is_ended = false;
             return old;
         },
@@ -47,7 +47,7 @@ export function Animate(from_value, to_value, easing_function, step) {
                 if(increment <= 1) {
                     const progress = easing_function(increment);
                     const new_value = (1 - progress) * from_value + progress * to_value;
-                    increment += step;
+                    increment = Math.round((increment + step) * 1000) / 1000;
                     return new_value;
                 } else {
                     is_running = false;
