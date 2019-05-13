@@ -29,23 +29,17 @@ export function DragIcon(app) {
         interactiveIcon.clear();
         interactiveIcon.lineStyle(2, 0xFFFFFF, 1);
         interactiveIcon.drawCircle(newPos, 0, 15);
+        interactiveIcon.drawCircle(finalPosition, 0, 4);
         if (finalPosition > 0) {
-            if (newPos > 15) {
-                interactiveIcon.moveTo(0, 0);
-                interactiveIcon.lineTo(newPos - 15, 0);
-            }
+
             if (newPos + 15 < finalPosition) {
                 interactiveIcon.moveTo(newPos + 15, 0);
-                interactiveIcon.lineTo(finalPosition, 0);
+                interactiveIcon.lineTo(finalPosition - 3, 0);
             }
         } else if (finalPosition < 0) {
-            if (newPos < -15) {
-                interactiveIcon.moveTo(0, 0);
-                interactiveIcon.lineTo(newPos + 15, 0);
-            }
             if (newPos - 15 > finalPosition) {
                 interactiveIcon.moveTo(newPos - 15, 0);
-                interactiveIcon.lineTo(finalPosition, 0);
+                interactiveIcon.lineTo(finalPosition + 3, 0);
             }
         }
     }
