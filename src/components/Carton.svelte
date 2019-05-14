@@ -27,7 +27,7 @@
 
     const dispatch = createEventDispatcher();
 
-    $: scaleFactor = innerHeight ? Math.round(innerHeight/824) : Math.round(window.innerHeight/824);
+    $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleRadius = scaleFactor * 15;
     $: circleTransform = `translate3d(0, ${circleTransformValue}px, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
@@ -106,10 +106,11 @@
 
     .carton {
         position: absolute;
-        height: calc(100% - 2 * calc(var(--scaleFactor) * 35px));
-        max-width: 100%;
+        width: 56.25vh;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 177.78vw;
         font-family: 'Arial', 'sans-serif';
-        padding: calc(var(--scaleFactor) * 35px);
         background-color: black;
         color: white;
         z-index: 1;
@@ -118,6 +119,7 @@
     }
     .carton__text {
         height: 100%;
+        padding: calc(var(--scaleFactor) * 35px);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -142,31 +144,51 @@
     }
 
     .icon {
-        width: calc(var(--scaleFactor) * 220px);
+        width: 100%;
+        height: calc(100 * var(--scaleFactor));
         position: absolute;
-        bottom: calc(var(--scaleFactor) * 35px * 2);
+        display: flex;
+        justify-content: center;
+        bottom: calc(var(--scaleFactor) * 35px);
     }
 
-    .loop {
+    .loopCircle {
         animation: wiggle 1.5s infinite ease-out;
+    }
+
+    .loopLine {
+        animation: drawLine 1.5s infinite ease-out;
     }
 
     .icon__circle {
         display: block;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
-        background-color: black;
         width: calc(var(--scaleFactor) * 30px);
         height: calc(var(--scaleFactor) * 30px);
         transform: var(--circleTransform);
     }
 
     .icon__line {
+        display: flex;
+        justify-content: center;
         position: absolute;
-        top: 50%;
-        border-top: solid calc(var(--scaleFactor) * 2px) #fff;
-        width: 100%;
+        top: calc(var(--scaleFactor) * -85px);
+        background-color: #fff;
+        width: 2px;
+        height: var(--iconLineHeight);
         z-index: -1;
+    }
+
+    .icon__line:before {
+        content: "";
+        display: block;
+        flex-shrink: 0;
+        width: calc(var(--scaleFactor) * 4px);
+        height: calc(var(--scaleFactor) * 4px);
+        border-radius: 50%;
+        border: solid calc(var(--scaleFactor) * 2px) #fff;
+        background-color: black;
     }
 
     .sand {
@@ -183,13 +205,15 @@
     }
 
     .sand--container {
-        top: -100%;
+        top: 0;
         height: 100%;
         overflow:hidden;
         z-index: 3;
+        opacity: 0;
+        transition: opacity linear 5s;
     }
-    .sand--container.falling {
-        animation: falling linear 5s both;
+    .sand--container.fadeIn {
+        opacity: 1;
     }
 
     .sand--vertical {
@@ -199,8 +223,9 @@
         width: 100%;
         height: 100%;
     }
+
     .sand--vertical.falling {
-        animation: falling linear 5s 5s infinite;
+        animation: falling linear 5s infinite;
     }
 
     .sand--vertical--top {
@@ -208,6 +233,7 @@
     }
 </style>
 
+<svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
 <div class="carton"
     out:fade
@@ -227,11 +253,11 @@
             transition:fade
             on:pointerdown="{onPointerDown}"
             on:touchstart="{onPointerDown}">
-            <hr class="icon__line"/>
-            <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+            <span class="icon__line" class:loopLine="{!isPointerDown}" style="--iconLineHeight:{iconLineHeight}"></span>
+            <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
-    <div class="sand sand--container" class:falling={ready}>
+    <div class="sand sand--container" class:fadeIn="{ready}">
         <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
         <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
     </div>

@@ -34,6 +34,7 @@
         max-width: 100vw;
         max-height: 177.78vw;
         background-color: black;
+        overflow: hidden;
     }
 </style>
 
