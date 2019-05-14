@@ -122,14 +122,14 @@ module.exports = {
             filename: './index.html' //relative to root of the application
         }),
         new WorkboxPlugin.GenerateSW({
-            include: [/\.(?:png|jpg|jpeg|svg|wav)$/],
+            include: [/\.(?:png|jpg|jpeg|svg|wav|js|html)$/],
             importsDirectory: "assets",
                 // Define runtime caching rules.
             runtimeCaching: [{
-                urlPattern: /\.(?:png|jpg|jpeg|svg|wav)$/,
+                urlPattern: /\.(?:png|jpg|jpeg|svg|wav|js|html)$/,
 
                 // Apply a cache-first strategy.
-                handler: 'CacheFirst',
+                handler: 'StaleWhileRevalidate',
 
                 options: {
                     // Use a custom cache name.
