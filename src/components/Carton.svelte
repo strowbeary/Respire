@@ -85,11 +85,20 @@
 
 <style>
     @keyframes wiggle {
-        0% {
+        0%, 100% {
             transform: translate3d(0, 0, 0);
         }
-        100% {
-            transform: translate3d(0, calc(var(--scaleFactor) * -100px), 0);
+        75% {
+            transform: translate3d(0, calc(var(--scaleFactor) * -95px), 0);
+        }
+    }
+
+    @keyframes fade {
+        0%, 90%, 100% {
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
         }
     }
 
@@ -139,6 +148,10 @@
         display: flex;
         justify-content: center;
         bottom: calc(var(--scaleFactor) * 35px);
+    }
+
+    .loopFade {
+        animation: fade 1.5s infinite ease-out;
     }
 
     .loopCircle {
@@ -263,7 +276,8 @@
             bind:this="{icon}"
             transition:fade
             on:pointerdown="{onPointerDown}"
-            on:touchstart="{onPointerDown}">
+            on:touchstart="{onPointerDown}"
+            class:loopFade="{!isPointerDown}">
             <span class="icon__line"></span>
             <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
