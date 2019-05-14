@@ -22,14 +22,12 @@
 
     let icon;
     let isPointerDown = false;
-    let circleTransformValue = 0;
     let innerHeight;
+    let carton;
 
     const dispatch = createEventDispatcher();
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    $: circleRadius = scaleFactor * 20;
-    $: circleTransform = `translate3d(0, ${circleTransformValue}px, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
 
@@ -37,47 +35,71 @@
         visible = true;
     });
 
-    function updateCirclePosition(e) {
-        let y = 0;
-        if(e.touches) {
-            y = e.touches[0].clientY;
-        } else {
-            y = e.clientY;
-        }
-        let start = icon.getBoundingClientRect().top;
-
-        let end = start - 100 * scaleFactor;
-        if (y > start) {
-            circleTransformValue = 0;
-        } else if (y < end) {
-            circleTransformValue = -100 * scaleFactor;
-        } else {
-            circleTransformValue = y - start;
-        }
-    }
+    let yStart = 0;
+    let xStart = 0;
+    let yEnd = 0;
+    let xEnd = 0;
+    let xCumul = [];
+    let yCumul = [];
+    let yLast;
 
     function onPointerDown(e) {
-        if (icon) {
+        if(e.touches) {
+            yStart = e.touches[0].clientY;
+            xStart = e.touches[0].clientX;
+        } else {
+            yStart = e.clientY;
+            xStart = e.clientX;
+        }
+
+        if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
             e.preventDefault();
+            yLast = parseFloat(getComputedStyle(carton).height);
             isPointerDown = true;
-            updateCirclePosition(e);
         }
     }
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            updateCirclePosition(e);
+            let x;
+            let y;
+            if (e.touches) {
+                y = e.touches[0].clientY;
+                x = e.touches[0].clientX;
+            } else {
+                y = e.clientY;
+                x = e.clientX;
+            }
+            xCumul.push(Math.abs(x - xStart) < 50);
+            yCumul.push(y <= yLast);
+            yLast = y;
         }
     }
 
     function onPointerUp(e) {
         if (isPointerDown) {
             e.preventDefault();
-            if (circleTransformValue === -100 * scaleFactor) {
+
+            if(e.touches) {
+                yEnd = e.touches[0].clientY;
+                xEnd = e.touches[0].clientX;
+            } else {
+                yEnd = e.clientY;
+                xEnd = e.clientX;
+            }
+
+            if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
+                !xCumul.includes(false) &&
+                !yCumul.includes(false)) {
                 dispatch('next');
             } else {
+                yStart = 0;
+                yEnd = 0;
+                xStart = 0;
+                xEnd = 0;
                 isPointerDown = false;
-                circleTransformValue = 0;
+                xCumul = [];
+                yCumul = [];
             }
         }
     }
@@ -162,10 +184,10 @@
         display: flex;
         justify-content: center;
         border-radius: 50%;
-        border: solid calc(var(--scaleFactor) * 2px) #fff;
+        border: solid calc(var(--scaleFactor) * 1px) #fff;
         width: calc(var(--scaleFactor) * 40px);
         height: calc(var(--scaleFactor) * 40px);
-        transform: var(--circleTransform);
+        opacity: 0;
     }
 
     .sand {
@@ -215,10 +237,13 @@
 <div class="carton"
     out:fade
     style="--scaleFactor:{scaleFactor}"
+    on:pointerdown="{onPointerDown}"
+    on:touchstart="{onPointerDown}"
     on:pointermove="{onPointerMove}"
     on:touchmove="{onPointerMove}"
     on:pointerup="{onPointerUp}"
-    on:touchend="{onPointerUp}">
+    on:touchend="{onPointerUp}"
+    bind:this="{carton}">
     <div class="carton__text">
         <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
         <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
@@ -227,10 +252,8 @@
     {#if ready}
        <div class="icon"
             bind:this="{icon}"
-            transition:fade
-            on:pointerdown="{onPointerDown}"
-            on:touchstart="{onPointerDown}">
-            <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+            transition:fade>
+            <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
        </div>
     {/if}
     <div class="sand sand--container" class:fadeIn="{ready}">

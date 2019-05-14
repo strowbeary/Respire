@@ -19,7 +19,7 @@ export function DragIcon(app) {
     let finalPosition = 0;
     let slideAnim = createSlideAnim(0, 1);
     slideAnim.start();
-    interactiveIcon.lineStyle(2, 0xFFFFFF, 1);
+    interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
     interactiveIcon.drawCircle(0, 0, 20);
     interactiveIcon.alpha = alpha;
 
@@ -27,7 +27,7 @@ export function DragIcon(app) {
 
     function draw(newPos) {
         interactiveIcon.clear();
-        interactiveIcon.lineStyle(2, 0xFFFFFF, 1);
+        interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
         interactiveIcon.drawCircle(newPos, 0, 20);
     }
 
