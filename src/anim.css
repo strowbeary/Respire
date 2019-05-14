@@ -1,4 +1,12 @@
+@font-face {
+    font-family: "BeatriceDisplayDA";
+    src: url("assets/fonts/BeatriceDisplayDA-Light.otf");
+}
 
+@font-face {
+    font-family: "Optician Sans";
+    src: url("assets/fonts/Optician-Sans.ttf");
+}
 
 @keyframes falling {
     0% {

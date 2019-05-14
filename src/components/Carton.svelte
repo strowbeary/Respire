@@ -12,7 +12,7 @@
     import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
 
     export let timeContext;
-    export let titleName ;
+    export let titleName;
     export let spaceContext;
 
     export let ready;
@@ -87,18 +87,16 @@
     @keyframes wiggle {
         0%, 100% {
             transform: translate3d(0, 0, 0);
-        }
-        75% {
-            transform: translate3d(0, calc(var(--scaleFactor) * -95px), 0);
-        }
-    }
-
-    @keyframes fade {
-        0%, 90%, 100% {
             opacity: 0;
         }
         10% {
             opacity: 1;
+        }
+        80% {
+            transform: translate3d(0, calc(var(--scaleFactor) * -95px), 0);
+        }
+        90% {
+            opacity: 0;
         }
     }
 
@@ -125,20 +123,26 @@
     }
 
     .carton__titleName {
-        font-size: calc(var(--scaleFactor) * 50px);
+        font-size: calc(var(--scaleFactor) * 60px);
         text-align: center;
+        color: transparent;
+        text-shadow: 0 0 1px #fff;
         margin-bottom: calc(var(--scaleFactor) * 50px);
+        font-family: 'BeatriceDisplayDA', 'serif';
+        font-weight: 100;
+        letter-spacing: 1px;
     }
 
     .carton__timeContext {
         font-size: calc(var(--scaleFactor) * 16px);
         text-transform: uppercase;
         margin-bottom: calc(var(--scaleFactor) * 20px);
+        font-family: 'Optician Sans', 'serif';
     }
 
     .carton__spaceContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        font-style: italic;
+        font-family: 'Optician Sans', 'serif';
     }
 
     .icon {
@@ -148,10 +152,6 @@
         display: flex;
         justify-content: center;
         bottom: calc(var(--scaleFactor) * 35px);
-    }
-
-    .loopFade {
-        animation: fade 1.5s infinite ease-out;
     }
 
     .loopCircle {
@@ -166,53 +166,6 @@
         width: calc(var(--scaleFactor) * 40px);
         height: calc(var(--scaleFactor) * 40px);
         transform: var(--circleTransform);
-    }
-
-    .icon__circle:before {
-        content: "";
-        position: absolute;
-        display: block;
-        width: 2px;
-        height: calc(40px * var(--scaleFactor));
-        background-color: black;
-    }
-
-    .icon__circle:after {
-        content: "";
-        position: absolute;
-        display: block;
-        top: calc(40px * var(--scaleFactor) + 2px);
-        width: 2px;
-        height: calc(100px * var(--scaleFactor));
-        background-color: black;
-    }
-
-    .icon__line {
-        display: flex;
-        justify-content: center;
-        position: absolute;
-        top: calc(var(--scaleFactor) * -80px);
-        height: calc(100px * var(--scaleFactor) - 20px);
-    }
-
-    .icon__line:before {
-        content: "";
-        display: block;
-        position: absolute;
-        flex-shrink: 0;
-        width: calc(var(--scaleFactor) * 8px);
-        height: calc(var(--scaleFactor) * 8px);
-        border-radius: 50%;
-        border: solid calc(var(--scaleFactor) * 2px) #fff;
-        background-color: black;
-        z-index: 1;
-    }
-
-    .icon__line:after {
-        content: "";
-        display: block;
-        height: 100%;
-        border-left: 2px dashed #fff;
     }
 
     .sand {
@@ -267,18 +220,16 @@
     on:pointerup="{onPointerUp}"
     on:touchend="{onPointerUp}">
     <div class="carton__text">
-        <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1000, delay: 500 }}">{timeContext}</p>
-        <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1000, delay: 700 }}">{titleName}</h3>
-        <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1000, delay: 900 }}">{spaceContext}</p>
+        <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
+        <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
+        <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
     </div>
     {#if ready}
        <div class="icon"
             bind:this="{icon}"
             transition:fade
             on:pointerdown="{onPointerDown}"
-            on:touchstart="{onPointerDown}"
-            class:loopFade="{!isPointerDown}">
-            <span class="icon__line"></span>
+            on:touchstart="{onPointerDown}">
             <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
