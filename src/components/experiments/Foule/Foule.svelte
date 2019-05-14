@@ -309,7 +309,6 @@
     function gameLoop() {
         const container_offset = container_anim.tick();
         container.position.set(0, container_offset);
-        console.log(container_offset);
         set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
         if(container_anim.is_ended_signal) {
             setInteractive();

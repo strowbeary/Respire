@@ -4,28 +4,27 @@
     * */
     import {fly, fade} from 'svelte/transition';
     import { onMount, afterUpdate, createEventDispatcher} from 'svelte';
+    import global_audio_scene_init from "./../global.sound";
 
     /*
     * RESSOURCES
     * */
     import SandVertical from "assets/images/carton/sandVerticalWhite.png";
-    import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
+    import SandHorizontal from "assets/images/carton/Sand_test_horizontal 3.png";
+
+    const dispatch = createEventDispatcher();
 
     export let timeContext;
     export let titleName ;
     export let spaceContext;
-
     export let ready;
     export let visible;
-
     export let sandLevel = 0;
 
     let icon;
     let isPointerDown = false;
     let circleTransformValue = 0;
     let innerHeight;
-
-    const dispatch = createEventDispatcher();
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleRadius = scaleFactor * 15;
@@ -34,8 +33,9 @@
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
     $: iconLineHeightValue = (100 * scaleFactor - circleRadius) + circleTransformValue;
     $: iconLineHeight = `${iconLineHeightValue}px`;
-
-    onMount(() => {
+    onMount(async () => {
+        const global_audio_scene = await global_audio_scene_init();
+        global_audio_scene.fade_in_nappe();
         visible = true;
     });
 

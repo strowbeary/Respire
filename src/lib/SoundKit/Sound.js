@@ -49,9 +49,7 @@ export function Sound(name, options) {
 
         const response = await fetch(options.url);
         const audio_raw_data = await response.arrayBuffer();
-        audio_context.decodeAudioData(audio_raw_data, (buffer) => {
-            source.buffer = buffer
-        });
+        source.buffer = await audio_context.decodeAudioData(audio_raw_data);
 
         return {
             play() {
