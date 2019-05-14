@@ -1,9 +1,9 @@
 <script>
-    import TrailSwipe from "components/experiments/Foule/Foule.svelte";
+    import Foule from "components/experiments/Foule/Foule.svelte";
     import Cartons from "components/Cartons.svelte";
 
     const options = [
-    	{name: 'TrailSwipe', component: TrailSwipe},
+    	{name: 'Foule', component: Foule},
     	{name: 'Cartons', component: Cartons},
     ];
 
@@ -24,5 +24,4 @@
 	{/each}
 </select>
 
-<!--<Sand/>-->
 <svelte:component this={selected.component}></svelte:component>
