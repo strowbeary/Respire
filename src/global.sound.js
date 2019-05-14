@@ -28,21 +28,26 @@ export default (async () => {
 
     let req_id = null;
     let nappe_animation = Animate(0, 0, t => t, 0.01);
+    let sable_animation = Animate(0, 0, t => t, 0.01);
     nappe_animation.start();
     (function loop(t) {
         if (!init_scene.is_paused) {
-            nappe_sound.set_volume(nappe_animation.tick());
-            sable_sound.set_volume(nappe_animation.tick());
+            let volume_nappe = nappe_animation.tick();
+            let volume_sable = sable_animation.tick();
+            nappe_sound.set_volume(volume_nappe);
+            sable_sound.set_volume(volume_sable);
         }
         req_id = requestAnimationFrame(loop.bind({}, t + 1))
     })(0);
 
     return {
         fade_out_sable() {
-            nappe_animation = Animate(0.7, 0, Easing.easeInQuad, 0.01);
-            nappe_animation.start();
+            sable_animation = Animate(0.7, 0, Easing.easeInQuad, 0.05);
+            sable_animation.start();
         },
         fade_in_nappe() {
+            sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.01);
+            sable_animation.start();
             nappe_animation = Animate(0, 0.7, Easing.easeInQuad, 0.01);
             nappe_animation.start();
         }

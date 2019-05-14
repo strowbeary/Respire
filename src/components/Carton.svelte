@@ -25,12 +25,14 @@
     let isPointerDown = false;
     let innerHeight;
     let carton;
+    let fade_out_sand;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
     global_audio_scene_init.then(global_audio_scene => {
             global_audio_scene.fade_in_nappe();
+            fade_out_sand = global_audio_scene.fade_out_sable;
     });
     onMount(() => {
         visible = true;
@@ -92,6 +94,7 @@
             if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
                 !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
+                fade_out_sand();
                 dispatch('next');
             } else {
                 yStart = 0;
