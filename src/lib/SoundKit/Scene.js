@@ -79,6 +79,9 @@ export async function Scene(options) {
             },
             get children() {
                 return initialized_children;
+            },
+            get is_paused() {
+                return audio_context.state === "suspended";
             }
         }
     }
