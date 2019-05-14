@@ -19,29 +19,16 @@ export function DragIcon(app) {
     let finalPosition = 0;
     let slideAnim = createSlideAnim(0, 1);
     slideAnim.start();
-    interactiveIcon.lineStyle(2, 0xFFFFFF, 1);
-    interactiveIcon.drawCircle(0, 0, 15);
+    interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
+    interactiveIcon.drawCircle(0, 0, 20);
     interactiveIcon.alpha = alpha;
 
     app.stage.addChild(interactiveIcon);
 
     function draw(newPos) {
         interactiveIcon.clear();
-        interactiveIcon.lineStyle(2, 0xFFFFFF, 1);
-        interactiveIcon.drawCircle(newPos, 0, 15);
-        interactiveIcon.drawCircle(finalPosition, 0, 4);
-        if (finalPosition > 0) {
-
-            if (newPos + 15 < finalPosition) {
-                interactiveIcon.moveTo(newPos + 15, 0);
-                interactiveIcon.lineTo(finalPosition - 3, 0);
-            }
-        } else if (finalPosition < 0) {
-            if (newPos - 15 > finalPosition) {
-                interactiveIcon.moveTo(newPos - 15, 0);
-                interactiveIcon.lineTo(finalPosition + 3, 0);
-            }
-        }
+        interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
+        interactiveIcon.drawCircle(newPos, 0, 20);
     }
 
     return {

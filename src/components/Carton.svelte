@@ -15,7 +15,7 @@
     const dispatch = createEventDispatcher();
 
     export let timeContext;
-    export let titleName ;
+    export let titleName;
     export let spaceContext;
     export let ready;
     export let visible;
@@ -23,63 +23,84 @@
 
     let icon;
     let isPointerDown = false;
-    let circleTransformValue = 0;
     let innerHeight;
+    let carton;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    $: circleRadius = scaleFactor * 15;
-    $: circleTransform = `translate3d(0, ${circleTransformValue}px, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
-    $: iconLineHeightValue = (100 * scaleFactor - circleRadius) + circleTransformValue;
-    $: iconLineHeight = `${iconLineHeightValue}px`;
+
     onMount(async () => {
         const global_audio_scene = await global_audio_scene_init();
         global_audio_scene.fade_in_nappe();
         visible = true;
     });
 
-    function updateCirclePosition(e) {
-        let y = 0;
-        if(e.touches) {
-            y = e.touches[0].clientY;
-        } else {
-            y = e.clientY;
-        }
-        let start = icon.getBoundingClientRect().top;
-
-        let end = start - 100 * scaleFactor;
-        if (y > start) {
-            circleTransformValue = 0;
-        } else if (y < end) {
-            circleTransformValue = -100 * scaleFactor;
-        } else {
-            circleTransformValue = y - start;
-        }
-    }
+    let yStart = 0;
+    let xStart = 0;
+    let yEnd = 0;
+    let xEnd = 0;
+    let xCumul = [];
+    let yCumul = [];
+    let yLast;
 
     function onPointerDown(e) {
-        if (icon) {
+        if(e.touches) {
+            yStart = e.touches[0].clientY;
+            xStart = e.touches[0].clientX;
+        } else {
+            yStart = e.clientY;
+            xStart = e.clientX;
+        }
+
+        if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
             e.preventDefault();
+            yLast = parseFloat(getComputedStyle(carton).height);
             isPointerDown = true;
-            updateCirclePosition(e);
         }
     }
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            updateCirclePosition(e);
+            let x;
+            let y;
+            if (e.touches) {
+                y = e.touches[0].clientY;
+                x = e.touches[0].clientX;
+            } else {
+                y = e.clientY;
+                x = e.clientX;
+            }
+            xCumul.push(Math.abs(x - xStart) < 50);
+            yCumul.push(y <= yLast);
+            yLast = y;
         }
     }
 
     function onPointerUp(e) {
         if (isPointerDown) {
             e.preventDefault();
-            if (circleTransformValue === -100 * scaleFactor) {
+
+            if(e.touches) {
+                yEnd = e.touches[0].clientY;
+                xEnd = e.touches[0].clientX;
+            } else {
+                yEnd = e.clientY;
+                xEnd = e.clientX;
+            }
+
+            if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
+                !xCumul.includes(false) &&
+                !yCumul.includes(false)) {
                 dispatch('next');
             } else {
+                yStart = 0;
+                yEnd = 0;
+                xStart = 0;
+                xEnd = 0;
                 isPointerDown = false;
-                circleTransformValue = 0;
+                xCumul = [];
+                yCumul = [];
             }
         }
     }
@@ -87,20 +108,18 @@
 
 <style>
     @keyframes wiggle {
-        0% {
+        0%, 100% {
             transform: translate3d(0, 0, 0);
+            opacity: 0;
         }
-        100% {
-            transform: translate3d(0, calc(var(--scaleFactor) * -100px), 0);
+        10% {
+            opacity: 1;
         }
-    }
-
-    @keyframes drawLine {
-        0% {
-            height: calc(var(--scaleFactor) * 85px);
+        80% {
+            transform: translate3d(0, calc(var(--scaleFactor) * -95px), 0);
         }
-        80%, 100% {
-           height: 0;
+        90% {
+            opacity: 0;
         }
     }
 
@@ -127,20 +146,26 @@
     }
 
     .carton__titleName {
-        font-size: calc(var(--scaleFactor) * 50px);
+        font-size: calc(var(--scaleFactor) * 60px);
         text-align: center;
+        color: transparent;
+        text-shadow: 0 0 1px #fff;
         margin-bottom: calc(var(--scaleFactor) * 50px);
+        font-family: 'BeatriceDisplayDA', 'serif';
+        font-weight: 100;
+        letter-spacing: 1px;
     }
 
     .carton__timeContext {
         font-size: calc(var(--scaleFactor) * 16px);
         text-transform: uppercase;
         margin-bottom: calc(var(--scaleFactor) * 20px);
+        font-family: 'Optician Sans', 'serif';
     }
 
     .carton__spaceContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        font-style: italic;
+        font-family: 'Optician Sans', 'serif';
     }
 
     .icon {
@@ -156,39 +181,14 @@
         animation: wiggle 1.5s infinite ease-out;
     }
 
-    .loopLine {
-        animation: drawLine 1.5s infinite ease-out;
-    }
-
     .icon__circle {
-        display: block;
-        border-radius: 50%;
-        border: solid calc(var(--scaleFactor) * 2px) #fff;
-        width: calc(var(--scaleFactor) * 30px);
-        height: calc(var(--scaleFactor) * 30px);
-        transform: var(--circleTransform);
-    }
-
-    .icon__line {
         display: flex;
         justify-content: center;
-        position: absolute;
-        top: calc(var(--scaleFactor) * -85px);
-        background-color: #fff;
-        width: 2px;
-        height: var(--iconLineHeight);
-        z-index: -1;
-    }
-
-    .icon__line:before {
-        content: "";
-        display: block;
-        flex-shrink: 0;
-        width: calc(var(--scaleFactor) * 4px);
-        height: calc(var(--scaleFactor) * 4px);
         border-radius: 50%;
-        border: solid calc(var(--scaleFactor) * 2px) #fff;
-        background-color: black;
+        border: solid calc(var(--scaleFactor) * 1px) #fff;
+        width: calc(var(--scaleFactor) * 40px);
+        height: calc(var(--scaleFactor) * 40px);
+        opacity: 0;
     }
 
     .sand {
@@ -238,23 +238,23 @@
 <div class="carton"
     out:fade
     style="--scaleFactor:{scaleFactor}"
+    on:pointerdown="{onPointerDown}"
+    on:touchstart="{onPointerDown}"
     on:pointermove="{onPointerMove}"
     on:touchmove="{onPointerMove}"
     on:pointerup="{onPointerUp}"
-    on:touchend="{onPointerUp}">
+    on:touchend="{onPointerUp}"
+    bind:this="{carton}">
     <div class="carton__text">
-        <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1000, delay: 500 }}">{timeContext}</p>
-        <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1000, delay: 700 }}">{titleName}</h3>
-        <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1000, delay: 900 }}">{spaceContext}</p>
+        <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
+        <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
+        <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
     </div>
     {#if ready}
        <div class="icon"
             bind:this="{icon}"
-            transition:fade
-            on:pointerdown="{onPointerDown}"
-            on:touchstart="{onPointerDown}">
-            <span class="icon__line" class:loopLine="{!isPointerDown}" style="--iconLineHeight:{iconLineHeight}"></span>
-            <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+            transition:fade>
+            <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
        </div>
     {/if}
     <div class="sand sand--container" class:fadeIn="{ready}">

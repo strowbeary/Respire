@@ -25,8 +25,4 @@
 </select>
 
 <!--<Sand/>-->
-{#if selected.name === 'TrailSwipe'}
-	<TrailSwipe/>
-{:else if selected.name === 'Cartons'}
-    <Cartons/>
-{/if}
+<svelte:component this={selected.component}></svelte:component>

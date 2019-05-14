@@ -27,9 +27,9 @@
     import Xindi from "assets/images/foule/Xindi.png";
 
     const carton_data ={
-        titleName: "A contre-courant",
-        timeContext: "18h avant l'examen",
-        spaceContext: "Amphithéâtre"
+        titleName: "À contre-courant",
+        timeContext: "18 heures avant l'examen",
+        spaceContext: "Amphitheatre"
     };
 
     let display_carton = true;
@@ -114,7 +114,7 @@
                 dragIcon.setDirection(-1);
             }
             dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
-            dragIcon.initIconAnim(0, 1);
+            dragIcon.initIconAnim(0, 0.5);
             dragIcon.startIconAnim();
 
             function onDragEnd() {
@@ -141,7 +141,7 @@
                         }
                     } else {
                         this.x = interactiveStartingPos;
-                        dragIcon.initIconAnim(0, 1);
+                        dragIcon.initIconAnim(0, 0.5);
                         dragIcon.startIconAnim();
                     }
                 }
@@ -156,7 +156,7 @@
                         this.offset = this.x - this.data.getLocalPosition(this.parent).x;
                         this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
                         this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
-                        dragIcon.initIconAnim(1, 0);
+                        dragIcon.initIconAnim(0.5, 0);
                         dragIcon.startIconAnim();
                     })
                     .on('pointerup', onDragEnd)
