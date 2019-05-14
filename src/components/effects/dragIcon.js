@@ -49,7 +49,8 @@ export function DragIcon(app) {
                 interactiveIcon.alpha = iconAnim.tick();
             }
             if (slideAnim && slideAnim.is_running) {
-                draw(finalPosition * slideAnim.tick());
+                const p = slideAnim.tick();
+                draw(finalPosition * p);
             } else {
                 slideAnim = createSlideAnim(0, 1);
                 slideAnim.start()

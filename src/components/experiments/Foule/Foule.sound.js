@@ -8,13 +8,13 @@ import { Scene, Sound, Vector3 } from "lib/SoundKit";
 export async function init_foule_sound_scene() {
 
     const scene = await Scene({
-        debug: true
+        debug: false
     });
 
     scene.add(
         Sound("crowd_left", {
             url: crowd_left_sound_url,
-            volume: 0.5,
+            volume: 0.3,
             spacialized: true,
             oriented: true,
             position: Vector3(-0.5, 0, -1.5),
@@ -22,7 +22,7 @@ export async function init_foule_sound_scene() {
         }),
         Sound("crowd_right", {
             url: crowd_right_sound_url,
-            volume: 0.5,
+            volume: 0.3,
             spacialized: true,
             oriented: true,
             loop: true,
@@ -70,6 +70,9 @@ export async function init_foule_sound_scene() {
             crowd_right_sound.set_position(
                 Vector3(crowd_right_sound.options.position.x, crowd_right_sound.options.position.y, -z)
             );
+        },
+        async destroy() {
+            await init_scene.destroy();
         }
     };
 }
