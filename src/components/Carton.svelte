@@ -28,12 +28,10 @@
     const dispatch = createEventDispatcher();
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    $: circleRadius = scaleFactor * 15;
+    $: circleRadius = scaleFactor * 20;
     $: circleTransform = `translate3d(0, ${circleTransformValue}px, 0)`;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
-    $: iconLineHeightValue = (100 * scaleFactor - circleRadius) + circleTransformValue;
-    $: iconLineHeight = `${iconLineHeightValue}px`;
 
     onMount(() => {
         visible = true;
@@ -95,15 +93,6 @@
         }
     }
 
-    @keyframes drawLine {
-        0% {
-            height: calc(var(--scaleFactor) * 85px);
-        }
-        80%, 100% {
-           height: 0;
-        }
-    }
-
     .carton {
         position: absolute;
         width: 56.25vh;
@@ -156,39 +145,61 @@
         animation: wiggle 1.5s infinite ease-out;
     }
 
-    .loopLine {
-        animation: drawLine 1.5s infinite ease-out;
-    }
-
     .icon__circle {
-        display: block;
+        display: flex;
+        justify-content: center;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
-        width: calc(var(--scaleFactor) * 30px);
-        height: calc(var(--scaleFactor) * 30px);
+        width: calc(var(--scaleFactor) * 40px);
+        height: calc(var(--scaleFactor) * 40px);
         transform: var(--circleTransform);
+    }
+
+    .icon__circle:before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 2px;
+        height: calc(40px * var(--scaleFactor));
+        background-color: black;
+    }
+
+    .icon__circle:after {
+        content: "";
+        position: absolute;
+        display: block;
+        top: calc(40px * var(--scaleFactor) + 2px);
+        width: 2px;
+        height: calc(100px * var(--scaleFactor));
+        background-color: black;
     }
 
     .icon__line {
         display: flex;
         justify-content: center;
         position: absolute;
-        top: calc(var(--scaleFactor) * -85px);
-        background-color: #fff;
-        width: 2px;
-        height: var(--iconLineHeight);
-        z-index: -1;
+        top: calc(var(--scaleFactor) * -80px);
+        height: calc(100px * var(--scaleFactor) - 20px);
     }
 
     .icon__line:before {
         content: "";
         display: block;
+        position: absolute;
         flex-shrink: 0;
-        width: calc(var(--scaleFactor) * 4px);
-        height: calc(var(--scaleFactor) * 4px);
+        width: calc(var(--scaleFactor) * 8px);
+        height: calc(var(--scaleFactor) * 8px);
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
         background-color: black;
+        z-index: 1;
+    }
+
+    .icon__line:after {
+        content: "";
+        display: block;
+        height: 100%;
+        border-left: 2px dashed #fff;
     }
 
     .sand {
@@ -253,7 +264,7 @@
             transition:fade
             on:pointerdown="{onPointerDown}"
             on:touchstart="{onPointerDown}">
-            <span class="icon__line" class:loopLine="{!isPointerDown}" style="--iconLineHeight:{iconLineHeight}"></span>
+            <span class="icon__line"></span>
             <span class="icon__circle" class:loopCircle="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
        </div>
     {/if}
