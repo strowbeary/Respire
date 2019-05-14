@@ -141,7 +141,7 @@
                         }
                     } else {
                         this.x = interactiveStartingPos;
-                        dragIcon.initIconAnim(0, 1);
+                        dragIcon.initIconAnim(0, 0.5);
                         dragIcon.startIconAnim();
                     }
                 }
