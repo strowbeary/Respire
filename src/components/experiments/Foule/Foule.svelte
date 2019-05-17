@@ -55,7 +55,11 @@
     function create_container_anim(from_value, to_value) {
         return Animate(from_value, to_value, Easing.easeOutCubic, 0.03)
     }
+    function create_person_anim(from_value, to_value) {
+        return Animate(from_value, to_value, Easing.linear, 0.01);
+    }
     let container_anim = create_container_anim(0, 1);
+    let person_anim = create_person_anim(0, 1);
     const imgAssets = {
         P8,
         P5,
@@ -99,9 +103,10 @@
     }
 
     let scale;
+    let person;
 
     async function setInteractive() {
-        let person = people[interactiveOrder[interactiveCurrentIndex]];
+         person = people[interactiveOrder[interactiveCurrentIndex]];
 
         if (interactiveCurrentIndex < 7) {
             interactiveCurrentFinalPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].end);
@@ -127,7 +132,7 @@
                         (this.direction === "right" && this.x > interactiveCurrentFinalPos)
                        ) {
                         this.x = interactiveCurrentFinalPos;
-                        this.sprite.interactive = false;
+                        person.interactive = false;
                         if (interactiveCurrentIndex+1 < interactiveOrder.length) {
                             interactiveCurrentIndex++;
                             play_interaction_sound();
@@ -139,7 +144,8 @@
                             }
                         }
                     } else {
-                        this.x = interactiveStartingPos;
+                        person_anim = create_person_anim(this.x, interactiveStartingPos);
+                        person_anim.start();
                         dragIcon.initIconAnim(0, 0.5);
                         dragIcon.startIconAnim();
                     }
@@ -150,25 +156,28 @@
                         // store a reference to the data
                         // the reason for this is because of multitouch
                         // we want to track the movement of this particular touch
-                        this.data = event.data;
-                        this.dragging = true;
-                        this.offset = this.x - this.data.getLocalPosition(this.parent).x;
-                        this.sprite = people[interactiveOrder[interactiveCurrentIndex]];
-                        this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
-                        dragIcon.initIconAnim(0.5, 0);
-                        dragIcon.startIconAnim();
-                        //reset after some time
-                        setTimeout(() => {
-                            if (this.dragging) {
-                               this.dragging = false;
-                               this.data = null;
-                               this.offset = 0;
-                               //interpolate x to be less brutal
-                               this.x = interactiveStartingPos;
-                               dragIcon.initIconAnim(0, 0.5);
-                               dragIcon.startIconAnim();
-                            }
-                        }, Math.random() * 500);
+                        if (!this.dragging) {
+                            this.data = event.data;
+                            this.dragging = true;
+                            this.offset = this.x - this.data.getLocalPosition(this.parent).x;
+                            this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
+                            dragIcon.initIconAnim(0.5, 0);
+                            dragIcon.startIconAnim();
+                            //reset after some time
+                            setTimeout(() => {
+                                if (this.dragging) {
+                                   this.dragging = false;
+                                   this.data = null;
+                                   this.offset = 0;
+                                   //interpolate x to be less brutal
+                                   //this.x = interactiveStartingPos;
+                                   person_anim = create_person_anim(this.x, interactiveStartingPos);
+                                   person_anim.start();
+                                   dragIcon.initIconAnim(0, 0.5);
+                                   dragIcon.startIconAnim();
+                                }
+                            }, Math.random() * 500);
+                        }
                     })
                     .on('pointerup', onDragEnd)
                     .on('pointerupoutside', onDragEnd)
@@ -201,10 +210,10 @@
 
     function generatePeople(resourceKey) {
         let texture = resources[resourceKey].texture;
-        let person = new Sprite(texture);
-        person.anchor.x = 0.5;
-        person.anchor.y = 0.5;
-        return person;
+        let sprite = new Sprite(texture);
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        return sprite;
     }
 
     function scalePeople(sprite, scaleValue) {
@@ -302,27 +311,29 @@
 
         await Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
-            let person = generatePeople(key);
+            let sprite = generatePeople(key);
 
-            people[keyName] = person;
+            people[keyName] = sprite;
             setPosition(keyName);
             if (keyName === "Xindi") {
                 setInteractive();
             }
-            container.addChild(person);
+            container.addChild(sprite);
         });
         app.ticker.add(delta => gameLoop(delta));
         is_ready = true;
     }
 
-    const anim_test = Animate(100, 10, Easing.easeInCubic, 0.01);
-    anim_test.start();
     function gameLoop() {
         const container_offset = container_anim.tick();
         container.position.set(0, container_offset);
         set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
         if(container_anim.is_ended_signal) {
             setInteractive();
+        }
+        if (person_anim.is_running) {
+            const person_offset = person_anim.tick();
+            person.position.set(person_offset, person.position.y);
         }
         dragIcon.loop();
         ["P8", "P5", "P6", "P7", "P2"]
