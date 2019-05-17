@@ -123,8 +123,7 @@
                     // set the interaction data to null
                     this.data = null;
                     this.offset = 0;
-                    if (Math.abs(this.x - interactiveCurrentFinalPos) < 10 ||
-                        (this.direction === "left" && this.x < interactiveCurrentFinalPos) ||
+                    if ((this.direction === "left" && this.x < interactiveCurrentFinalPos) ||
                         (this.direction === "right" && this.x > interactiveCurrentFinalPos)
                        ) {
                         this.x = interactiveCurrentFinalPos;
@@ -158,6 +157,18 @@
                         this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
                         dragIcon.initIconAnim(0.5, 0);
                         dragIcon.startIconAnim();
+                        //reset after some time
+                        setTimeout(() => {
+                            if (this.dragging) {
+                               this.dragging = false;
+                               this.data = null;
+                               this.offset = 0;
+                               //interpolate x to be less brutal
+                               this.x = interactiveStartingPos;
+                               dragIcon.initIconAnim(0, 0.5);
+                               dragIcon.startIconAnim();
+                            }
+                        }, Math.random() * 500);
                     })
                     .on('pointerup', onDragEnd)
                     .on('pointerupoutside', onDragEnd)
