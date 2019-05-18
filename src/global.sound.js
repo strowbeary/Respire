@@ -41,6 +41,9 @@ export default (async () => {
     })(0);
 
     return {
+        async start() {
+          return await init_scene.play();
+        },
         fade_out_sable() {
             sable_animation = Animate(0.7, 0, Easing.easeInQuad, 0.05);
             sable_animation.start();

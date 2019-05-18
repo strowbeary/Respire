@@ -7,7 +7,7 @@
     import * as PIXI from "pixi.js";
     import {MaskedSprite} from "utils/MaskedSprite.pixi.js";
     import {Animate, Easing} from "lib/TimingKit";
-	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
+	import {init_foule_sound_scene} from "components/scenes/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
 	/*

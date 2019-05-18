@@ -2,7 +2,6 @@
 import {createEventDispatcher} from "svelte";
 import { afterUpdate } from 'svelte';
 import * as PIXI from "pixi.js";
-
 const dispatch = createEventDispatcher();
 export let appProperties;
 export let canvasSize;
