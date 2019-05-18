@@ -56,7 +56,7 @@
         return Animate(from_value, to_value, Easing.easeOutCubic, 0.03)
     }
     function create_person_anim(from_value, to_value) {
-        return Animate(from_value, to_value, Easing.linear, 0.01);
+        return Animate(from_value, to_value, Easing.linear, 0.03);
     }
     let container_anim = create_container_anim(0, 1);
     let person_anim = create_person_anim(0, 1);
@@ -169,14 +169,10 @@
                                    this.dragging = false;
                                    this.data = null;
                                    this.offset = 0;
-                                   //interpolate x to be less brutal
-                                   //this.x = interactiveStartingPos;
                                    person_anim = create_person_anim(this.x, interactiveStartingPos);
                                    person_anim.start();
-                                   dragIcon.initIconAnim(0, 0.5);
-                                   dragIcon.startIconAnim();
                                 }
-                            }, Math.random() * 500);
+                            }, 300);
                         }
                     })
                     .on('pointerup', onDragEnd)
@@ -334,6 +330,10 @@
         if (person_anim.is_running) {
             const person_offset = person_anim.tick();
             person.position.set(person_offset, person.position.y);
+        }
+        if (person_anim.is_ended_signal) {
+            dragIcon.initIconAnim(0, 0.5);
+            dragIcon.startIconAnim();
         }
         dragIcon.loop();
         ["P8", "P5", "P6", "P7", "P2"]
