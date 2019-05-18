@@ -34,9 +34,6 @@
             global_audio_scene.fade_in_nappe();
             fade_out_sand = global_audio_scene.fade_out_sable;
     });
-    onMount(() => {
-        visible = true;
-    });
 
     let yStart = 0;
     let xStart = 0;
@@ -242,11 +239,11 @@
     out:fade
     style="--scaleFactor:{scaleFactor}"
     on:pointerdown="{onPointerDown}"
-    on:touchstart="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
     on:pointermove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
     on:pointerup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
     bind:this="{carton}">
     <div class="carton__text">
         <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
