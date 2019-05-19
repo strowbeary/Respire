@@ -250,7 +250,7 @@
         <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
         <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
     </div>
-    {#if ready}
+    {#if ready && fade_out_sand}
        <div class="icon"
             bind:this="{icon}"
             transition:fade>
