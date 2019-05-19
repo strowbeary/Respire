@@ -6,10 +6,12 @@
     import {createEventDispatcher} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
     import Carton from 'components/Carton.svelte';
+    import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
 
     /*
     * RESSOURCES
     * */
+    import placeholderVideo from 'assets/videos/placeholder.webm';
 
     const carton_data ={
         titleName: "Dans le brouillard",
@@ -18,6 +20,8 @@
     };
     let display_carton = true;
     let is_ready = true;
+    let videoVisibility = true;
+    let iconVisibility = true;
 
     const dispatch = createEventDispatcher();
 
@@ -27,6 +31,7 @@
     let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
     let alarmClock;
+    let videoComponent;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
@@ -68,12 +73,16 @@
         if (isPointerDown) {
             e.preventDefault();
             if (circleTransformValue === (200 * window.innerHeight / 824)) {
-                //dispatch('next');
-                alert("ENDING");
+                iconVisibility = false;
+                isPointerDown = false;
             } else {
                 isPointerDown = false;
             }
         }
+    }
+
+    function onFirstVideoEnd() {
+        videoVisibility = false;
     }
 </script>
 
@@ -156,15 +165,33 @@
         mix-blend-mode: difference;
         z-index: 1;
         opacity: var(--opacityDay);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    video {
+        object-fit: cover;
     }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<AppWrapper>
+<AppWrapper let:canvasSize={canvasSize}>
     <div slot="scene">
         <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
+            videoComponent.play();
             display_carton = false;
         }}></Carton>
+        {#if canvasSize.canvasWidth && videoVisibility}
+            <video
+                out:fade
+                width="{canvasSize.canvasWidth}"
+                height="{canvasSize.canvasHeight}"
+                bind:this="{videoComponent}"
+                src={placeholderVideo}
+                on:ended={onFirstVideoEnd}
+            ></video>
+        {/if}
         <div class="alarmClock"
             out:fade
             style="--scaleFactor:{scaleFactor}"
@@ -173,15 +200,19 @@
             on:pointerup="{onPointerUp}"
             on:touchend|passive="{onPointerUp}"
             bind:this="{alarmClock}">
-            <div class="day" style="--opacityDay:{opacityDay}"></div>
-            <div class="icon"
-                 bind:this="{icon}"
-                 transition:fade
-                 on:pointerdown="{onPointerDown}"
-                 on:touchstart|passive="{onPointerDown}">
-                 <div class="icon__line"></div>
-                 <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+            <div class="day" style="--opacityDay:{opacityDay}">
+                <PreparationAnim value="jeans"></PreparationAnim>
             </div>
+            {#if iconVisibility}
+                <div class="icon"
+                     bind:this="{icon}"
+                     transition:fade
+                     on:pointerdown="{onPointerDown}"
+                     on:touchstart|passive="{onPointerDown}">
+                     <div class="icon__line"></div>
+                     <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+                </div>
+            {/if}
         </div>
     </div>
 </AppWrapper>

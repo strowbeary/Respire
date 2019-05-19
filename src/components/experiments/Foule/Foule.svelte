@@ -345,11 +345,11 @@
 
 <AppWrapper>
     <span slot="scene" let:canvasSize={canvasSize}>
+        <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
+            start_audio()
+            display_carton = false;
+        }}></Carton>
         {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
-                    display_carton = false;
-                    start_audio()
-                }}></Carton>
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}
     </span>
