@@ -1,5 +1,5 @@
 <script>
-import AppWrapper from "../AppWrapper.svelte";
+    import AppWrapper from "../AppWrapper.svelte";
     import {fly, fade} from 'svelte/transition';
     import global_sound_scene from "../../global.sound";
     import {createEventDispatcher} from "svelte";
@@ -7,6 +7,7 @@ import AppWrapper from "../AppWrapper.svelte";
     const dispatch = createEventDispatcher();
  $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
 
+     export let globalSoundScene;
     let innerHeight;
      let icon;
      let title_scene;
@@ -68,7 +69,7 @@ import AppWrapper from "../AppWrapper.svelte";
                          !xCumul.includes(false) &&
                          !yCumul.includes(false)) {
                          console.log("start");
-                         global_sound_scene.then(async scene => {
+                         globalSoundScene.then(async scene => {
                              await scene.start();
                              scene.fade_in_nappe();
                          });
@@ -171,7 +172,8 @@ import AppWrapper from "../AppWrapper.svelte";
         on:pointermove="{onPointerMove}"
         on:touchmove="{onPointerMove}"
         on:pointerup="{onPointerUp}"
-        on:touchend="{onPointerUp}">
+        on:touchend="{onPointerUp}"
+        transition:fade>
         <div>
             <h1>Respire</h1>
              <p>Cette experience necessite le port d'un casque</p>
