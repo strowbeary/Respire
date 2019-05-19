@@ -5,10 +5,19 @@
     import {fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
+    import Carton from 'components/Carton.svelte';
 
     /*
     * RESSOURCES
     * */
+
+    const carton_data ={
+        titleName: "Dans le brouillard",
+        timeContext: "24 heures avant l'examen",
+        spaceContext: "Chambre"
+    };
+    let display_carton = true;
+    let is_ready = true;
 
     const dispatch = createEventDispatcher();
 
@@ -89,7 +98,7 @@
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        z-index: 1;
+        z-index: 0;
         display: flex;
         justify-content: center;
     }
@@ -153,6 +162,9 @@
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 <AppWrapper>
     <div slot="scene">
+        <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
+            display_carton = false;
+        }}></Carton>
         <div class="alarmClock"
             out:fade
             style="--scaleFactor:{scaleFactor}"
