@@ -86,7 +86,7 @@ module.exports = {
             },
         },
         {
-            test: /\.(png|svg|jpg|gif|wav)$/,
+            test: /\.(png|svg|jpg|gif|wav|apng)$/,
             use: [
             {
                 loader: 'file-loader?name=[name].[sha512:hash:base64:7].[ext]',

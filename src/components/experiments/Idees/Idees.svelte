@@ -10,12 +10,11 @@
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
+    import PixiApngAndGif from 'pixi-apngandgif'
 	/*
 	* RESSOURCES
 	* */
-    import Idea1 from "assets/images/idees/Idea1.png";
-    import Idea2 from "assets/images/idees/Idea2.png";
-    import Idea3 from "assets/images/idees/Idea3.png";
+    import Idea from "assets/images/idees/Idea.png";
 
     const carton_data ={
         titleName: "Les idées noires",
@@ -34,6 +33,7 @@
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
+        Resource = PIXI.loaders.Resource,
         Sprite = PIXI.Sprite,
         Container = PIXI.Container;
 
@@ -41,13 +41,19 @@
     let container = new Container();
 
     const imgAssets = {
-        Idea1, Idea2, Idea3
+        Idea
+    };
+
+    const loadOption = {
+        loadType: Resource.LOAD_TYPE.XHR,
+        xhrType: Resource.XHR_RESPONSE_TYPE.BUFFER,
+        crossOrigin:''
     };
 
     let ideas = [];
     let dragIcon;
 
-    function init(data) {
+    async function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
@@ -57,17 +63,17 @@
 
         let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
-            loader
-                .add(imgToAdd)
-                .load(setup);
+            await imgToAdd.forEach((resourceKey) => {
+                loader.add(resourceKey, loadOption)
+            });
+            loader.load(setup);
         } else {
             setup()
         }
     }
 
-    function generateSprite(resourceKey) {
-        let texture = resources[resourceKey].texture;
-        let sprite = new Sprite(texture);
+    function generateAnimatedSprite(resourceKey) {
+        let sprite = new PixiApngAndGif(resourceKey, resources).sprite;
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
         return sprite;
@@ -79,6 +85,10 @@
 
     function setPosition(keyName) {
          switch(keyName){
+            case "Idea":
+                ideas[keyName].positions = {start: 0.15, end: -ideas[keyName].width/2};
+                ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.9);
+                break;
             case "Idea1":
                 ideas[keyName].positions = {start: 0.15, end: -ideas[keyName].width/2};
                 ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.9);
@@ -97,19 +107,19 @@
     }
 
     function create_clone(sprite, keyName) {
-        if (Object.keys(ideas).length < 30) {
-            let clone = new Sprite(sprite._texture);
-            clone.anchor.x = 0.5;
-            clone.anchor.y = 0.5;
+        if (Object.keys(ideas).length < 10) {
+            let assetKey = keyName.split('-')[0];
+            let clone = generateAnimatedSprite(imgAssets[assetKey]);
             clone.position.set(sprite.position.x, sprite.position.y);
             clone.alpha = 0;
             clone.parentKey = keyName;
             let index = Object.values(ideas).filter(idea => idea._texture.textureCacheIds[0] === sprite._texture.textureCacheIds[0]).length;
-            let name = keyName.split('-')[0] + '-' + index;
+            let name = assetKey + '-' + index;
             ideas[name] = clone;
             ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.03);
             clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.03);
             clone.anim_opacity = Animate(0, 1, Easing.linear, 0.03);
+            setInteractive(clone);
             ideas[keyName].anim_scale.start();
             clone.anim_scale.start();
             clone.anim_opacity.start();
@@ -122,24 +132,54 @@
         let parent = ideas[sprite.parentKey];
         sprite.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
         parent.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
-        sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - 50, Easing.easeInOutQuad, 0.01);
-        parent.anim_position_y = Animate(parent.position.y, parent.position.y + 50, Easing.easeInOutQuad, 0.01);
+        sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - 100, Easing.easeInOutQuad, 0.01);
+        parent.anim_position_y = Animate(parent.position.y, parent.position.y + 100, Easing.easeInOutQuad, 0.01);
         sprite.anim_scale_y.start();
         parent.anim_scale_y.start();
         sprite.anim_position_y.start();
         parent.anim_position_y.start();
     }
 
+    let animatedSprite;
+
+    function onDragEnd() {
+        if (this.dragging) {
+            this.dragging = false;
+            this.data = null;
+        }
+    }
+
+    function setInteractive(sprite) {
+        sprite.on('pointerdown', function (event) {
+                  if (!this.dragging) {
+                      this.data = event.data;
+                      this.dragging = true;
+                      this.offset = this.x - this.data.getLocalPosition(this.parent).x;
+                      this.direction = "left";
+                  }
+              })
+              .on('pointerup', onDragEnd)
+              .on('pointerupoutside', onDragEnd)
+              .on('pointermove', function () {
+                  if (this.dragging) {
+                      let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
+                      this.x = newPos;
+                  }
+              });
+    }
+
     async function setup() {
-        Object.values(imgAssets).forEach((key) => {
-            let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
-            let sprite = generateSprite(key);
+        Object.values(imgAssets).forEach((resourceKey) => {
+            let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === resourceKey);
+            let sprite = generateAnimatedSprite(resourceKey);
             ideas[keyName] = sprite;
             setPosition(keyName);
+            setInteractive(sprite);
+            sprite.interactive = true;
             container.addChild(sprite);
         });
         setTimeout(() => {
-            setAppearAnimation("Idea1");
+            setAppearAnimation("Idea");
         }, 10000);
         app.ticker.add(delta => gameLoop(delta));
         is_ready = true;
