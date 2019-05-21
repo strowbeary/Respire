@@ -97,27 +97,37 @@
     }
 
     function create_clone(sprite, keyName) {
-        let clone = new Sprite(sprite._texture);
-        clone.anchor.x = 0.5;
-        clone.anchor.y = 0.5;
-        clone.position.set(sprite.position.x, sprite.position.y);
-        clone.alpha = 0;
-        let index = Object.values(ideas).filter(idea => idea._texture.textureCacheIds[0] === sprite._texture.textureCacheIds[0]).length;
-        let name = keyName.split('-')[0] + '-' + index;
-        ideas[name] = clone;
-        clone.anim_opacity = create_sprite_appear(0, 1);
-        clone.anim_opacity.start();
-        container.addChild(clone);
+        if (Object.keys(ideas).length < 30) {
+            let clone = new Sprite(sprite._texture);
+            clone.anchor.x = 0.5;
+            clone.anchor.y = 0.5;
+            clone.position.set(sprite.position.x, sprite.position.y);
+            clone.alpha = 0;
+            clone.parentKey = keyName;
+            let index = Object.values(ideas).filter(idea => idea._texture.textureCacheIds[0] === sprite._texture.textureCacheIds[0]).length;
+            let name = keyName.split('-')[0] + '-' + index;
+            ideas[name] = clone;
+            ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.03);
+            clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.03);
+            clone.anim_opacity = Animate(0, 1, Easing.linear, 0.03);
+            ideas[keyName].anim_scale.start();
+            clone.anim_scale.start();
+            clone.anim_opacity.start();
+            container.addChild(clone);
+        }
     }
 
     function move_clone(keyName) {
         let sprite = ideas[keyName];
-        sprite.anim_position_y = create_sprite_appear(sprite.position.y, sprite.position.y - 50);
+        let parent = ideas[sprite.parentKey];
+        sprite.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
+        parent.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
+        sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - 50, Easing.easeInOutQuad, 0.01);
+        parent.anim_position_y = Animate(parent.position.y, parent.position.y + 50, Easing.easeInOutQuad, 0.01);
+        sprite.anim_scale_y.start();
+        parent.anim_scale_y.start();
         sprite.anim_position_y.start();
-    }
-
-    function create_sprite_appear(from_value, to_value) {
-      return Animate(from_value, to_value, Easing.linear, 0.03);
+        parent.anim_position_y.start();
     }
 
     async function setup() {
@@ -137,7 +147,7 @@
 
     function setAppearAnimation(keyName) {
         let sprite = ideas[keyName];
-        sprite.anim_position_x = create_sprite_appear(sprite.positions.end, positionFromCanvasWidth(sprite.positions.start));
+        sprite.anim_position_x = Animate(sprite.positions.end, positionFromCanvasWidth(sprite.positions.start), Easing.linear, 0.03);
         sprite.anim_position_x.start();
     };
 
@@ -162,13 +172,32 @@
                         move_clone(property);
                     }
                 }
+                if (ideas[property].anim_scale) {
+                    let sprite = ideas[property];
+                    if (sprite.anim_scale.is_running) {
+                        sprite.scale.set(sprite.anim_scale.tick());
+                    }
+                }
+                if (ideas[property].anim_scale_y) {
+                    let sprite = ideas[property];
+                    if (sprite.anim_scale_y.is_running) {
+                        sprite.scale.set(1, sprite.anim_scale_y.tick());
+                    }
+                    if (sprite.anim_scale_y.is_ended_signal && Math.abs(sprite.scale.y - 1) > 0.2) {
+                        sprite.anim_scale_y = Animate(0.5, 1, Easing.easeInQuad, 0.1);
+                        sprite.anim_scale_y.start();
+                    }
+                }
                 if (ideas[property].anim_position_y) {
                     let sprite = ideas[property];
                     if (sprite.anim_position_y.is_running) {
                         sprite.position.set(sprite.position.x, sprite.anim_position_y.tick());
                     }
                     if (sprite.anim_position_y.is_ended_signal) {
-                        create_clone(sprite, property);
+                        if (sprite.parentKey) {
+                            sprite.parentKey = "";
+                            create_clone(sprite, property);
+                        }
                     }
                 }
             }
