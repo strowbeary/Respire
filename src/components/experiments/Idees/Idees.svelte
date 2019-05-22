@@ -116,12 +116,14 @@
             let index = Object.values(ideas).filter(idea => idea._texture.textureCacheIds[0] === sprite._texture.textureCacheIds[0]).length;
             let name = assetKey + '-' + index;
             ideas[name] = clone;
-            ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.03);
-            clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.03);
-            clone.anim_opacity = Animate(0, 1, Easing.linear, 0.03);
+            let parent = ideas[keyName];
+            parent.childKey = name;
+            //ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.001);
+            //clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.001);
+            clone.anim_opacity = Animate(0, 1, Easing.linear, 0.001);
             setInteractive(clone);
-            ideas[keyName].anim_scale.start();
-            clone.anim_scale.start();
+            //ideas[keyName].anim_scale.start();
+            //clone.anim_scale.start();
             clone.anim_opacity.start();
             container.addChild(clone);
         }
@@ -130,6 +132,8 @@
     function move_clone(keyName) {
         let sprite = ideas[keyName];
         let parent = ideas[sprite.parentKey];
+        sprite.interactive = false;
+        parent.interactive = false;
         sprite.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
         parent.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
         sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - 100, Easing.easeInOutQuad, 0.01);
@@ -147,6 +151,7 @@
             this.dragging = false;
             this.data = null;
         }
+        //TODO: has to create conditions for correctly swipe or not
     }
 
     function setInteractive(sprite) {
@@ -156,6 +161,11 @@
                       this.dragging = true;
                       this.offset = this.x - this.data.getLocalPosition(this.parent).x;
                       this.direction = "left";
+
+                      if (sprite.childKey) {
+                          ideas[sprite.childKey].anim_opacity = null;
+                          ideas[sprite.childKey].alpha = 0;
+                      }
                   }
               })
               .on('pointerup', onDragEnd)
@@ -164,6 +174,10 @@
                   if (this.dragging) {
                       let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
                       this.x = newPos;
+
+                      if (sprite.childKey) {
+                          ideas[sprite.childKey].x = newPos;
+                      }
                   }
               });
     }
@@ -212,20 +226,24 @@
                         move_clone(property);
                     }
                 }
-                if (ideas[property].anim_scale) {
+                /*if (ideas[property].anim_scale) {
                     let sprite = ideas[property];
                     if (sprite.anim_scale.is_running) {
                         sprite.scale.set(sprite.anim_scale.tick());
                     }
-                }
+                }*/
                 if (ideas[property].anim_scale_y) {
                     let sprite = ideas[property];
                     if (sprite.anim_scale_y.is_running) {
                         sprite.scale.set(1, sprite.anim_scale_y.tick());
                     }
-                    if (sprite.anim_scale_y.is_ended_signal && Math.abs(sprite.scale.y - 1) > 0.2) {
-                        sprite.anim_scale_y = Animate(0.5, 1, Easing.easeInQuad, 0.1);
-                        sprite.anim_scale_y.start();
+
+                    if (sprite.anim_scale_y.is_ended_signal) {
+                        if (Math.abs(sprite.scale.y - 1) > 0.2) {
+                           sprite.anim_scale_y = Animate(0.5, 1, Easing.easeInQuad, 0.1);
+                           sprite.anim_scale_y.start();
+                        }
+                        sprite.interactive = true;
                     }
                 }
                 if (ideas[property].anim_position_y) {
