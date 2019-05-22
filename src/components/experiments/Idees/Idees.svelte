@@ -78,6 +78,7 @@
         sprite.anchor.y = 0.5;
         sprite.scaleDefault = canvasWidth/sprite.width * 0.65;
         sprite.scale.set(sprite.scaleDefault);
+        sprite.direction = "up";
         return sprite;
     }
 
@@ -109,9 +110,11 @@
     }
 
     function create_clone(sprite, keyName) {
-        if (Object.keys(ideas).length < 10) {
+        if (Object.keys(ideas).length < 30) {
             let assetKey = keyName.split('-')[0];
-            let clone = generateAnimatedSprite(imgAssets[assetKey]);
+            //if multiple assets
+            //let clone = generateAnimatedSprite(imgAssets[assetKey]);
+            let clone = generateAnimatedSprite(imgAssets["Idea"]);
             clone.position.set(sprite.position.x, sprite.position.y);
             clone.alpha = 0;
             clone.parentKey = keyName;
@@ -138,22 +141,42 @@
         parent.interactive = false;
         sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
         parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
-        sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-        parent.anim_position_y = Animate(parent.position.y, parent.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+        if (sprite.position.y - sprite.height/6 < sprite.height/6) {
+            sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+        } else {
+            sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+        }
+        if (parent.position.y + sprite.height/6 > canvasHeight - sprite.height/6) {
+            parent.anim_position_y = Animate(parent.position.y, canvasHeight - sprite.height/2, Easing.easeInOutQuad, 0.01);
+        } else {
+            parent.anim_position_y = Animate(parent.position.y, parent.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+        }
         sprite.anim_scale_y.start();
         parent.anim_scale_y.start();
         sprite.anim_position_y.start();
         parent.anim_position_y.start();
     }
 
-    let animatedSprite;
-
     function onDragEnd() {
         if (this.dragging) {
             this.dragging = false;
             this.data = null;
-
-            if ((this.x > -this.width/2 || this.x < canvasWidth + this.width/2) && this.childKey) {
+            if (this.x < 0 || this.x > canvasWidth - this.width/2) {
+                let keyName = Object.keys(ideas).find(key => ideas[key] === this);
+                container.removeChild(this);
+                delete ideas[keyName];
+                if (this.childKey) {
+                    container.removeChild(ideas[this.childKey]);
+                    delete ideas[this.childKey];
+                    this.childKey = "";
+                    let property = keyName.split('-')[0];
+                    let sprites = Object.keys(ideas).filter(key => key.includes(keyName.split('-')[0]));
+                    if (sprites.length > 0) {
+                        let sprite = ideas[sprites[sprites.length - 1]];
+                        create_clone(sprite, property);
+                    }
+                }
+            } else if (this.childKey) {
                 ideas[this.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
                 ideas[this.childKey].anim_opacity.start();
             }
@@ -169,8 +192,8 @@
                       this.direction = "left";
 
                       if (this.childKey) {
-                          ideas[sprite.childKey].anim_opacity = null;
-                          ideas[sprite.childKey].alpha = 0;
+                          ideas[this.childKey].anim_opacity = null;
+                          ideas[this.childKey].alpha = 0;
                       }
                   }
               })
@@ -181,15 +204,24 @@
                       let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
                       this.x = newPos;
 
-                      if (sprite.childKey) {
-                          ideas[sprite.childKey].x = newPos;
+                      if (this.childKey) {
+                          ideas[this.childKey].x = newPos;
                       }
                   }
               });
     }
 
     async function setup() {
-        Object.values(imgAssets).forEach((resourceKey) => {
+        for (let i = 1; i < 4; i++) {
+            let sprite = generateAnimatedSprite(imgAssets["Idea"]);
+            ideas["Idea"+i] = sprite;
+            setPosition("Idea"+i);
+            setInteractive(sprite);
+            sprite.interactive = true;
+            container.addChild(sprite);
+        }
+        //if multiple assets
+        /*Object.values(imgAssets).forEach((resourceKey) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === resourceKey);
             let sprite = generateAnimatedSprite(resourceKey);
             ideas[keyName] = sprite;
@@ -197,10 +229,16 @@
             setInteractive(sprite);
             sprite.interactive = true;
             container.addChild(sprite);
-        });
+        });*/
         setTimeout(() => {
-            setAppearAnimation("Idea");
+            setAppearAnimation("Idea1");
         }, 10000);
+        setTimeout(() => {
+            setAppearAnimation("Idea2");
+        }, 12000);
+        setTimeout(() => {
+           setAppearAnimation("Idea3");
+        }, 15000);
         app.ticker.add(delta => gameLoop(delta));
         is_ready = true;
     }
@@ -249,7 +287,6 @@
                            sprite.anim_scale_y = Animate(sprite.scaleDefault/2, sprite.scaleDefault, Easing.easeInQuad, 0.1);
                            sprite.anim_scale_y.start();
                         }
-                        sprite.interactive = true;
                     }
                 }
                 if (ideas[property].anim_position_y) {
@@ -258,10 +295,14 @@
                         sprite.position.set(sprite.position.x, sprite.anim_position_y.tick());
                     }
                     if (sprite.anim_position_y.is_ended_signal) {
+                        if (sprite.childKey) {
+                            sprite.childKey = "";
+                        }
                         if (sprite.parentKey) {
                             sprite.parentKey = "";
                             create_clone(sprite, property);
                         }
+                        sprite.interactive = true;
                     }
                 }
             }
