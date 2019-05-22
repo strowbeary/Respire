@@ -72,13 +72,13 @@
         }
     }
 
-    function generateAnimatedSprite(resourceKey) {
+    function generateAnimatedSprite(resourceKey, direction) {
         let sprite = new PixiApngAndGif(resourceKey, resources).sprite;
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
         sprite.scaleDefault = canvasWidth/sprite.width * 0.65;
         sprite.scale.set(sprite.scaleDefault);
-        sprite.direction = "up";
+        sprite.direction = direction || "up";
         return sprite;
     }
 
@@ -109,20 +109,47 @@
          }
     }
 
-    function create_clone(sprite, keyName) {
+    async function create_clone(sprite, keyName) {
         if (Object.keys(ideas).length < 30) {
             let assetKey = keyName.split('-')[0];
             //if multiple assets
             //let clone = generateAnimatedSprite(imgAssets[assetKey]);
-            let clone = generateAnimatedSprite(imgAssets["Idea"]);
-            clone.position.set(sprite.position.x, sprite.position.y);
-            clone.alpha = 0;
-            clone.parentKey = keyName;
-            let index = Object.values(ideas).filter(idea => idea._texture.textureCacheIds[0] === sprite._texture.textureCacheIds[0]).length;
+            let clone = generateAnimatedSprite(imgAssets["Idea"], sprite.direction);
+            let index = Object.keys(ideas).filter(key => key.includes(assetKey)).length;
             let name = assetKey + '-' + index;
             ideas[name] = clone;
-            let parent = ideas[keyName];
-            parent.childKey = name;
+            if (sprite.direction === "up") {
+                if (sprite.position.y - sprite.height/6 > sprite.height/6) {
+                    clone.position.set(sprite.position.x, sprite.position.y);
+                    clone.parentKey = keyName;
+                    sprite.childKey = name;
+                } else {
+                    clone.direction = "down";
+                    let parentSprite = Object.keys(ideas)
+                        .filter(key => key.includes(assetKey))
+                        .map(key => ideas[key])
+                        .reduce((prev, curr) => prev.position.y < curr.position.y ? prev : curr);
+                    parentSprite.childKey = name;
+                    clone.position.set(parentSprite.position.x, parentSprite.position.y);
+                    clone.parentKey = Object.keys(ideas).filter(key => ideas[key] === parentSprite)[0];
+                }
+            } if (sprite.direction === "down") {
+                if (sprite.position.y > canvasHeight - sprite.height/6) {
+                    clone.position.set(sprite.position.x, sprite.position.y);
+                    clone.parentKey = keyName;
+                    sprite.childKey = name;
+                } else {
+                    clone.direction = "up";
+                    let parentSprite = Object.keys(ideas)
+                        .filter(key => key.includes(assetKey))
+                        .map(key => ideas[key])
+                        .reduce((prev, curr) => prev.position.y > curr.position.y ? prev : curr);
+                    parentSprite.childKey = name;
+                    clone.position.set(parentSprite.position.x, parentSprite.position.y);
+                    clone.parentKey = Object.keys(ideas).filter(key => ideas[key] === parentSprite)[0];
+                }
+            }
+            clone.alpha = 0;
             //ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.005);
             //clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.005);
             clone.anim_opacity = Animate(0, 1, Easing.linear, 0.005);
@@ -141,15 +168,12 @@
         parent.interactive = false;
         sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
         parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
-        if (sprite.position.y - sprite.height/6 < sprite.height/6) {
+        if (sprite.direction === "up") {
             sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-        } else {
-            sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-        }
-        if (parent.position.y + sprite.height/6 > canvasHeight - sprite.height/6) {
-            parent.anim_position_y = Animate(parent.position.y, canvasHeight - sprite.height/2, Easing.easeInOutQuad, 0.01);
-        } else {
             parent.anim_position_y = Animate(parent.position.y, parent.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+        } else if (sprite.direction === "down") {
+            sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+            parent.anim_position_y = Animate(parent.position.y, parent.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
         }
         sprite.anim_scale_y.start();
         parent.anim_scale_y.start();
