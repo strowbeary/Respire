@@ -11,6 +11,9 @@
 	/*
 	* RESSOURCES
 	* */
+	import Box from "assets/images/pilule/Box.png";
+	import Pill from "assets/images/pilule/Pill.png";
+	import Ticket from "assets/images/pilule/Ticket.png";
 
     const carton_data = {
         titleName: "Noctambule",
@@ -24,7 +27,7 @@
     export let canvasProps;
 
     const appProperties = {
-       transparent: true,
+       backgroundColor: 0xffffff,
        antialias: true
     };
 
@@ -35,7 +38,11 @@
 
     let app, canvasWidth, canvasHeight;
     let container = new Container();
-    const imgAssets = {};
+    const imgAssets = {
+        Box,
+        Pill,
+        Ticket
+    };
 
     let dragIcon;
 
@@ -57,9 +64,6 @@
         }
     }
 
-    let scale;
-    let person;
-
     function generateSprite(resourceKey) {
         let texture = resources[resourceKey].texture;
         let sprite = new Sprite(texture);
@@ -72,24 +76,28 @@
         return number * canvasWidth;
     }
 
-    function setPosition(keyName) {
+    function setPosition(sprite, keyName) {
         switch (keyName) {
+            case "Box":
+                sprite.scale.set(canvasWidth/sprite.width);
+                sprite.position.set(canvasWidth/2, canvasHeight/2);
+                break;
+            case "Ticket":
+                sprite.scale.set(canvasWidth/sprite.width);
+                sprite.position.set(canvasWidth/2, canvasHeight/2);
+                break;
             default:
+                sprite.scale.set(canvasWidth/sprite.width * 0.3);
+                sprite.position.set(canvasWidth/2, canvasHeight/2);
                 break;
         }
     }
 
     async function setup() {
-
         await Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let sprite = generateSprite(key);
-
-            /*people[keyName] = sprite;
-            setPosition(keyName);
-            if (keyName === "Xindi") {
-                setInteractive();
-            }*/
+            setPosition(sprite, keyName);
             container.addChild(sprite);
         });
         app.ticker.add(delta => gameLoop(delta));
@@ -104,9 +112,8 @@
 <AppWrapper>
     <span slot="scene" let:canvasSize={canvasSize}>
         {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
+                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
                     display_carton = false;
-                    start_audio()
                 }}></Carton>
             <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
         {/if}

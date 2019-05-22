@@ -1,6 +1,6 @@
 <script>
     import Selector from "components/Selector.svelte";
-    import TrailSwipe from "components/experiments/Foule/Foule.svelte";
+    import TrailSwipe from "components/experiments/Pilule/Pilule.svelte";
     import anim_bg from "assets/images/animated_background.png";
 
 </script>
@@ -20,6 +20,6 @@
 }
 </style>
 
-<img class="overlay" src={anim_bg} alt="animated background">
+<!--<img class="overlay" src={anim_bg} alt="animated background">-->
 <TrailSwipe></TrailSwipe>
 
