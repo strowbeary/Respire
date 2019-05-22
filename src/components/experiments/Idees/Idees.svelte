@@ -76,6 +76,8 @@
         let sprite = new PixiApngAndGif(resourceKey, resources).sprite;
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
+        sprite.scaleDefault = canvasWidth/sprite.width * 0.65;
+        sprite.scale.set(sprite.scaleDefault);
         return sprite;
     }
 
@@ -118,9 +120,9 @@
             ideas[name] = clone;
             let parent = ideas[keyName];
             parent.childKey = name;
-            //ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.001);
-            //clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.001);
-            clone.anim_opacity = Animate(0, 1, Easing.linear, 0.001);
+            //ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.005);
+            //clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.005);
+            clone.anim_opacity = Animate(0, 1, Easing.linear, 0.005);
             setInteractive(clone);
             //ideas[keyName].anim_scale.start();
             //clone.anim_scale.start();
@@ -134,10 +136,10 @@
         let parent = ideas[sprite.parentKey];
         sprite.interactive = false;
         parent.interactive = false;
-        sprite.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
-        parent.anim_scale_y = Animate(1, 0.5, Easing.easeInOutQuad, 0.05);
-        sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - 100, Easing.easeInOutQuad, 0.01);
-        parent.anim_position_y = Animate(parent.position.y, parent.position.y + 100, Easing.easeInOutQuad, 0.01);
+        sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
+        parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
+        sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+        parent.anim_position_y = Animate(parent.position.y, parent.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
         sprite.anim_scale_y.start();
         parent.anim_scale_y.start();
         sprite.anim_position_y.start();
@@ -152,8 +154,8 @@
             this.data = null;
 
             if ((this.x > -this.width/2 || this.x < canvasWidth + this.width/2) && this.childKey) {
-                ideas[sprite.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
-                ideas[sprite.childKey].anim_opacity.start()
+                ideas[this.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
+                ideas[this.childKey].anim_opacity.start();
             }
         }
     }
@@ -239,12 +241,12 @@
                 if (ideas[property].anim_scale_y) {
                     let sprite = ideas[property];
                     if (sprite.anim_scale_y.is_running) {
-                        sprite.scale.set(1, sprite.anim_scale_y.tick());
+                        sprite.scale.set(sprite.scaleDefault, sprite.anim_scale_y.tick());
                     }
 
                     if (sprite.anim_scale_y.is_ended_signal) {
-                        if (Math.abs(sprite.scale.y - 1) > 0.2) {
-                           sprite.anim_scale_y = Animate(0.5, 1, Easing.easeInQuad, 0.1);
+                        if (Math.abs(sprite.scale.y - sprite.scaleDefault/2) < 0.1) {
+                           sprite.anim_scale_y = Animate(sprite.scaleDefault/2, sprite.scaleDefault, Easing.easeInQuad, 0.1);
                            sprite.anim_scale_y.start();
                         }
                         sprite.interactive = true;
