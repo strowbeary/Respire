@@ -150,8 +150,12 @@
         if (this.dragging) {
             this.dragging = false;
             this.data = null;
+
+            if ((this.x > -this.width/2 || this.x < canvasWidth + this.width/2) && this.childKey) {
+                ideas[sprite.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
+                ideas[sprite.childKey].anim_opacity.start()
+            }
         }
-        //TODO: has to create conditions for correctly swipe or not
     }
 
     function setInteractive(sprite) {
@@ -162,7 +166,7 @@
                       this.offset = this.x - this.data.getLocalPosition(this.parent).x;
                       this.direction = "left";
 
-                      if (sprite.childKey) {
+                      if (this.childKey) {
                           ideas[sprite.childKey].anim_opacity = null;
                           ideas[sprite.childKey].alpha = 0;
                       }
