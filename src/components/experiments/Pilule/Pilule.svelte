@@ -98,6 +98,16 @@
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let sprite = generateSprite(key);
             setPosition(sprite, keyName);
+            if (keyName === "Ticket") { //these sprites will be used for hit test
+                let sprite2 = generateSprite(key);
+                sprite2.scale.set(canvasWidth/sprite2.width);
+                sprite2.position.set(canvasWidth/2 + sprite2, canvasHeight/2);
+                container.addChild(sprite2);
+                let sprite3 = generateSprite(key);
+                sprite3.scale.set(canvasWidth/sprite3.width);
+                sprite3.position.set(canvasWidth/2 - sprite3, canvasHeight/2);
+                container.addChild(sprite3);
+            }
             container.addChild(sprite);
         });
         app.ticker.add(delta => gameLoop(delta));
