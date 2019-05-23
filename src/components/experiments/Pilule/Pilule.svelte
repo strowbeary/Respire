@@ -34,10 +34,15 @@
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
         Sprite = PIXI.Sprite,
-        Container = PIXI.Container;
+        Point = PIXI.Point,
+        Container = PIXI.Container,
+        Graphics = PIXI.Graphics;
 
     let app, canvasWidth, canvasHeight;
     let container = new Container();
+    let graphics = new Graphics();
+
+    container.addChild(graphics);
 
     const imgAssets = {
         Box,
@@ -79,6 +84,7 @@
 
     let boxHeight = 0;
     let boxWidth = 0;
+    let pilulePosInitial = {};
 
     function setPosition(sprite, keyName) {
         switch (keyName) {
@@ -90,10 +96,51 @@
             case "Ticket":
                 sprite.scale.set(canvasWidth/sprite.width * 0.5);
                 break;
+            case "Pill":
+                preparePill(sprite);
+                break;
             default:
                 sprite.scale.set(canvasWidth/sprite.width * 0.05);
                 break;
         }
+    }
+
+    function preparePill(sprite) {
+        piluleSprite = sprite;
+        sprite.scale.set(canvasWidth/sprite.width * 0.05);
+
+        //ici j'ai fait du vaudou pour placer la pilule
+        pilulePosInitial = {x: (boxWidth/3)*0.7, y: (boxHeight/2.25)*0.7 - sprite.height/2};
+        sprite.position.set(pilulePosInitial.x, pilulePosInitial.y);
+
+        function onDragEnd() {
+            if (this.dragging) {
+                this.dragging = false;
+                this.data = null;
+            }
+        }
+        sprite.interactive = true;
+        sprite.on('pointerdown', function (event) {
+                  // store a reference to the data
+                  // the reason for this is because of multitouch
+                  // we want to track the movement of this particular touch
+                  if (!this.dragging) {
+                      this.data = event.data;
+                      this.dragging = true;
+                      this.offsetY = this.y - this.data.getLocalPosition(this.parent).y;
+                      this.offsetX = this.x - this.data.getLocalPosition(this.parent).x;
+                  }
+              })
+              .on('pointerup', onDragEnd)
+              .on('pointerupoutside', onDragEnd)
+              .on('pointermove', function () {
+                  if (this.dragging) {
+                      let newPosX = this.data.getLocalPosition(this.parent).x + this.offsetX;
+                      let newPosY = this.data.getLocalPosition(this.parent).y + this.offsetY;
+                      this.y = newPosY;
+                      this.x = newPosX;
+                  }
+              });
     }
 
     function generateBorderSprite(isHorizontal) {
@@ -112,12 +159,14 @@
         return sprite;
     }
 
+    let borderLeft, borderRight, piluleSprite;
+
     function generateBoxBorder() {
-        let borderLeft = generateBorderSprite();
-        let borderRight = generateBorderSprite();
+        borderLeft = generateBorderSprite();
+        borderRight = generateBorderSprite();
         let borderBottom = generateBorderSprite(true);
         borderRight.position.set((boxWidth/2)*0.7, 0);
-        borderLeft.position.set(-(boxWidth/2)*0.65, 0);
+        borderLeft.position.set(-(boxWidth/2)*0.5, 0);
         borderBottom.position.set(0, (boxHeight/2)*0.7);
 
         container.addChild(borderLeft);
@@ -138,14 +187,79 @@
             container.addChild(sprite);
         });
 
-        generateBoxBorder();
+        //generateBoxBorder();
+        let path = [-(boxWidth/2)*0.8, - (boxHeight/2)*0.625,
+                    boxWidth*0.15,  - (boxHeight/2)*0.625 - boxHeight*0.08,
+                    boxWidth*0.475,  (boxHeight/2)*0.625 - boxHeight*0.04,
+                    -(boxWidth/2)*0.2, (boxHeight/2)*0.625 + boxHeight*0.04
+                   ];
+        graphics.beginFill(0xFF0000);
+        graphics.drawPolygon(path);
+        /*graphics.moveTo(-(boxWidth/2.5)*0.7, -(boxHeight/2)*0.7);
+        graphics.lineTo(boxWidth*0.6 -(boxWidth/2.5)*0.7,  -(boxHeight/2)*0.7);
+        graphics.lineTo(boxWidth*0.6 -(boxWidth/2.5)*0.7, boxHeight*0.7 -(boxHeight/2)*0.7);
+        graphics.lineTo(-(boxWidth/2.5)*0.7, boxHeight*0.7 -(boxHeight/2)*0.7);
+        graphics.lineTo(-(boxWidth/2.5)*0.7, -(boxHeight/2)*0.7);*/
+        graphics.endFill();
+        //graphics.rotation = -Math.PI/13.5;
+
+        /*graphics.beginFill(0xFF0000);
+        graphics.drawRect(-(boxWidth/2.5)*0.7, -(boxHeight/2)*0.7, boxWidth*0.6, boxHeight*0.7);
+        graphics.endFill();
+        graphics.rotation = -Math.PI/13.5;*/
+        /*graphics.beginFill(0xFF0000);
+        graphics.drawRect((boxWidth/2)*0.7, 0, 1, canvasHeight);
+        graphics.endFill();
+        graphics.beginFill(0xFF0000);
+        graphics.drawRect(-(boxWidth/2)*0.5, 0, 1, canvasHeight);
+        graphics.endFill();*/
+
+        container.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.01);
+        container.animDirection = "left";
+        container.animWiggle.start();
 
         app.ticker.add(delta => gameLoop(delta));
         is_ready = true;
     }
 
+    function getBottomLeft() {
+        let x = piluleSprite.position.x - piluleSprite.width/2;
+        let y = piluleSprite.position.y + piluleSprite.height/2;
+        return new Point(x, y);
+    }
+
+    function getTopRight() {
+        let x = piluleSprite.position.x + piluleSprite.width/2;
+        let y = piluleSprite.position.y - piluleSprite.height/2;
+        return new Point(x, y);
+    }
+
+
     function gameLoop() {
-        //container.rotation -= 0.01 * delta;
+        if (piluleSprite.dragging) {
+            if (!graphics.graphicsData[0].shape.contains(piluleSprite.position.x - piluleSprite.width/2, piluleSprite.position.y + piluleSprite.height/2)
+            || !graphics.graphicsData[0].shape.contains(piluleSprite.position.x + piluleSprite.width/2, piluleSprite.position.y - piluleSprite.height/2)) {
+                container.animWiggle = "";
+                piluleSprite.dragging = false;
+            }
+            /*if (!graphics.containsPoint(getTopRight())) {
+                console.log("right");
+            }*/
+        }
+        if (container.animWiggle.is_running) {
+            container.rotation = container.animWiggle.tick();
+        }
+        if (container.animWiggle.is_ended_signal) {
+            if (container.animDirection === "left") {
+                container.animWiggle = Animate(Math.PI/12, -Math.PI/12, Easing.easeOutCubic, 0.01);
+                container.animWiggle.start();
+                container.animDirection = "right";
+            } else {
+                container.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.01);
+                container.animWiggle.start();
+                container.animDirection = "left";
+            }
+        }
     }
 </script>
 
