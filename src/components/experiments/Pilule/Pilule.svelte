@@ -38,6 +38,7 @@
 
     let app, canvasWidth, canvasHeight;
     let container = new Container();
+
     const imgAssets = {
         Box,
         Pill,
@@ -76,46 +77,75 @@
         return number * canvasWidth;
     }
 
+    let boxHeight = 0;
+    let boxWidth = 0;
+
     function setPosition(sprite, keyName) {
         switch (keyName) {
             case "Box":
-                sprite.scale.set(canvasWidth/sprite.width);
-                sprite.position.set(canvasWidth/2, canvasHeight/2);
+                sprite.scale.set(canvasWidth/sprite.width * 0.5);
+                boxHeight = sprite.height;
+                boxWidth = sprite.width;
                 break;
             case "Ticket":
-                sprite.scale.set(canvasWidth/sprite.width);
-                sprite.position.set(canvasWidth/2, canvasHeight/2);
+                sprite.scale.set(canvasWidth/sprite.width * 0.5);
                 break;
             default:
-                sprite.scale.set(canvasWidth/sprite.width * 0.3);
-                sprite.position.set(canvasWidth/2, canvasHeight/2);
+                sprite.scale.set(canvasWidth/sprite.width * 0.05);
                 break;
         }
     }
 
+    function generateBorderSprite(isHorizontal) {
+        let sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
+        sprite.tint = 0xff0000; //Change with the color wanted
+        if (!isHorizontal) {
+            sprite.width = 1;
+            sprite.height = canvasHeight;
+        } else {
+            sprite.width = canvasWidth;
+            sprite.height = 1;
+        }
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        sprite.rotation = -Math.PI/13.5;
+        return sprite;
+    }
+
+    function generateBoxBorder() {
+        let borderLeft = generateBorderSprite();
+        let borderRight = generateBorderSprite();
+        let borderBottom = generateBorderSprite(true);
+        borderRight.position.set((boxWidth/2)*0.7, 0);
+        borderLeft.position.set(-(boxWidth/2)*0.65, 0);
+        borderBottom.position.set(0, (boxHeight/2)*0.7);
+
+        container.addChild(borderLeft);
+        container.addChild(borderRight);
+        container.addChild(borderBottom);
+    }
+
     async function setup() {
+        container.pivot.x = container.width / 2;
+        container.pivot.y = container.height / 2;
+        container.x = canvasWidth / 2;
+        container.y = canvasHeight / 2;
+
         await Object.values(imgAssets).forEach((key) => {
             let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
             let sprite = generateSprite(key);
             setPosition(sprite, keyName);
-            if (keyName === "Ticket") { //these sprites will be used for hit test
-                let sprite2 = generateSprite(key);
-                sprite2.scale.set(canvasWidth/sprite2.width);
-                sprite2.position.set(canvasWidth/2 + sprite2, canvasHeight/2);
-                container.addChild(sprite2);
-                let sprite3 = generateSprite(key);
-                sprite3.scale.set(canvasWidth/sprite3.width);
-                sprite3.position.set(canvasWidth/2 - sprite3, canvasHeight/2);
-                container.addChild(sprite3);
-            }
             container.addChild(sprite);
         });
+
+        generateBoxBorder();
+
         app.ticker.add(delta => gameLoop(delta));
         is_ready = true;
     }
 
     function gameLoop() {
-
+        //container.rotation -= 0.01 * delta;
     }
 </script>
 
