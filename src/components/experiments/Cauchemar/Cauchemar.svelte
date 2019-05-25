@@ -110,6 +110,7 @@
         z-index: 0;
         display: flex;
         justify-content: center;
+        align-items: center;
     }
 
     .icon {
@@ -170,6 +171,17 @@
         align-items: center;
     }
 
+    .hour {
+        color: white;
+        font-size: calc(var(--scaleFactor) * 85px);
+        font-family: 'BeatriceDisplayDA', 'serif';
+        letter-spacing: 10px;
+        border: solid 1px white;
+        padding: 10px;
+        filter: blur(1px);
+        opacity: calc(1 - var(--opacityDay));
+    }
+
     video {
         object-fit: cover;
     }
@@ -194,14 +206,19 @@
         {/if}
         <div class="alarmClock"
             out:fade
-            style="--scaleFactor:{scaleFactor}"
+            style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
             on:pointermove="{onPointerMove}"
             on:touchmove|passive="{onPointerMove}"
             on:pointerup="{onPointerUp}"
             on:touchend|passive="{onPointerUp}"
             bind:this="{alarmClock}">
-            <div class="day" style="--opacityDay:{opacityDay}">
-                <PreparationAnim value="jeans"></PreparationAnim>
+            <span class="hour">
+                08:00
+            </span>
+            <div class="day">
+                {#if opacityDay === 1}
+                    <PreparationAnim value="jeans"></PreparationAnim>
+                {/if}
             </div>
             {#if iconVisibility}
                 <div class="icon"
