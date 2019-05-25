@@ -18,7 +18,7 @@
         Sprite = PIXI.Sprite,
         filters = PIXI.filters;
 
-    let graphics = new Graphics();
+    let graphicsEye = new Graphics();
     let app, background, canvasWidth, canvasHeight;
     let increment = 0;
     let height = 0;
@@ -44,7 +44,7 @@
         background = new Sprite(resources[backgroundImg].texture);
         background.scale.set(canvasWidth/background.width);
         app.stage.addChild(background);
-        app.stage.addChild(graphics);
+        app.stage.addChild(graphicsEye);
 
         initCloseEye();
 
@@ -52,14 +52,14 @@
     }
 
     function initOpenEye() {
-        graphics.beginFill(0x000000);
-        graphics.moveTo(0, 0);
-        graphics.bezierCurveTo(50, -100, canvasWidth - 50, -100, canvasWidth, 0);
-        graphics.moveTo(0, 0);
-        graphics.bezierCurveTo(50, 100, canvasWidth - 50, 100, canvasWidth, 0);
-        graphics.position.set(canvasWidth/2, canvasHeight/2);
-        graphics.endFill();
-        background.mask = graphics;
+        graphicsEye.beginFill(0x000000);
+        graphicsEye.moveTo(0, 0);
+        graphicsEye.bezierCurveTo(50, -100, canvasWidth - 50, -100, canvasWidth, 0);
+        graphicsEye.moveTo(0, 0);
+        graphicsEye.bezierCurveTo(50, 100, canvasWidth - 50, 100, canvasWidth, 0);
+        graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
+        graphicsEye.endFill();
+        background.mask = graphicsEye;
         background.filters = [new filters.BlurFilter()];
 
         scaleAnim = Animate(1, 8.5, Easing.bounceOut, 0.005);
@@ -71,16 +71,16 @@
     }
 
     function initCloseEye() {
-        graphics.beginFill(0x000000);
-        graphics.moveTo(0, 0);
-        graphics.bezierCurveTo(50, -100 * 2, canvasWidth - 50, -100 * 2, canvasWidth, 0);
-        graphics.moveTo(0, 0);
-        graphics.bezierCurveTo(50, 100 * 2, canvasWidth - 50, 100 * 2, canvasWidth, 0);
-        graphics.position.set(canvasWidth/2, canvasHeight/2);
-        graphics.pivot.set(canvasWidth/2, height/2);
-        graphics.scale.set(4);
-        graphics.endFill();
-        background.mask = graphics;
+        graphicsEye.beginFill(0x000000);
+        graphicsEye.moveTo(0, 0);
+        graphicsEye.bezierCurveTo(50, -100 * 2, canvasWidth - 50, -100 * 2, canvasWidth, 0);
+        graphicsEye.moveTo(0, 0);
+        graphicsEye.bezierCurveTo(50, 100 * 2, canvasWidth - 50, 100 * 2, canvasWidth, 0);
+        graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
+        graphicsEye.pivot.set(canvasWidth/2, height/2);
+        graphicsEye.scale.set(4);
+        graphicsEye.endFill();
+        background.mask = graphicsEye;
         background.filters = [new filters.BlurFilter(4, 4)];
 
         scaleAnim = Animate(6, 1, Easing.bounceOut, 0.0025);
@@ -96,17 +96,17 @@
         if (scaleAnim.is_running || heightAnim.is_running) {
             height = heightAnim.tick();
             scale = scaleAnim.tick();
-            console.log(height, scale);
-            graphics.clear();
-            graphics.beginFill(0x000000);
-            graphics.moveTo(0, 0);
-            graphics.bezierCurveTo(50, -100 * height, canvasWidth - 50, -100 * height, canvasWidth, 0);
-            graphics.moveTo(0, 0);
-            graphics.bezierCurveTo(50, 100 * height, canvasWidth - 50, 100 * height, canvasWidth, 0);
-            graphics.position.set(canvasWidth/2, canvasHeight/2);
-            graphics.pivot.set(canvasWidth/2, height/2);
-            graphics.scale.set(scale);
-            graphics.endFill();
+
+            graphicsEye.clear();
+            graphicsEye.beginFill(0x000000);
+            graphicsEye.moveTo(0, 0);
+            graphicsEye.bezierCurveTo(50, -100 * height, canvasWidth - 50, -100 * height, canvasWidth, 0);
+            graphicsEye.moveTo(0, 0);
+            graphicsEye.bezierCurveTo(50, 100 * height, canvasWidth - 50, 100 * height, canvasWidth, 0);
+            graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
+            graphicsEye.pivot.set(canvasWidth/2, height/2);
+            graphicsEye.scale.set(scale);
+            graphicsEye.endFill();
         }
 
         if (blurAnim.is_running) {
