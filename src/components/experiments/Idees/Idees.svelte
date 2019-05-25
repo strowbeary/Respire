@@ -14,7 +14,8 @@
 	/*
 	* RESSOURCES
 	* */
-    import Idea from "assets/images/idees/Idea.png";
+    import Idea from "assets/images/idees/Idea_small.png";
+    import Prof from "assets/images/foule/P3.png";
 
     const carton_data ={
         titleName: "Les idées noires",
@@ -35,11 +36,12 @@
         resources = PIXI.loader.resources,
         Resource = PIXI.loaders.Resource,
         Sprite = PIXI.Sprite,
-        Container = PIXI.Container;
+        Container = PIXI.Container,
+        filters = PIXI.filters;
 
     let app, canvasWidth, canvasHeight;
     let container = new Container();
-
+    let prof;
     const imgAssets = {
         Idea
     };
@@ -58,9 +60,14 @@
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
-
         dragIcon = DragIcon(app);
+        loadImages();
+    }
 
+    async function loadImages() {
+        if (!resources[Prof]) {
+            loader.add(Prof);
+        }
         let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
             await imgToAdd.forEach((resourceKey) => {
@@ -88,13 +95,13 @@
 
     function setPosition(keyName) {
          switch(keyName){
-            case "Idea":
-                ideas[keyName].positions = {start: 0.15, end: -ideas[keyName].width/2};
-                ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.9);
-                break;
             case "Idea1":
                 ideas[keyName].positions = {start: 0.15, end: -ideas[keyName].width/2};
                 ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.9);
+                ideas[keyName].isFirst = true;
+                dragIcon.setDirection(-1);
+                dragIcon.setPosition(positionFromCanvasWidth(ideas[keyName].positions.start), ideas[keyName].y);
+                dragIcon.initIconAnim(0, 1);
                 break;
             case "Idea2":
                 ideas[keyName].positions = {start: 0.95, end: positionFromCanvasWidth(1) + ideas[keyName].width/2};
@@ -119,8 +126,8 @@
             let name = assetKey + '-' + index;
             ideas[name] = clone;
             if (sprite.direction === "up") {
-                if (sprite.position.y - sprite.height/6 > sprite.height/6) {
-                    clone.position.set(sprite.position.x, sprite.position.y);
+                if (sprite.y - sprite.height/6 > sprite.height/6) {
+                    clone.position.set(sprite.x, sprite.y);
                     clone.parentKey = keyName;
                     sprite.childKey = name;
                 } else {
@@ -128,14 +135,14 @@
                     let parentSprite = Object.keys(ideas)
                         .filter(key => key.includes(assetKey))
                         .map(key => ideas[key])
-                        .reduce((prev, curr) => prev.position.y < curr.position.y ? prev : curr);
+                        .reduce((prev, curr) => prev.y < curr.y ? prev : curr);
                     parentSprite.childKey = name;
-                    clone.position.set(parentSprite.position.x, parentSprite.position.y);
+                    clone.position.set(parentSprite.x, parentSprite.y);
                     clone.parentKey = Object.keys(ideas).filter(key => ideas[key] === parentSprite)[0];
                 }
             } if (sprite.direction === "down") {
-                if (sprite.position.y > canvasHeight - sprite.height/6) {
-                    clone.position.set(sprite.position.x, sprite.position.y);
+                if (sprite.y > canvasHeight - sprite.height/6) {
+                    clone.position.set(sprite.x, sprite.y);
                     clone.parentKey = keyName;
                     sprite.childKey = name;
                 } else {
@@ -143,9 +150,9 @@
                     let parentSprite = Object.keys(ideas)
                         .filter(key => key.includes(assetKey))
                         .map(key => ideas[key])
-                        .reduce((prev, curr) => prev.position.y > curr.position.y ? prev : curr);
+                        .reduce((prev, curr) => prev.y > curr.y ? prev : curr);
                     parentSprite.childKey = name;
-                    clone.position.set(parentSprite.position.x, parentSprite.position.y);
+                    clone.position.set(parentSprite.x, parentSprite.y);
                     clone.parentKey = Object.keys(ideas).filter(key => ideas[key] === parentSprite)[0];
                 }
             }
@@ -169,26 +176,37 @@
         sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
         parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
         if (sprite.direction === "up") {
-            sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-            parent.anim_position_y = Animate(parent.position.y, parent.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+            sprite.anim_position_y = Animate(sprite.y, sprite.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+            parent.anim_position_y = Animate(parent.y, parent.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
         } else if (sprite.direction === "down") {
-            sprite.anim_position_y = Animate(sprite.position.y, sprite.position.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
-            parent.anim_position_y = Animate(parent.position.y, parent.position.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+            sprite.anim_position_y = Animate(sprite.y, sprite.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+            parent.anim_position_y = Animate(parent.y, parent.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+        }
+        if (parent.isFirst) {
+            dragIcon.initIconAnim(1, 0);
+            dragIcon.startIconAnim();
         }
         sprite.anim_scale_y.start();
         parent.anim_scale_y.start();
         sprite.anim_position_y.start();
         parent.anim_position_y.start();
+        blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
+        blurAnim.start();
     }
 
     function onDragEnd() {
         if (this.dragging) {
             this.dragging = false;
             this.data = null;
+
             if (this.x < 0 || this.x > canvasWidth - this.width/2) {
                 let keyName = Object.keys(ideas).find(key => ideas[key] === this);
                 container.removeChild(this);
                 delete ideas[keyName];
+
+                blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.05);
+                blurAnim.start();
+
                 if (this.childKey) {
                     container.removeChild(ideas[this.childKey]);
                     delete ideas[this.childKey];
@@ -203,6 +221,16 @@
             } else if (this.childKey) {
                 ideas[this.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
                 ideas[this.childKey].anim_opacity.start();
+
+                if (this.isFirst) {
+                    dragIcon.setPosition(this.x, this.y);
+                    dragIcon.initIconAnim(0, 0.5);
+                    dragIcon.startIconAnim();
+                }
+            } else if (this.isFirst) {
+                dragIcon.setPosition(this.x, this.y);
+                dragIcon.initIconAnim(0, 0.5);
+                dragIcon.startIconAnim();
             }
         }
     }
@@ -214,6 +242,11 @@
                       this.dragging = true;
                       this.offset = this.x - this.data.getLocalPosition(this.parent).x;
                       this.direction = "left";
+
+                      if (this.isFirst) {
+                          dragIcon.initIconAnim(0.5, 0);
+                          dragIcon.startIconAnim();
+                      }
 
                       if (this.childKey) {
                           ideas[this.childKey].anim_opacity = null;
@@ -236,6 +269,14 @@
     }
 
     async function setup() {
+        prof = new Sprite(resources[Prof].texture);
+        prof.scale.set((canvasWidth/prof.width) * 0.25);
+        prof.anchor.x = 0.5;
+        prof.anchor.y = 0.5;
+        prof.position.set(canvasWidth/2, canvasHeight/2);
+        prof.filters = [new filters.BlurFilter(0.1)];
+        container.addChild(prof);
+
         for (let i = 1; i < 4; i++) {
             let sprite = generateAnimatedSprite(imgAssets["Idea"]);
             ideas["Idea"+i] = sprite;
@@ -271,17 +312,26 @@
         let sprite = ideas[keyName];
         sprite.anim_position_x = Animate(sprite.positions.end, positionFromCanvasWidth(sprite.positions.start), Easing.linear, 0.03);
         sprite.anim_position_x.start();
+        blurAnim = Animate(blurValue, blurValue + 0.5, Easing.linear, 0.03);
+        blurAnim.start();
     };
 
+    let blurAnim;
+    let blurValue = 0;
+
     function gameLoop() {
+        dragIcon.loop();
         if (Object.keys(ideas).length > 0) {
             for (let property in ideas) {
                 if (ideas[property].anim_position_x) {
                     let sprite = ideas[property];
                     if (sprite.anim_position_x.is_running) {
-                        sprite.position.set(sprite.anim_position_x.tick(), sprite.position.y);
+                        sprite.x = sprite.anim_position_x.tick();
                     }
                     if (sprite.anim_position_x.is_ended_signal) {
+                        if (sprite.isFirst) {
+                            dragIcon.startIconAnim();
+                        }
                         create_clone(sprite, property);
                     }
                 }
@@ -316,7 +366,7 @@
                 if (ideas[property].anim_position_y) {
                     let sprite = ideas[property];
                     if (sprite.anim_position_y.is_running) {
-                        sprite.position.set(sprite.position.x, sprite.anim_position_y.tick());
+                        sprite.y = sprite.anim_position_y.tick();
                     }
                     if (sprite.anim_position_y.is_ended_signal) {
                         if (sprite.childKey) {
@@ -326,9 +376,23 @@
                             sprite.parentKey = "";
                             create_clone(sprite, property);
                         }
+                        if (sprite.isFirst) {
+                           dragIcon.setPosition(sprite.x, sprite.y);
+                           dragIcon.initIconAnim(0, 1);
+                           dragIcon.startIconAnim();
+                        }
                         sprite.interactive = true;
                     }
                 }
+            }
+        }
+        if (blurAnim) {
+            if (blurAnim.is_running) {
+                prof.filters[0].blur = blurAnim.tick();
+            }
+            if (blurAnim.is_ended_signal) {
+                blurValue = blurAnim.tick();
+                blurAnim = null;
             }
         }
     }
