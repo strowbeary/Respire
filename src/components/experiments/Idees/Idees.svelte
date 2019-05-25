@@ -201,21 +201,23 @@
 
             if (this.x < 0 || this.x > canvasWidth - this.width/2) {
                 let keyName = Object.keys(ideas).find(key => ideas[key] === this);
-                container.removeChild(this);
-                delete ideas[keyName];
+                if (keyName) {
+                    container.removeChild(this);
+                    delete ideas[keyName];
 
-                blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.05);
-                blurAnim.start();
+                    blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.05);
+                    blurAnim.start();
 
-                if (this.childKey) {
-                    container.removeChild(ideas[this.childKey]);
-                    delete ideas[this.childKey];
-                    this.childKey = "";
-                    let property = keyName.split('-')[0];
-                    let sprites = Object.keys(ideas).filter(key => key.includes(keyName.split('-')[0]));
-                    if (sprites.length > 0) {
-                        let sprite = ideas[sprites[sprites.length - 1]];
-                        create_clone(sprite, property);
+                    if (this.childKey) {
+                        container.removeChild(ideas[this.childKey]);
+                        delete ideas[this.childKey];
+                        this.childKey = "";
+                        let property = keyName.split('-')[0];
+                        let sprites = Object.keys(ideas).filter(key => key.includes(keyName.split('-')[0]));
+                        if (sprites.length > 0) {
+                            let sprite = ideas[sprites[sprites.length - 1]];
+                            create_clone(sprite, property);
+                        }
                     }
                 }
             } else if (this.childKey) {
@@ -248,7 +250,7 @@
                           dragIcon.startIconAnim();
                       }
 
-                      if (this.childKey) {
+                      if (this.childKey && ideas[this.childKey]) {
                           ideas[this.childKey].anim_opacity = null;
                           ideas[this.childKey].alpha = 0;
                       }
@@ -261,7 +263,7 @@
                       let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
                       this.x = newPos;
 
-                      if (this.childKey) {
+                      if (this.childKey && ideas[this.childKey]) {
                           ideas[this.childKey].x = newPos;
                       }
                   }
