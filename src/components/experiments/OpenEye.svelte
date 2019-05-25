@@ -1,8 +1,8 @@
 <script>
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
-    import backgroundImg from "assets/images/background.jpg";
-    import {EasingFunctions} from "lib/easing";
+    import backgroundImg from "assets/images/pilule/Cours.jpg";
+    import {Animate, Easing} from "lib/TimingKit";
     import * as PIXI from "pixi.js";
 
     export let canvasProps;
@@ -23,6 +23,7 @@
     let increment = 0;
     let height = 0;
     let scale = 1;
+    let scaleAnim, heightAnim, blurAnim;
 
     function init(data) {
         app = data.detail.app;
@@ -43,7 +44,7 @@
     function setup() {
         background = new Sprite(resources[backgroundImg].texture);
         app.stage.addChild(background);
-        background.position.set(-background.width/2, 0);
+        background.scale.set(canvasWidth/background.width);
 
         graphics.beginFill(0x000000);
         graphics.moveTo(0, 0);
@@ -59,15 +60,20 @@
         background.filters = [new filters.BlurFilter()];
 
         app.ticker.add(delta => gameLoop(delta));
+        scaleAnim = Animate(1, 8.5, Easing.bounceOut, 0.005);
+        heightAnim = Animate(0, 2, Easing.bounceOut, 0.005);
+        blurAnim = Animate(16, 0, Easing.bounceOut, 0.01);
+        scaleAnim.start();
+        heightAnim.start();
+        blurAnim.start();
     }
 
     function gameLoop(delta) {
-        if (height < 2 || scale < 8.5) {
-            if (increment <= 1) {
-                height = EasingFunctions.bounceOut(increment) * 2;
-                scale = EasingFunctions.bounceOut(increment) * 8.5;
-            }
-            increment += 0.005;
+
+        if (scaleAnim.is_running || heightAnim.is_running) {
+            height = heightAnim.tick();
+            scale = scaleAnim.tick();
+
             graphics.clear();
             graphics.beginFill(0x000000);
             graphics.moveTo(0, 0);
@@ -78,9 +84,12 @@
             graphics.pivot.set(canvasWidth/2, height/2);
             graphics.scale.set(scale);
             graphics.endFill();
+        }
 
-            background.filters = [new filters.BlurFilter(EasingFunctions.bounceOut(1 - increment) * 16, 4)];
-        } else if (background.filters.length > 0) {
+        if (blurAnim.is_running) {
+            background.filters = [new filters.BlurFilter(blurAnim.tick(), 4)];
+        }
+        if (blurAnim.is_ended_signal) {
             background.filters = [];
         }
     }
