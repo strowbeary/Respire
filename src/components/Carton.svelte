@@ -44,18 +44,20 @@
     let yLast;
 
     function onPointerDown(e) {
-        if(e.touches) {
-            yStart = e.touches[0].clientY;
-            xStart = e.touches[0].clientX;
-        } else {
-            yStart = e.clientY;
-            xStart = e.clientX;
-        }
+        if (visible) {
+            if(e.touches) {
+                yStart = e.touches[0].clientY;
+                xStart = e.touches[0].clientX;
+            } else {
+                yStart = e.clientY;
+                xStart = e.clientX;
+            }
 
-        if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
-            e.preventDefault();
-            yLast = parseFloat(getComputedStyle(carton).height);
-            isPointerDown = true;
+            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
+                e.preventDefault();
+                yLast = parseFloat(getComputedStyle(carton).height);
+                isPointerDown = true;
+            }
         }
     }
 
