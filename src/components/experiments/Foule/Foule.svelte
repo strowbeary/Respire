@@ -90,7 +90,7 @@
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
 
-        dragIcon = DragIcon(app);
+        dragIcon = DragIcon(app.stage);
 
         let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
@@ -118,7 +118,7 @@
             } else {
                 dragIcon.setDirection(-1);
             }
-            dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
+            dragIcon.setPosition(person.x, person.y - person.height * 0.25 + container.y);
             dragIcon.initIconAnim(0, 0.5);
             dragIcon.startIconAnim();
 
@@ -137,7 +137,7 @@
                             interactiveCurrentIndex++;
                             play_interaction_sound();
                             if (interactiveCurrentIndex % 2 === 0) {
-                                container_anim = create_container_anim(container.position.y, container.position.y + (canvasHeight * 0.1));
+                                container_anim = create_container_anim(container.y, container.y + (canvasHeight * 0.1));
                                 container_anim.start();
                             } else {
                                 setInteractive();
@@ -198,7 +198,7 @@
                         resolve();
                     }, Math.random() * 200 + i * 400));
                 }));
-            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
+            container_anim = Animate(container.y, container.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
             container_anim.start();
 
         }
@@ -322,14 +322,13 @@
 
     function gameLoop() {
         const container_offset = container_anim.tick();
-        container.position.set(0, container_offset);
+        container.y = container_offset;
         set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
         if(container_anim.is_ended_signal) {
             setInteractive();
         }
         if (person_anim.is_running) {
-            const person_offset = person_anim.tick();
-            person.position.set(person_offset, person.position.y);
+            person.x = person_anim.tick();
         }
         if (person_anim.is_ended_signal) {
             dragIcon.initIconAnim(0, 0.5);
@@ -339,7 +338,7 @@
         ["P8", "P5", "P6", "P7", "P2"]
         .map(k => people[k])
         .forEach(p => {
-            p.position.set(p.anim.tick(), p.position.y)
+            p.x = p.anim.tick()
         })
     }
 </script>

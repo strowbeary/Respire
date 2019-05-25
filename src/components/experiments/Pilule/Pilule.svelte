@@ -66,7 +66,6 @@
         app.stage.addChild(containerEye);
         app.stage.addChild(containerPill);
 
-        dragIcon = DragIcon(app);
         loadImages();
     }
 
@@ -191,6 +190,8 @@
                   if (!this.dragging) {
                       this.data = event.data;
                       this.dragging = true;
+                      dragIcon.initIconAnim(0.5, 0);
+                      dragIcon.startIconAnim();
                       this.offsetY = this.y - this.data.getLocalPosition(this.parent).y;
                       this.offsetX = this.x - this.data.getLocalPosition(this.parent).x;
                   }
@@ -214,6 +215,9 @@
                       }
                   }
               });
+        dragIcon = DragIcon(containerPill, true);
+        dragIcon.setDirection(1);
+        dragIcon.setPosition(sprite.x, sprite.y);
     }
 
     let piluleSprite;
@@ -282,32 +286,20 @@
             }
         }
 
-        if (piluleSprite.animFall_x) {
-            if (piluleSprite.animFall_x.is_running) {
+        if (piluleSprite.animFall_x && piluleSprite.animFall_y) {
+            if (piluleSprite.animFall_x.is_running || piluleSprite.animFall_y.is_running) {
                 piluleSprite.x = piluleSprite.animFall_x.tick();
-            }
-
-            if (piluleSprite.animFall_x.is_ended_signal) {
-               piluleSprite.animFall_x = null;
-               if (piluleSprite.animFall_y === null) {
-                   piluleSprite.interactive = true;
-                   launchContainerAnim();
-               }
-            }
-
-        }
-
-        if (piluleSprite.animFall_y) {
-            if (piluleSprite.animFall_y.is_running) {
                 piluleSprite.y = piluleSprite.animFall_y.tick();
             }
-            if (piluleSprite.animFall_y.is_ended_signal) {
-                piluleSprite.animFall_y = null;
-                if (piluleSprite.animFall_x === null) {
-                   piluleSprite.interactive = true;
-                   launchContainerAnim();
-                }
+
+            if (piluleSprite.animFall_x.is_ended_signal && piluleSprite.animFall_y.is_ended_signal) {
+               piluleSprite.animFall_x = null;
+               piluleSprite.interactive = true;
+               launchContainerAnim();
+               dragIcon.initIconAnim(0, 0.5);
+               dragIcon.startIconAnim();
             }
+
         }
 
         if (containerPill.animWiggle.is_running) {
@@ -401,10 +393,14 @@
                } else {
                    currentScene = "pill";
                    containerPill.cacheAsBitmap = false;
+                   dragIcon.initIconAnim(0, 0.5);
+                   dragIcon.startIconAnim();
                    launchContainerAnim();
                }
            }
         }
+
+        dragIcon.loop();
     }
 </script>
 
