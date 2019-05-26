@@ -198,6 +198,15 @@
         }
     }
 
+    @keyframes closeDoor {
+        0% {
+            transform: perspective(100px) rotateY(90deg) translateX(50%);
+        }
+        100% {
+            transform: perspective(100px) rotateY(0deg) translateX(50%);
+        }
+    }
+
     .room_door_light {
         position: absolute;
         width: calc(20% * 460/var(--canvasWidth));
@@ -212,6 +221,10 @@
         height: calc(20% * 460/var(--canvasWidth));
         background: transparent;
         z-index: 1;
+    }
+
+    .room_door_wrapper {
+        transform-style: preserve-3d;
     }
 
     .room_door_frame {
@@ -249,15 +262,7 @@
         width: 50%;
         height: 60%;
         background-color: black;
-        transform: rotateY(90deg) translateX(50%);
-    }
-
-    .room_door_all {
-        position: absolute;
-        transform-style: preserve-3d;
-        width: 100%;
-        height: 100%;
-        transform: translateZ(-100px);
+        animation: closeDoor 30s linear forwards;
     }
 </style>
 
