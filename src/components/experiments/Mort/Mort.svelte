@@ -134,20 +134,11 @@
         opacity: 0;
     }
 
-    .room_wrapper {
-      width: 100%;
-      height: 50%;
-      position: relative;
-      perspective: 400px;
-      margin: 0 auto;
-    }
-
 
     .room {
       width: 100%;
       height: 100%;
       position: absolute;
-      transform-style: preserve-3d;
       display: flex;
       align-items: center;
     }
@@ -160,14 +151,15 @@
       background: white;
       backface-visibility: hidden;
       overflow: hidden;
+      transform-style: preserve-3d;
     }
 
     .room_wall-right {
-        transform: rotateY(-90deg) translateZ(-100px);
+        transform: perspective(50px) rotateY(-90deg) translateZ(calc(-200px * var(--canvasWidth)/400));
     }
 
     .room_wall-left {
-        transform: rotateY(90deg) translateZ(-100px);
+        transform: perspective(50px) rotateY(90deg) translateZ(calc(-200px * var(--canvasWidth)/400));
     }
 
     .wallpaper {
@@ -208,20 +200,18 @@
 
     .room_door_light {
         position: absolute;
-        width: 50%;
-        height: 100%;
+        width: calc(20% * 460/var(--canvasWidth));
+        height: calc(20% * 460/var(--canvasWidth));
         background: white;
-        transform: translateZ(-100px) translateX(50%) translateY(5%);
-        transform-style: preserve-3d;
+        z-index: 1;
     }
 
     .room_door_wrapper, .room_door_frame {
         position: absolute;
-        width: 50%;
-        height: 100%;
+        width: calc(20% * 460/var(--canvasWidth));
+        height: calc(20% * 460/var(--canvasWidth));
         background: transparent;
-        transform-style: preserve-3d;
-        transform: translateZ(-50px) translateX(50%);
+        z-index: 1;
     }
 
     .room_door_frame {
@@ -284,26 +274,21 @@
             on:touchmove|passive="{onPointerMove}"
             on:pointerup="{onPointerUp}"
             on:touchend|passive="{onPointerUp}">
-
-            <div class="room_wrapper">
-                <div class="room">
-                    <div class="room_door_light"></div>
-                    <div class="room_door_wrapper">
-                        <div class="room_door"></div>
-                    </div>
-                    <div class="room_door_frame">
-                        <div class="room_door_frame_top"></div>
-                        <div class="room_door_frame_left"></div>
-                        <div class="room_door_frame_space"></div>
-                        <div class="room_door_frame_right"></div>
-                    </div>
-                    <div class="room_wall room_wall-left">
-                        <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
-                    </div>
-                    <div class="room_wall room_wall-right">
-                        <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
-                    </div>
-                </div>
+            <div class="room_door_light"></div>
+            <div class="room_door_wrapper">
+                <div class="room_door"></div>
+            </div>
+            <div class="room_door_frame">
+                <div class="room_door_frame_top"></div>
+                <div class="room_door_frame_left"></div>
+                <div class="room_door_frame_space"></div>
+                <div class="room_door_frame_right"></div>
+            </div>
+            <div class="room_wall room_wall-left">
+                <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+            </div>
+            <div class="room_wall room_wall-right">
+                <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
             </div>
             {#if iconVisibility}
                 <div class="icon"
