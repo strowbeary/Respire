@@ -22,63 +22,92 @@
     let iconVisibility = true;
 
     const dispatch = createEventDispatcher();
-    let toto;
 
     let icon;
     let isPointerDown = false;
     let circleTransformValue = 0;
     let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
+    let runningDuration = 60;
+    let mort;
 
-    $: {
-        console.log(toto);
-    }
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
     $: opacityDay = circleTransformValue / (200 * scaleFactor);
 
-    function updateCirclePosition(e) {
-        let x = 0;
-        if(e.touches) {
-            x = e.touches[0].clientX;
-        } else {
-            x = e.clientX;
-        }
-        let start = icon.getBoundingClientRect().left;
-        let end = icon.getBoundingClientRect().right;
-        if (x < start) {
-            circleTransformValue = -circleRadius;
-        } else if (x > end) {
-            circleTransformValue = 200 * window.innerHeight / 824;
-        } else {
-            circleTransformValue = x - start - circleRadius;
-        }
-    }
+    let yStart = 0;
+    let xStart = 0;
+    let yEnd = 0;
+    let xEnd = 0;
+    let xCumul = [];
+    let yCumul = [];
+    let yLast;
 
     function onPointerDown(e) {
-        if (icon) {
+        if(e.touches) {
+            yStart = e.touches[0].clientY;
+            xStart = e.touches[0].clientX;
+        } else {
+            yStart = e.clientY;
+            xStart = e.clientX;
+        }
+
+        if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
             e.preventDefault();
+            yLast = parseFloat(getComputedStyle(mort).height);
             isPointerDown = true;
-            updateCirclePosition(e);
         }
     }
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            updateCirclePosition(e);
+            let x;
+            let y;
+            if (e.touches) {
+                y = e.touches[0].clientY;
+                x = e.touches[0].clientX;
+            } else {
+                y = e.clientY;
+                x = e.clientX;
+            }
+            xCumul.push(Math.abs(x - xStart) < 50);
+            yCumul.push(y <= yLast);
+            yLast = y;
         }
     }
 
     function onPointerUp(e) {
         if (isPointerDown) {
             e.preventDefault();
-            if (circleTransformValue === (200 * window.innerHeight / 824)) {
-                iconVisibility = false;
-                isPointerDown = false;
+            if(e.touches) {
+                yEnd = e.touches[0].clientY;
+                xEnd = e.touches[0].clientX;
             } else {
-                isPointerDown = false;
+                yEnd = e.clientY;
+                xEnd = e.clientX;
+            }
+            if (yEnd < yStart - parseFloat(getComputedStyle(mort).height)/10 &&
+                !xCumul.includes(false) &&
+                !yCumul.includes(false)) {
+                runningDuration = 30;
+                setTimeout(() => {
+                    runningDuration = 60;
+                }, 3000);
+                reset();
+            } else {
+                reset();
             }
         }
+    }
+
+    function reset() {
+        yStart = 0;
+        yEnd = 0;
+        xStart = 0;
+        xEnd = 0;
+        isPointerDown = false;
+        xCumul = [];
+        yCumul = [];
     }
 </script>
 
@@ -109,6 +138,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        animation: run 1s linear infinite;
     }
 
     .icon {
@@ -165,7 +195,6 @@
     .wallpaper {
         position: absolute;
         background-repeat: repeat-x;
-        animation: slide 60s linear infinite;
         background-size: 400px 100%;
         height: 100%;
         width: 1200px;
@@ -173,11 +202,13 @@
 
     .room_wall-left .wallpaper {
         animation: slide 6s linear infinite;
+        animation-duration: calc(100ms * var(--runningDuration));
     }
 
     .room_wall-right .wallpaper {
         right: 0;
         animation: slideRight 6s linear infinite;
+        animation-duration: calc(100ms * var(--runningDuration));
     }
 
     @keyframes slideRight{
@@ -204,6 +235,18 @@
         }
         100% {
             transform: perspective(100px) rotateY(0deg) translateX(50%);
+        }
+    }
+
+    @keyframes run {
+        0%, 100% {
+            transform: translateX(-2%) translateY(-2%);
+        }
+        25%, 75% {
+            transform: translateX(0%) translateY(2%);
+        }
+        50% {
+            transform: translateX(2%) translateY(-2%);
         }
     }
 
@@ -274,11 +317,14 @@
         }}></Carton>
         <div class="mort"
             out:fade
-            style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}"
+            style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --runningDuration:{runningDuration}"
+            on:pointerdown="{onPointerDown}"
+            on:touchstart|passive="{onPointerDown}"
             on:pointermove="{onPointerMove}"
             on:touchmove|passive="{onPointerMove}"
             on:pointerup="{onPointerUp}"
-            on:touchend|passive="{onPointerUp}">
+            on:touchend|passive="{onPointerUp}"
+            bind:this="{mort}">
             <div class="room_door_light"></div>
             <div class="room_door_wrapper">
                 <div class="room_door"></div>
@@ -299,7 +345,7 @@
                 <div class="icon"
                      bind:this="{icon}"
                      transition:fade>
-                     <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+                     <span class="icon__circle" class:loopCircle="{!isPointerDown && runningDuration === 60}"></span>
                 </div>
             {/if}
         </div>
