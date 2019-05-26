@@ -22,6 +22,7 @@
     let iconVisibility = true;
 
     const dispatch = createEventDispatcher();
+    let toto;
 
     let icon;
     let isPointerDown = false;
@@ -29,6 +30,9 @@
     let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
 
+    $: {
+        console.log(toto);
+    }
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
     $: opacityDay = circleTransformValue / (200 * scaleFactor);
@@ -120,14 +124,6 @@
         animation: wiggle 1.5s infinite ease-out;
     }
 
-    .door {
-        position: absolute;
-        background-color: white;
-        width: 100px;
-        height: 200px;
-        transform: translateZ(-100px);
-    }
-
     .icon__circle {
         display: flex;
         justify-content: center;
@@ -139,8 +135,8 @@
     }
 
     .room_wrapper {
-      width: 400px;
-      height: 400px;
+      width: 100%;
+      height: 50%;
       position: relative;
       perspective: 400px;
       margin: 0 auto;
@@ -152,6 +148,8 @@
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
     }
 
     .room_wall {
@@ -208,12 +206,68 @@
         }
     }
 
-    .room_door {
+    .room_door_light {
         position: absolute;
         width: 50%;
         height: 100%;
-        background: red;
-        transform: translateZ(-100px) translateX(50%);
+        background: white;
+        transform: translateZ(-100px) translateX(50%) translateY(5%);
+        transform-style: preserve-3d;
+    }
+
+    .room_door_wrapper, .room_door_frame {
+        position: absolute;
+        width: 50%;
+        height: 100%;
+        background: transparent;
+        transform-style: preserve-3d;
+        transform: translateZ(-50px) translateX(50%);
+    }
+
+    .room_door_frame {
+        display: grid;
+        grid-template-areas:
+            "top top top top top top top top"
+            "top top top top top top top top"
+            "left left space space space space right right"
+            "left left space space space space right right"
+            "left left space space space space right right";
+    }
+
+    .room_door_frame_top {
+        grid-area: top;
+        background-color: dimgrey;
+    }
+
+    .room_door_frame_space {
+        grid-area: space;
+    }
+
+    .room_door_frame_left {
+        grid-area: left;
+        background-color: dimgrey;
+    }
+
+    .room_door_frame_right {
+        grid-area: right;
+        background-color: dimgrey;
+    }
+
+    .room_door {
+        position: absolute;
+        bottom: 0;
+        width: 50%;
+        height: 60%;
+        background-color: black;
+        transform: rotateY(90deg) translateX(50%);
+    }
+
+    .room_door_all {
+        position: absolute;
+        transform-style: preserve-3d;
+        width: 100%;
+        height: 100%;
+        transform: translateZ(-100px);
     }
 </style>
 
@@ -225,7 +279,7 @@
         }}></Carton>
         <div class="mort"
             out:fade
-            style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
+            style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}"
             on:pointermove="{onPointerMove}"
             on:touchmove|passive="{onPointerMove}"
             on:pointerup="{onPointerUp}"
@@ -233,7 +287,16 @@
 
             <div class="room_wrapper">
                 <div class="room">
-                    <div class="room_door"></div>
+                    <div class="room_door_light"></div>
+                    <div class="room_door_wrapper">
+                        <div class="room_door"></div>
+                    </div>
+                    <div class="room_door_frame">
+                        <div class="room_door_frame_top"></div>
+                        <div class="room_door_frame_left"></div>
+                        <div class="room_door_frame_space"></div>
+                        <div class="room_door_frame_right"></div>
+                    </div>
                     <div class="room_wall room_wall-left">
                         <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
                     </div>
