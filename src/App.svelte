@@ -3,14 +3,14 @@
     import anim_bg from "assets/images/animated_background.png";
     import AppWrapper from "components/AppWrapper.svelte";
 
+    import Cauchemar from "components/experiments/Cauchemar/Cauchemar.svelte";
     import Foule from "components/experiments/Foule/Foule.svelte";
     import Idees from "components/experiments/Idees/Idees.svelte";
 
-    const components = [Foule, Idees];
+    const components = [Cauchemar, Foule, Idees];
     let index = 0;
 
     function next(){
-        console.log("next");
         index++;
     }
 </script>

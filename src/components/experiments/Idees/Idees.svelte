@@ -2,7 +2,7 @@
     /*
     * MODULES
     * */
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, onDestroy} from 'svelte';
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
@@ -406,6 +406,10 @@
     function next() {
         display_carton = false;
     }
+
+    onDestroy(() => {
+        app.destroy();
+    });
 </script>
 
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next="{next}"></Carton>

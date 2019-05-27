@@ -12,6 +12,7 @@
     * RESSOURCES
     * */
     import placeholderVideo from 'assets/videos/placeholder.webm';
+    export let canvasSize;
 
     const carton_data ={
         titleName: "Dans le brouillard",
@@ -75,6 +76,7 @@
             if (circleTransformValue === (200 * window.innerHeight / 824)) {
                 iconVisibility = false;
                 isPointerDown = false;
+                setTimeout(next, 1000);
             } else {
                 isPointerDown = false;
             }
@@ -83,6 +85,10 @@
 
     function onFirstVideoEnd() {
         videoVisibility = false;
+    }
+
+    function next() {
+        dispatch("next");
     }
 </script>
 
@@ -188,48 +194,44 @@
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<AppWrapper let:canvasSize={canvasSize}>
-    <div slot="scene">
-        <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
-            videoComponent.play();
-            display_carton = false;
-        }}></Carton>
-        {#if canvasSize.canvasWidth && videoVisibility}
-            <video
-                out:fade
-                width="{canvasSize.canvasWidth}"
-                height="{canvasSize.canvasHeight}"
-                bind:this="{videoComponent}"
-                src={placeholderVideo}
-                on:ended={onFirstVideoEnd}
-            ></video>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
+    videoComponent.play();
+    display_carton = false;
+}}></Carton>
+{#if canvasSize.canvasWidth && videoVisibility}
+    <video
+        out:fade
+        width="{canvasSize.canvasWidth}"
+        height="{canvasSize.canvasHeight}"
+        bind:this="{videoComponent}"
+        src={placeholderVideo}
+        on:ended={onFirstVideoEnd}
+    ></video>
+{/if}
+<div class="alarmClock"
+    out:fade
+    style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
+    on:pointermove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
+    on:pointerup="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
+    bind:this="{alarmClock}">
+    <span class="hour">
+        08:00
+    </span>
+    <div class="day">
+        {#if opacityDay === 1}
+            <PreparationAnim value="jeans"></PreparationAnim>
         {/if}
-        <div class="alarmClock"
-            out:fade
-            style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
-            on:pointermove="{onPointerMove}"
-            on:touchmove|passive="{onPointerMove}"
-            on:pointerup="{onPointerUp}"
-            on:touchend|passive="{onPointerUp}"
-            bind:this="{alarmClock}">
-            <span class="hour">
-                08:00
-            </span>
-            <div class="day">
-                {#if opacityDay === 1}
-                    <PreparationAnim value="jeans"></PreparationAnim>
-                {/if}
-            </div>
-            {#if iconVisibility}
-                <div class="icon"
-                     bind:this="{icon}"
-                     transition:fade
-                     on:pointerdown="{onPointerDown}"
-                     on:touchstart|passive="{onPointerDown}">
-                     <div class="icon__line"></div>
-                     <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
-                </div>
-            {/if}
-        </div>
     </div>
-</AppWrapper>
+    {#if iconVisibility}
+        <div class="icon"
+             bind:this="{icon}"
+             transition:fade
+             on:pointerdown="{onPointerDown}"
+             on:touchstart|passive="{onPointerDown}">
+             <div class="icon__line"></div>
+             <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
+        </div>
+    {/if}
+</div>
