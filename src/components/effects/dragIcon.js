@@ -11,24 +11,29 @@ function createSlideAnim(from_value, to_value) {
     return Animate(from_value, to_value, Easing.easeOutCubic, 0.01);
 }
 
-export function DragIcon(app) {
+export function DragIcon(container, isVertical) {
     const interactiveIcon = new Graphics();
     const lineWidth = 100;
     let alpha = 0;
     let iconAnim;
     let finalPosition = 0;
     let slideAnim = createSlideAnim(0, 1);
+    let vertical = isVertical;
     slideAnim.start();
     interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
     interactiveIcon.drawCircle(0, 0, 20);
     interactiveIcon.alpha = alpha;
 
-    app.stage.addChild(interactiveIcon);
+    container.addChild(interactiveIcon);
 
     function draw(newPos) {
         interactiveIcon.clear();
         interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
-        interactiveIcon.drawCircle(newPos, 0, 20);
+        if (!vertical) {
+            interactiveIcon.drawCircle(newPos, 0, 20);
+        } else {
+            interactiveIcon.drawCircle(0, -newPos, 20);
+        }
     }
 
     return {
