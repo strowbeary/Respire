@@ -1,8 +1,18 @@
 <script>
-    import Selector from "components/Selector.svelte";
     import TrailSwipe from "components/experiments/Idees/Idees.svelte";
     import anim_bg from "assets/images/animated_background.png";
+    import AppWrapper from "components/AppWrapper.svelte";
 
+    import Foule from "components/experiments/Foule/Foule.svelte";
+    import Idees from "components/experiments/Idees/Idees.svelte";
+
+    const components = [Foule, Idees];
+    let index = 0;
+
+    function next(){
+        console.log("next");
+        index++;
+    }
 </script>
 
 <style>
@@ -21,5 +31,9 @@
 </style>
 
 <!--<img class="overlay" src={anim_bg} alt="animated background">-->
-<TrailSwipe></TrailSwipe>
+<AppWrapper let:canvasSize={canvasSize}>
+    {#if canvasSize.canvasWidth}
+        <svelte:component this={components[index]} on:next="{next}" {canvasSize}></svelte:component>
+    {/if}
+</AppWrapper>
 

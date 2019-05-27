@@ -2,6 +2,7 @@
     /*
     * MODULES
     * */
+    import {createEventDispatcher} from 'svelte';
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
@@ -16,6 +17,9 @@
 	* */
     import Idea from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
+    export let canvasSize;
+
+    const dispatch = createEventDispatcher();
 
     const carton_data ={
         titleName: "Les idées noires",
@@ -398,15 +402,11 @@
             }
         }
     }
+
+    function next() {
+        display_carton = false;
+    }
 </script>
 
-<AppWrapper>
-    <span slot="scene" let:canvasSize={canvasSize}>
-        {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
-                    display_carton = false;
-                }}></Carton>
-            <Canvas {appProperties} {canvasSize} on:pixiApp="{init}" bgColor="white"></Canvas>
-        {/if}
-    </span>
-</AppWrapper>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next="{next}"></Carton>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}" bgColor="white"></Canvas>

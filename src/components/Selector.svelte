@@ -1,27 +1,13 @@
 <script>
     import Foule from "components/experiments/Foule/Foule.svelte";
-    import Cartons from "components/Cartons.svelte";
+    import Idees from "components/experiments/Idees/Idees.svelte";
 
-    const options = [
-    	{name: 'Foule', component: Foule},
-    	{name: 'Cartons', component: Cartons},
-    ];
+    const components = [Foule, Idees];
+    let index = 0;
 
-    let selected = options[0];
+    function next(){
+        index++;
+    }
 </script>
 
-<style>
-    .selector {
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
-</style>
-
-<select class="selector" bind:value={selected}>
-	{#each options as option}
-		<option value={option}>{option.name}</option>
-	{/each}
-</select>
-
-<svelte:component this={selected.component}></svelte:component>
+<svelte:component this={components[index]} on:next="{next}"></svelte:component>

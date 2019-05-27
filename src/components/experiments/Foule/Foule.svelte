@@ -2,6 +2,7 @@
     /*
     * MODULES
     * */
+    import {createEventDispatcher, onDestroy} from "svelte";
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
@@ -26,6 +27,8 @@
     import P8 from "assets/images/foule/P8.png";
     import Xindi from "assets/images/foule/Xindi.png";
 
+    const dispatch = createEventDispatcher();
+
     const carton_data ={
         titleName: "À contre-courant",
         timeContext: "18 heures avant l'examen",
@@ -34,6 +37,7 @@
 
     let display_carton = true;
     let is_ready = false;
+    export let canvasSize;
 
     export let canvasProps;
     let set_z_position = () => {};
@@ -104,6 +108,7 @@
 
     let scale;
     let person;
+    let ending = false;
 
     async function setInteractive() {
          person = people[interactiveOrder[interactiveCurrentIndex]];
@@ -200,7 +205,7 @@
                 }));
             container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
             container_anim.start();
-
+            ending = true;
         }
     }
 
@@ -326,6 +331,10 @@
         set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
         if(container_anim.is_ended_signal) {
             setInteractive();
+
+            if (ending) {
+                dispatch("next");
+            }
         }
         if (person_anim.is_running) {
             const person_offset = person_anim.tick();
@@ -339,19 +348,22 @@
         ["P8", "P5", "P6", "P7", "P2"]
         .map(k => people[k])
         .forEach(p => {
-            p.position.set(p.anim.tick(), p.position.y)
+            p.position.set(p.anim.tick(), p.position.y);
         })
     }
+
+    function next() {
+        display_carton = false;
+        start_audio();
+    }
+
+    onDestroy(() => {
+        app.destroy();
+    });
 </script>
 
-<AppWrapper>
-    <span slot="scene" let:canvasSize={canvasSize}>
-        {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
-                    display_carton = false;
-                    start_audio()
-                }}></Carton>
-            <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
-        {/if}
-    </span>
-</AppWrapper>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
+    display_carton = false;
+    start_audio()
+}}></Carton>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
