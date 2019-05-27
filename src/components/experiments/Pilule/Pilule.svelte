@@ -2,6 +2,7 @@
     /*
     * MODULES
     * */
+    import {createEventDispatcher, onDestroy} from 'svelte';
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
@@ -15,6 +16,7 @@
 	import Pill from "assets/images/pilule/Pill.png";
 	import Ticket from "assets/images/pilule/Ticket.png";
 	import backgroundImg from "assets/images/pilule/Cours.jpg";
+	export let canvasSize;
 
     const carton_data = {
         titleName: "Noctambule",
@@ -402,15 +404,13 @@
 
         dragIcon.loop();
     }
+
+    onDestroy(() => {
+        app.destroy();
+    });
 </script>
 
-<AppWrapper>
-    <span slot="scene" let:canvasSize={canvasSize}>
-        {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
-                    display_carton = false;
-                }}></Carton>
-            <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
-        {/if}
-    </span>
-</AppWrapper>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
+    display_carton = false;
+}}></Carton>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>

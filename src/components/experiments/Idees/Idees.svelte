@@ -64,7 +64,7 @@
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
-        dragIcon = DragIcon(app);
+        dragIcon = DragIcon(app.stage);
         loadImages();
     }
 
@@ -121,7 +121,7 @@
     }
 
     async function create_clone(sprite, keyName) {
-        if (Object.keys(ideas).length < 30) {
+        if (Object.keys(ideas).length < 30 && Object.keys(ideas).length > 0) {
             let assetKey = keyName.split('-')[0];
             //if multiple assets
             //let clone = generateAnimatedSprite(imgAssets[assetKey]);
@@ -129,6 +129,7 @@
             let index = Object.keys(ideas).filter(key => key.includes(assetKey)).length;
             let name = assetKey + '-' + index;
             ideas[name] = clone;
+            console.log(ideas);
             if (sprite.direction === "up") {
                 if (sprite.y - sprite.height/6 > sprite.height/6) {
                     clone.position.set(sprite.x, sprite.y);
@@ -175,27 +176,29 @@
     function move_clone(keyName) {
         let sprite = ideas[keyName];
         let parent = ideas[sprite.parentKey];
-        sprite.interactive = false;
-        parent.interactive = false;
-        sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
-        parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
-        if (sprite.direction === "up") {
-            sprite.anim_position_y = Animate(sprite.y, sprite.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-            parent.anim_position_y = Animate(parent.y, parent.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
-        } else if (sprite.direction === "down") {
-            sprite.anim_position_y = Animate(sprite.y, sprite.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
-            parent.anim_position_y = Animate(parent.y, parent.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+        if (parent && sprite) {
+            sprite.interactive = false;
+            parent.interactive = false;
+            sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
+            parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
+            if (sprite.direction === "up") {
+                sprite.anim_position_y = Animate(sprite.y, sprite.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+                parent.anim_position_y = Animate(parent.y, parent.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+            } else if (sprite.direction === "down") {
+                sprite.anim_position_y = Animate(sprite.y, sprite.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
+                parent.anim_position_y = Animate(parent.y, parent.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
+            }
+            if (parent.isFirst) {
+                dragIcon.initIconAnim(1, 0);
+                dragIcon.startIconAnim();
+            }
+            sprite.anim_scale_y.start();
+            parent.anim_scale_y.start();
+            sprite.anim_position_y.start();
+            parent.anim_position_y.start();
+            blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
+            blurAnim.start();
         }
-        if (parent.isFirst) {
-            dragIcon.initIconAnim(1, 0);
-            dragIcon.startIconAnim();
-        }
-        sprite.anim_scale_y.start();
-        parent.anim_scale_y.start();
-        sprite.anim_position_y.start();
-        parent.anim_position_y.start();
-        blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
-        blurAnim.start();
     }
 
     function onDragEnd() {
@@ -223,6 +226,9 @@
                             create_clone(sprite, property);
                         }
                     }
+                }
+                if (Object.keys(ideas).length === 0) {
+                    dispatch("next");
                 }
             } else if (this.childKey) {
                 ideas[this.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);

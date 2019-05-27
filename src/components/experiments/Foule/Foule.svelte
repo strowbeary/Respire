@@ -169,7 +169,7 @@
                             dragIcon.startIconAnim();
                             //reset after some time
                             setTimeout(() => {
-                                if (this.dragging) {
+                                if (this.dragging && !container_anim.is_running) {
                                    this.dragging = false;
                                    this.data = null;
                                    this.offset = 0;
@@ -346,7 +346,7 @@
         ["P8", "P5", "P6", "P7", "P2"]
         .map(k => people[k])
         .forEach(p => {
-            p.y = p.anim.tick()
+            p.x = p.anim.tick()
         })
     }
 
