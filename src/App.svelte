@@ -7,8 +7,9 @@
     import Foule from "components/experiments/Foule/Foule.svelte";
     import Idees from "components/experiments/Idees/Idees.svelte";
     import Pilule from "components/experiments/Pilule/Pilule.svelte";
+    import Mort from "components/experiments/Mort/Mort.svelte";
 
-    const components = [Cauchemar, Foule, Idees, Pilule];
+    const components = [Cauchemar, Foule, Idees, Pilule, Mort];
     let index = 0;
 
     function next(){

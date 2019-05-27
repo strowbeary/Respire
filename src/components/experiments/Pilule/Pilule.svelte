@@ -28,6 +28,7 @@
     let is_ready = false;
 
     export let canvasProps;
+    const dispatch = createEventDispatcher();
 
     const appProperties = {
        backgroundColor: 0xffffff,
@@ -361,6 +362,7 @@
        if (blurAnim.is_ended_signal) {
            if (success) {
                background.filters = [];
+               dispatch("next");
            } else {
                launchScene();
            }

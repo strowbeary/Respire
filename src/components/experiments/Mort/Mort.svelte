@@ -11,13 +11,14 @@
     * RESSOURCES
     * */
     import Wallpaper from "assets/images/mort/wallpaper.png";
+    export let canvasSize;
 
     const carton_data ={
         titleName: "Dernière ligne droite",
         timeContext: "5 minutes avant l'examen",
         spaceContext: "Couloir de la fac"
     };
-    let display_carton = false;
+    let display_carton = true;
     let is_ready = false;
     let iconVisibility = true;
 
@@ -108,6 +109,11 @@
         isPointerDown = false;
         xCumul = [];
         yCumul = [];
+    }
+
+    function next() {
+        dispatch("next");
+        console.log("fin");
     }
 </script>
 
@@ -309,45 +315,40 @@
     }
 </style>
 
-<svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<AppWrapper let:canvasSize={canvasSize}>
-    <div slot="scene">
-        <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
-            display_carton = false;
-        }}></Carton>
-        <div class="mort"
-            out:fade
-            style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --runningDuration:{runningDuration}"
-            on:pointerdown="{onPointerDown}"
-            on:touchstart|passive="{onPointerDown}"
-            on:pointermove="{onPointerMove}"
-            on:touchmove|passive="{onPointerMove}"
-            on:pointerup="{onPointerUp}"
-            on:touchend|passive="{onPointerUp}"
-            bind:this="{mort}">
-            <div class="room_door_light"></div>
-            <div class="room_door_wrapper">
-                <div class="room_door"></div>
-            </div>
-            <div class="room_door_frame">
-                <div class="room_door_frame_top"></div>
-                <div class="room_door_frame_left"></div>
-                <div class="room_door_frame_space"></div>
-                <div class="room_door_frame_right"></div>
-            </div>
-            <div class="room_wall room_wall-left">
-                <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
-            </div>
-            <div class="room_wall room_wall-right">
-                <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
-            </div>
-            {#if iconVisibility}
-                <div class="icon"
-                     bind:this="{icon}"
-                     transition:fade>
-                     <span class="icon__circle" class:loopCircle="{!isPointerDown && runningDuration === 60}"></span>
-                </div>
-            {/if}
-        </div>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
+    display_carton = false;
+}}></Carton>
+<div class="mort"
+    out:fade
+    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --runningDuration:{runningDuration}"
+    on:pointerdown="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
+    on:pointermove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
+    on:pointerup="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
+    bind:this="{mort}">
+    <div class="room_door_light"></div>
+    <div class="room_door_wrapper">
+        <div class="room_door" on:animationend=""></div>
     </div>
-</AppWrapper>
+    <div class="room_door_frame">
+        <div class="room_door_frame_top"></div>
+        <div class="room_door_frame_left"></div>
+        <div class="room_door_frame_space"></div>
+        <div class="room_door_frame_right"></div>
+    </div>
+    <div class="room_wall room_wall-left">
+        <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+    </div>
+    <div class="room_wall room_wall-right">
+        <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+    </div>
+    {#if iconVisibility}
+        <div class="icon"
+             bind:this="{icon}"
+             transition:fade>
+             <span class="icon__circle" class:loopCircle="{!isPointerDown && runningDuration === 60}"></span>
+        </div>
+    {/if}
+</div>
