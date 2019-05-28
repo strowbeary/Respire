@@ -17,6 +17,7 @@
     img {
         position: absolute;
         width: 50%;
+        user-select: none;
     }
 </style>
 
