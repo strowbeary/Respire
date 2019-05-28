@@ -129,7 +129,6 @@
             let index = Object.keys(ideas).filter(key => key.includes(assetKey)).length;
             let name = assetKey + '-' + index;
             ideas[name] = clone;
-            console.log(ideas);
             if (sprite.direction === "up") {
                 if (sprite.y - sprite.height/6 > sprite.height/6) {
                     clone.position.set(sprite.x, sprite.y);
@@ -341,6 +340,7 @@
                         sprite.x = sprite.anim_position_x.tick();
                     }
                     if (sprite.anim_position_x.is_ended_signal) {
+                        sprite.anim_position_x = null;
                         if (sprite.isFirst) {
                             dragIcon.startIconAnim();
                         }
@@ -353,6 +353,7 @@
                         sprite.alpha = sprite.anim_opacity.tick();
                     }
                     if (sprite.anim_opacity.is_ended_signal) {
+                        sprite.anim_opacity = null;
                         move_clone(property);
                     }
                 }
@@ -372,6 +373,8 @@
                         if (Math.abs(sprite.scale.y - sprite.scaleDefault/2) < 0.1) {
                            sprite.anim_scale_y = Animate(sprite.scaleDefault/2, sprite.scaleDefault, Easing.easeInQuad, 0.1);
                            sprite.anim_scale_y.start();
+                        } else {
+                            sprite.anim_scale_y = null;
                         }
                     }
                 }
@@ -381,6 +384,7 @@
                         sprite.y = sprite.anim_position_y.tick();
                     }
                     if (sprite.anim_position_y.is_ended_signal) {
+                        sprite.anim_position_y = null;
                         if (sprite.childKey) {
                             sprite.childKey = "";
                         }

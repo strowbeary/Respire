@@ -325,22 +325,28 @@
     }
 
     function gameLoop() {
-        const container_offset = container_anim.tick();
-        container.y = container_offset;
-        set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
-        if(container_anim.is_ended_signal) {
-            setInteractive();
+        if (container_anim) {
+            const container_offset = container_anim.tick();
+            container.y = container_offset;
+            set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
+            if(container_anim.is_ended_signal) {
+                container_anim = null;
+                setInteractive();
 
-            if (ending) {
-                dispatch("next");
+                if (ending) {
+                    dispatch("next");
+                }
             }
         }
-        if (person_anim.is_running) {
-            person.x = person_anim.tick();
-        }
-        if (person_anim.is_ended_signal) {
-            dragIcon.initIconAnim(0, 0.5);
-            dragIcon.startIconAnim();
+        if (person_anim) {
+            if (person_anim.is_running) {
+                person.x = person_anim.tick();
+            }
+            if (person_anim.is_ended_signal) {
+                person_anim = null;
+                dragIcon.initIconAnim(0, 0.5);
+                dragIcon.startIconAnim();
+            }
         }
         dragIcon.loop();
         ["P8", "P5", "P6", "P7", "P2"]
