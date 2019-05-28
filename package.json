@@ -48,6 +48,7 @@
     "dat.gui": "^0.7.6",
     "inline-worker": "^1.1.0",
     "lighterhtml": "^0.9.2",
+    "pixi-apngandgif": "^1.0.0",
     "pixi.js": "^4.8.7"
   }
 }

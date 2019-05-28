@@ -1,0 +1,421 @@
+<script>
+    /*
+    * MODULES
+    * */
+    import {createEventDispatcher, onDestroy} from 'svelte';
+    import Canvas from "components/Canvas.svelte";
+    import AppWrapper from "components/AppWrapper.svelte";
+    import * as PIXI from "pixi.js";
+    import {Animate, Easing} from "lib/TimingKit";
+    import {DragIcon} from "components/effects/dragIcon";
+    import Carton from "components/Carton.svelte";
+	/*
+	* RESSOURCES
+	* */
+	import Box from "assets/images/pilule/Box.png";
+	import Pill from "assets/images/pilule/Pill.png";
+	import Ticket from "assets/images/pilule/Ticket.png";
+	import backgroundImg from "assets/images/pilule/Cours.jpg";
+	export let canvasSize;
+
+    const carton_data = {
+        titleName: "Noctambule",
+        timeContext: "7 heures avant l'examen",
+        spaceContext: "Chambre"
+    };
+
+    let display_carton = true;
+    let is_ready = false;
+
+    export let canvasProps;
+    const dispatch = createEventDispatcher();
+
+    const appProperties = {
+       backgroundColor: 0xffffff,
+       antialias: true
+    };
+
+    let loader = PIXI.loader,
+        resources = PIXI.loader.resources,
+        filters = PIXI.filters,
+        Sprite = PIXI.Sprite,
+        Point = PIXI.Point,
+        Texture = PIXI.Texture,
+        Container = PIXI.Container,
+        Graphics = PIXI.Graphics;
+
+    let currentScene = "eye";
+    let app, canvasWidth, canvasHeight;
+    let containerEye = new Container();
+    let graphicsEye = new Graphics();
+    let containerPill = new Container();
+    let graphicsPill = new Graphics();
+
+    containerEye.addChild(graphicsEye);
+    containerPill.addChild(graphicsPill);
+
+    const imgAssets = {
+        Box,
+        Pill,
+        Ticket
+    };
+
+    let dragIcon;
+
+    function init(data) {
+        app = data.detail.app;
+        canvasWidth = data.detail.canvasWidth;
+        canvasHeight = data.detail.canvasHeight;
+        app.stage.addChild(containerEye);
+        app.stage.addChild(containerPill);
+
+        loadImages();
+    }
+
+    let background, scaleAnim, heightAnim, blurAnim;
+    let height, scale;
+
+    async function setup() {
+       await setupPill();
+       setUpEye();
+    }
+
+    function setUpEye() {
+        let backgroundColor = new Sprite(Texture.WHITE);
+        backgroundColor.tint = 0x000000;
+        backgroundColor.height = canvasHeight;
+        backgroundColor.width = canvasWidth;
+        containerEye.addChild(backgroundColor);
+
+        background = new Sprite(resources[backgroundImg].texture);
+        background.scale.set(canvasWidth/background.width);
+        containerEye.addChild(background);
+        containerEye.addChild(graphicsEye);
+        containerEye.pivot.x = containerEye.width / 2;
+        containerEye.pivot.y = containerEye.height / 2;
+        containerEye.x = canvasWidth / 2;
+        containerEye.y = canvasHeight / 2;
+
+        initCloseEye();
+
+        app.ticker.add(delta => gameLoop(delta));
+        is_ready = true;
+    }
+
+    function initCloseEye() {
+        graphicsEye.beginFill(0x000000);
+        graphicsEye.moveTo(0, 0);
+        graphicsEye.bezierCurveTo(50, -100 * 2, canvasWidth - 50, -100 * 2, canvasWidth, 0);
+        graphicsEye.moveTo(0, 0);
+        graphicsEye.bezierCurveTo(50, 100 * 2, canvasWidth - 50, 100 * 2, canvasWidth, 0);
+        graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
+        graphicsEye.pivot.set(canvasWidth/2, height/2);
+        graphicsEye.scale.set(4);
+        graphicsEye.endFill();
+        background.mask = graphicsEye;
+        background.filters = [new filters.BlurFilter(4, 4)];
+
+        scaleAnim = Animate(6, 1, Easing.bounceOut, 0.0025);
+        heightAnim = Animate(1.5, 0, Easing.bounceOut, 0.0025);
+        blurAnim = Animate(0, 4, Easing.bounceOut, 0.0025);
+        scaleAnim.start();
+        heightAnim.start();
+        blurAnim.start();
+    }
+
+    function loadImages() {
+        if (!resources[backgroundImg]) {
+            loader.add(backgroundImg)
+        }
+        let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
+        if (imgToAdd.length > 0) {
+            loader
+                .add(imgToAdd)
+                .load(setup);
+        } else {
+            setup()
+        }
+    }
+
+    function generateSprite(resourceKey) {
+        let texture = resources[resourceKey].texture;
+        let sprite = new Sprite(texture);
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        return sprite;
+    }
+
+    function positionFromCanvasWidth(number) {
+        return number * canvasWidth;
+    }
+
+    let pilulePosInitial = {};
+
+    function setPosition(sprite, keyName) {
+        switch (keyName) {
+            case "Box":
+                sprite.scale.set(canvasWidth/sprite.width * 0.5);
+                break;
+            case "Ticket":
+                sprite.scale.set(canvasWidth/sprite.width * 0.5);
+                break;
+            case "Pill":
+                preparePill(sprite);
+                break;
+            default:
+                sprite.scale.set(canvasWidth/sprite.width * 0.05);
+                break;
+        }
+    }
+
+    function preparePill(sprite) {
+        piluleSprite = sprite;
+        sprite.scale.set(canvasWidth/sprite.width * 0.05);
+
+        pilulePosInitial = {x: positionFromCanvasWidth(0.11), y: positionFromCanvasWidth(0.2)};
+        sprite.position.set(pilulePosInitial.x, pilulePosInitial.y);
+
+        function onDragEnd() {
+            if (this.dragging) {
+                this.dragging = false;
+                this.data = null;
+                this.interactive = false;
+                containerPill.animWiggle = "";
+                containerPill.rotation = -Math.PI/12;
+                launchPillAnim();
+            }
+        }
+        sprite.interactive = true;
+        sprite.on('pointerdown', function (event) {
+                  // store a reference to the data
+                  // the reason for this is because of multitouch
+                  // we want to track the movement of this particular touch
+                  if (!this.dragging) {
+                      this.data = event.data;
+                      this.dragging = true;
+                      dragIcon.initIconAnim(0.5, 0);
+                      dragIcon.startIconAnim();
+                      this.offsetY = this.y - this.data.getLocalPosition(this.parent).y;
+                      this.offsetX = this.x - this.data.getLocalPosition(this.parent).x;
+                  }
+              })
+              .on('pointerup', onDragEnd)
+              .on('pointerupoutside', onDragEnd)
+              .on('pointermove', function () {
+                  if (this.dragging) {
+                      let newPosX = this.data.getLocalPosition(this.parent).x + this.offsetX;
+                      let newPosY = this.data.getLocalPosition(this.parent).y + this.offsetY;
+
+                      if (graphicsPill.graphicsData[1].shape.contains(newPosX - piluleSprite.width/2, newPosY + piluleSprite.height/2)) {
+                          this.y = newPosY;
+                          this.x = newPosX;
+                      } else if (this.y < 0) {
+                          this.dragging = false;
+                          this.data = null;
+                          this.interactive = false;
+                          success = true;
+                          launchScene();
+                      }
+                  }
+              });
+        dragIcon = DragIcon(containerPill, true);
+        dragIcon.setDirection(1);
+        dragIcon.setPosition(sprite.x, sprite.y);
+    }
+
+    let piluleSprite;
+
+    async function setupPill() {
+        containerPill.pivot.x = containerPill.width / 2;
+        containerPill.pivot.y = containerPill.height / 2;
+        containerPill.x = canvasWidth + canvasWidth.width / 2;
+        containerPill.y = canvasHeight / 2;
+
+        await Object.values(imgAssets).forEach((key) => {
+            let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
+            let sprite = generateSprite(key);
+            setPosition(sprite, keyName);
+            containerPill.addChild(sprite);
+        });
+
+        let path2 = [
+            positionFromCanvasWidth(-0.35), positionFromCanvasWidth(-8/9),
+            positionFromCanvasWidth(-0.045), positionFromCanvasWidth(-8/9),
+            positionFromCanvasWidth(0.395), positionFromCanvasWidth(8/9),
+            positionFromCanvasWidth(0.07),positionFromCanvasWidth(8/9)
+        ];
+        let path3 = [
+            positionFromCanvasWidth(-0.5), positionFromCanvasWidth(-0.2),
+            positionFromCanvasWidth(0.5), positionFromCanvasWidth(-0.5),
+            positionFromCanvasWidth(0.5), positionFromCanvasWidth(0.2),
+            positionFromCanvasWidth(-0.5), positionFromCanvasWidth(0.5)
+        ];
+        graphicsPill.beginFill(0xFF0000);
+        graphicsPill.drawPolygon(path2);
+        graphicsPill.drawPolygon(path3);
+        graphicsPill.endFill();
+        graphicsPill.alpha = 0;
+
+        containerPill.rotation = -Math.PI/12;
+        containerPill.cacheAsBitmap = true;
+    }
+
+    function launchContainerAnim() {
+        containerPill.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.03);
+        containerPill.animDirection = "left";
+        containerPill.animWiggle.start();
+    }
+
+    function launchPillAnim() {
+        piluleSprite.animFall_x = Animate(piluleSprite.x, pilulePosInitial.x, Easing.easeInQuad, 0.1);
+        piluleSprite.animFall_y = Animate(piluleSprite.y, pilulePosInitial.y, Easing.easeInQuad, 0.1);
+        piluleSprite.animFall_x.start();
+        piluleSprite.animFall_y.start();
+    }
+
+    function hitBoxTest() {
+        return !graphicsPill.graphicsData[0].shape.contains(piluleSprite.position.x - piluleSprite.width/2, piluleSprite.position.y + piluleSprite.height/2)
+                           || !graphicsPill.graphicsData[0].shape.contains(piluleSprite.position.x + piluleSprite.width/2, piluleSprite.position.y - piluleSprite.height/2);
+    }
+
+    function gameLoopPill() {
+        if (piluleSprite.dragging) {
+            if (hitBoxTest()) {
+                containerPill.animWiggle = "";
+                containerPill.rotation = -Math.PI/12;
+                piluleSprite.dragging = false;
+                piluleSprite.interactive = false;
+                launchPillAnim();
+            }
+        }
+
+        if (piluleSprite.animFall_x && piluleSprite.animFall_y) {
+            if (piluleSprite.animFall_x.is_running || piluleSprite.animFall_y.is_running) {
+                piluleSprite.x = piluleSprite.animFall_x.tick();
+                piluleSprite.y = piluleSprite.animFall_y.tick();
+            }
+
+            if (piluleSprite.animFall_x.is_ended_signal && piluleSprite.animFall_y.is_ended_signal) {
+               piluleSprite.animFall_x = null;
+               piluleSprite.animFall_y = null;
+               piluleSprite.interactive = true;
+               launchContainerAnim();
+               dragIcon.initIconAnim(0, 0.5);
+               dragIcon.startIconAnim();
+            }
+
+        }
+
+        if (containerPill.animWiggle.is_running) {
+            containerPill.rotation = containerPill.animWiggle.tick();
+        }
+        if (containerPill.animWiggle.is_ended_signal) {
+            if (containerPill.animDirection === "left") {
+                containerPill.animWiggle = Animate(Math.PI/12, -Math.PI/12, Easing.easeOutCubic, 0.03);
+                containerPill.animWiggle.start();
+                containerPill.animDirection = "right";
+            } else {
+                containerPill.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.03);
+                containerPill.animWiggle.start();
+                containerPill.animDirection = "left";
+            }
+        }
+    }
+
+    let success = false;
+
+    function launchScene() {
+      containerEye.cacheAsBitmap = true;
+      containerPill.cacheAsBitmap = true;
+      currentScene = null;
+
+      if (success) {
+          containerEye.animTranslate = Animate(-canvasWidth - canvasWidth/2, canvasWidth/2, Easing.easeInQuad, 0.01);
+          containerPill.animTranslate = Animate(canvasWidth/2, canvasWidth + canvasWidth/2, Easing.easeInQuad, 0.01);
+      } else {
+          containerEye.animTranslate = Animate(canvasWidth/2, -canvasWidth - canvasWidth/2, Easing.easeInQuad, 0.01);
+          containerPill.animTranslate = Animate(canvasWidth + canvasWidth/2, canvasWidth/2, Easing.easeInQuad, 0.01);
+      }
+      containerEye.animTranslate.start();
+      containerPill.animTranslate.start();
+    }
+
+    function gameLoopEye() {
+       if (scaleAnim.is_running || heightAnim.is_running) {
+           height = heightAnim.tick();
+           scale = scaleAnim.tick();
+           graphicsEye.clear();
+           graphicsEye.beginFill(0x000000);
+           graphicsEye.moveTo(0, 0);
+           graphicsEye.bezierCurveTo(50, -100 * height, canvasWidth - 50, -100 * height, canvasWidth, 0);
+           graphicsEye.moveTo(0, 0);
+           graphicsEye.bezierCurveTo(50, 100 * height, canvasWidth - 50, 100 * height, canvasWidth, 0);
+           graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
+           graphicsEye.pivot.set(canvasWidth/2, height/2);
+           graphicsEye.scale.set(scale);
+           graphicsEye.endFill();
+       }
+
+       if (blurAnim.is_running) {
+           background.filters = [new filters.BlurFilter(blurAnim.tick(), 4)];
+       }
+
+       if (blurAnim.is_ended_signal) {
+           if (success) {
+               background.filters = [];
+               setTimeout(() => {
+                   dispatch("next")
+               }, 2000);
+           } else {
+               launchScene();
+           }
+       }
+    }
+
+    function launchBlurAnim() {
+        blurAnim = Animate(4, 0, Easing.easeInQuad, 0.025);
+        blurAnim.start();
+    }
+
+    function gameLoop() {
+        if (currentScene === "eye") {
+            gameLoopEye();
+        }
+
+        if (currentScene === "pill") {
+            gameLoopPill();
+        }
+
+        if (containerEye.animTranslate && containerPill.animTranslate) {
+           if (containerEye.animTranslate.is_running && containerPill.animTranslate.is_running) {
+               containerEye.x = containerEye.animTranslate.tick();
+               containerPill.x = containerPill.animTranslate.tick();
+           }
+
+           if (containerEye.animTranslate.is_ended_signal && containerPill.animTranslate.is_ended_signal) {
+               if (success) {
+                   currentScene = "eye";
+                   containerEye.cacheAsBitmap = false;
+                   launchBlurAnim();
+               } else {
+                   currentScene = "pill";
+                   containerPill.cacheAsBitmap = false;
+                   dragIcon.initIconAnim(0, 0.5);
+                   dragIcon.startIconAnim();
+                   launchContainerAnim();
+               }
+           }
+        }
+
+        dragIcon.loop();
+    }
+
+    onDestroy(() => {
+        app.destroy();
+    });
+</script>
+
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
+    display_carton = false;
+}}></Carton>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>

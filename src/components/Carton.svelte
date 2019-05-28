@@ -44,18 +44,20 @@
     let yLast;
 
     function onPointerDown(e) {
-        if(e.touches) {
-            yStart = e.touches[0].clientY;
-            xStart = e.touches[0].clientX;
-        } else {
-            yStart = e.clientY;
-            xStart = e.clientX;
-        }
+        if (visible) {
+            if(e.touches) {
+                yStart = e.touches[0].clientY;
+                xStart = e.touches[0].clientX;
+            } else {
+                yStart = e.clientY;
+                xStart = e.clientX;
+            }
 
-        if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
-            e.preventDefault();
-            yLast = parseFloat(getComputedStyle(carton).height);
-            isPointerDown = true;
+            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
+                e.preventDefault();
+                yLast = parseFloat(getComputedStyle(carton).height);
+                isPointerDown = true;
+            }
         }
     }
 
@@ -250,7 +252,7 @@
         <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
         <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
     </div>
-    {#if ready}
+    {#if ready && fade_out_sand}
        <div class="icon"
             bind:this="{icon}"
             transition:fade>

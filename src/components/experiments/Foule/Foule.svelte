@@ -2,10 +2,10 @@
     /*
     * MODULES
     * */
+    import {createEventDispatcher, onDestroy} from "svelte";
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
-    import {MaskedSprite} from "utils/MaskedSprite.pixi.js";
     import {Animate, Easing} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
@@ -26,6 +26,8 @@
     import P8 from "assets/images/foule/P8.png";
     import Xindi from "assets/images/foule/Xindi.png";
 
+    const dispatch = createEventDispatcher();
+
     const carton_data ={
         titleName: "À contre-courant",
         timeContext: "18 heures avant l'examen",
@@ -34,6 +36,7 @@
 
     let display_carton = true;
     let is_ready = false;
+    export let canvasSize;
 
     export let canvasProps;
     let set_z_position = () => {};
@@ -90,7 +93,7 @@
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
 
-        dragIcon = DragIcon(app);
+        dragIcon = DragIcon(app.stage);
 
         let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
         if (imgToAdd.length > 0) {
@@ -104,6 +107,7 @@
 
     let scale;
     let person;
+    let ending = false;
 
     async function setInteractive() {
          person = people[interactiveOrder[interactiveCurrentIndex]];
@@ -118,8 +122,8 @@
             } else {
                 dragIcon.setDirection(-1);
             }
-            dragIcon.setPosition(person.position.x, person.position.y - person.height * 0.25 + container.position.y);
-            dragIcon.initIconAnim(0, 1);
+            dragIcon.setPosition(person.x, person.y - person.height * 0.25 + container.y);
+            dragIcon.initIconAnim(0, 0.5);
             dragIcon.startIconAnim();
 
             function onDragEnd() {
@@ -137,7 +141,7 @@
                             interactiveCurrentIndex++;
                             play_interaction_sound();
                             if (interactiveCurrentIndex % 2 === 0) {
-                                container_anim = create_container_anim(container.position.y, container.position.y + (canvasHeight * 0.1));
+                                container_anim = create_container_anim(container.y, container.y + (canvasHeight * 0.1));
                                 container_anim.start();
                             } else {
                                 setInteractive();
@@ -198,9 +202,9 @@
                         resolve();
                     }, Math.random() * 200 + i * 400));
                 }));
-            container_anim = Animate(container.position.y, container.position.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
+            container_anim = Animate(container.y, container.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
             container_anim.start();
-
+            ending = true;
         }
     }
 
@@ -321,37 +325,49 @@
     }
 
     function gameLoop() {
-        const container_offset = container_anim.tick();
-        container.position.set(0, container_offset);
-        set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
-        if(container_anim.is_ended_signal) {
-            setInteractive();
+        if (container_anim) {
+            const container_offset = container_anim.tick();
+            container.y = container_offset;
+            set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
+            if(container_anim.is_ended_signal) {
+                container_anim = null;
+                setInteractive();
+
+                if (ending) {
+                    dispatch("next");
+                }
+            }
         }
-        if (person_anim.is_running) {
-            const person_offset = person_anim.tick();
-            person.position.set(person_offset, person.position.y);
-        }
-        if (person_anim.is_ended_signal) {
-            dragIcon.initIconAnim(0, 0.5);
-            dragIcon.startIconAnim();
+        if (person_anim) {
+            if (person_anim.is_running) {
+                person.x = person_anim.tick();
+            }
+            if (person_anim.is_ended_signal) {
+                person_anim = null;
+                dragIcon.initIconAnim(0, 0.5);
+                dragIcon.startIconAnim();
+            }
         }
         dragIcon.loop();
         ["P8", "P5", "P6", "P7", "P2"]
         .map(k => people[k])
         .forEach(p => {
-            p.position.set(p.anim.tick(), p.position.y)
+            p.x = p.anim.tick()
         })
     }
+
+    function next() {
+        display_carton = false;
+        start_audio();
+    }
+
+    onDestroy(() => {
+        app.destroy();
+    });
 </script>
 
-<AppWrapper>
-    <span slot="scene" let:canvasSize={canvasSize}>
-        {#if canvasSize.canvasWidth}
-                <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
-                    display_carton = false;
-                    start_audio()
-                }}></Carton>
-            <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
-        {/if}
-    </span>
-</AppWrapper>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
+    display_carton = false;
+    start_audio()
+}}></Carton>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
