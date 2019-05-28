@@ -363,7 +363,9 @@
        if (blurAnim.is_ended_signal) {
            if (success) {
                background.filters = [];
-               dispatch("next");
+               setTimeout(() => {
+                   dispatch("next")
+               }, 2000);
            } else {
                launchScene();
            }

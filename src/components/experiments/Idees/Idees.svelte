@@ -226,9 +226,6 @@
                         }
                     }
                 }
-                if (Object.keys(ideas).length === 0) {
-                    dispatch("next");
-                }
             } else if (this.childKey) {
                 ideas[this.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
                 ideas[this.childKey].anim_opacity.start();
@@ -409,6 +406,13 @@
             if (blurAnim.is_ended_signal) {
                 blurValue = blurAnim.tick();
                 blurAnim = null;
+
+                if (Object.keys(ideas).length === 0) {
+                    prof.filters = [];
+                    setTimeout(() => {
+                        dispatch("next");
+                    }, 2000);
+                }
             }
         }
     }
@@ -422,5 +426,5 @@
     });
 </script>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next="{next}"></Carton>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
 <Canvas {appProperties} {canvasSize} on:pixiApp="{init}" bgColor="white"></Canvas>

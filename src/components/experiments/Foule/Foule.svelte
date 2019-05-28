@@ -169,7 +169,7 @@
                             dragIcon.startIconAnim();
                             //reset after some time
                             setTimeout(() => {
-                                if (this.dragging && !container_anim.is_running) {
+                                if (this.dragging) {
                                    this.dragging = false;
                                    this.data = null;
                                    this.offset = 0;

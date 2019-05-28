@@ -19,7 +19,7 @@
         spaceContext: "Couloir de la fac"
     };
     let display_carton = true;
-    let is_ready = false;
+    let is_ready = true;
     let iconVisibility = true;
 
     const dispatch = createEventDispatcher();
@@ -315,7 +315,7 @@
     }
 </style>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
     display_carton = false;
 }}></Carton>
 <div class="mort"
