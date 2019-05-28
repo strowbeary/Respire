@@ -217,7 +217,7 @@
                     if (this.childKey) {
                         container.removeChild(ideas[this.childKey]);
                         delete ideas[this.childKey];
-                        this.childKey = "";
+                        //this.childKey = "";
                         let property = keyName.split('-')[0];
                         let sprites = Object.keys(ideas).filter(key => key.includes(keyName.split('-')[0]));
                         if (sprites.length > 0) {
@@ -256,7 +256,8 @@
                           dragIcon.startIconAnim();
                       }
 
-                      if (this.childKey && ideas[this.childKey]) {
+                      //normalement, comme le clone n'est pas interactif, il est impossible de l'avoir éjecté avant
+                      if (this.childKey && ideas[this.childKey]) { //on ne permet pas que le clone encore dans la sprite continue de faire sa vie
                           ideas[this.childKey].anim_opacity = null;
                           ideas[this.childKey].alpha = 0;
                       }
@@ -351,7 +352,7 @@
                     }
                     if (sprite.anim_opacity.is_ended_signal) {
                         sprite.anim_opacity = null;
-                        move_clone(property);
+                        move_clone(property); //si on commence à bouger, alors on ne peut cliquer sur aucune des sprites en mouvement
                     }
                 }
                 /*if (ideas[property].anim_scale) {
@@ -387,7 +388,7 @@
                         }
                         if (sprite.parentKey) {
                             sprite.parentKey = "";
-                            create_clone(sprite, property);
+                            //create_clone(sprite, property);
                         }
                         if (sprite.isFirst) {
                            dragIcon.setPosition(sprite.x, sprite.y);
