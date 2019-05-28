@@ -10,7 +10,7 @@
     import Mort from "components/experiments/Mort/Mort.svelte";
 
     const components = [Cauchemar, Foule, Idees, Pilule, Mort];
-    let index = 0;
+    let index = 2;
 
     function next(){
         index++;

@@ -41,7 +41,8 @@
         Resource = PIXI.loaders.Resource,
         Sprite = PIXI.Sprite,
         Container = PIXI.Container,
-        filters = PIXI.filters;
+        filters = PIXI.filters,
+        RoundedRectangle = PIXI.RoundedRectangle;
 
     let app, canvasWidth, canvasHeight;
     let container = new Container();
@@ -85,6 +86,8 @@
 
     function generateAnimatedSprite(resourceKey, direction) {
         let sprite = new PixiApngAndGif(resourceKey, resources).sprite;
+        sprite.hitArea = new RoundedRectangle(-240, -50, 480, 100, 150);
+        sprite.buttonMode = true;
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
         sprite.scaleDefault = canvasWidth/sprite.width * 0.65;
@@ -388,7 +391,7 @@
                         }
                         if (sprite.parentKey) {
                             sprite.parentKey = "";
-                            //create_clone(sprite, property);
+                            create_clone(sprite, property);
                         }
                         if (sprite.isFirst) {
                            dragIcon.setPosition(sprite.x, sprite.y);
