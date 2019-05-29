@@ -6,7 +6,7 @@
     import {createEventDispatcher} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
     import Carton from 'components/Carton.svelte';
-
+    import {Animate, Easing} from 'lib/TimingKit';
     /*
     * RESSOURCES
     * */
@@ -21,6 +21,12 @@
     let display_carton = true;
     let is_ready = true;
     let iconVisibility = true;
+    let anim;
+    let translateValue = 0;
+    let loop;
+    let speedUp = false;
+    let speedUpRunning = false;
+    let speedOut = true;
 
     const dispatch = createEventDispatcher();
 
@@ -45,18 +51,20 @@
     let yLast;
 
     function onPointerDown(e) {
-        if(e.touches) {
-            yStart = e.touches[0].clientY;
-            xStart = e.touches[0].clientX;
-        } else {
-            yStart = e.clientY;
-            xStart = e.clientX;
-        }
+        if (speedOut) {
+            if(e.touches) {
+                yStart = e.touches[0].clientY;
+                xStart = e.touches[0].clientX;
+            } else {
+                yStart = e.clientY;
+                xStart = e.clientX;
+            }
 
-        if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
-            e.preventDefault();
-            yLast = parseFloat(getComputedStyle(mort).height);
-            isPointerDown = true;
+            if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
+                e.preventDefault();
+                yLast = parseFloat(getComputedStyle(mort).height);
+                isPointerDown = true;
+            }
         }
     }
 
@@ -90,10 +98,8 @@
             if (yEnd < yStart - parseFloat(getComputedStyle(mort).height)/10 &&
                 !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
-                runningDuration = 30;
-                setTimeout(() => {
-                    runningDuration = 60;
-                }, 3000);
+                speedUp = true;
+                speedOut = false;
                 reset();
             } else {
                 reset();
@@ -112,8 +118,35 @@
     }
 
     function next() {
-        dispatch("next");
-        console.log("fin");
+        alert("mort");
+        //dispatch("next");
+    }
+
+    function startAnimation() {
+        anim = Animate(0, -400, Easing.linear, 0.005);
+        anim.start();
+        loop = requestAnimationFrame(translate);
+    }
+
+    function translate() {
+        if (anim.is_running) {
+            translateValue = anim.tick();
+            loop = requestAnimationFrame(translate);
+        } else {
+            if (speedUp) {
+                speedUp = false;
+                speedUpRunning = true;
+                anim = Animate(0, -400, Easing.linear, 0.01);
+                anim.start();
+                loop = requestAnimationFrame(translate);
+            } else {
+                speedUpRunning = false;
+                setTimeout(() => {
+                    speedOut = true;
+                }, 1000);
+                startAnimation();
+            }
+        }
     }
 </script>
 
@@ -170,7 +203,6 @@
         opacity: 0;
     }
 
-
     .room {
       width: 100%;
       height: 100%;
@@ -207,14 +239,12 @@
     }
 
     .room_wall-left .wallpaper {
-        animation: slide 6s linear infinite;
-        animation-duration: calc(100ms * var(--runningDuration));
+        transform: translate3d(calc(var(--translateValue) * 1px), 0, 0);
     }
 
     .room_wall-right .wallpaper {
         right: 0;
-        animation: slideRight 6s linear infinite;
-        animation-duration: calc(100ms * var(--runningDuration));
+        transform: translate3d(calc(var(--translateValue) * -1px), 0, 0);
     }
 
     @keyframes slideRight{
@@ -311,16 +341,20 @@
         width: 50%;
         height: 60%;
         background-color: black;
+    }
+
+    .room_door_animation {
         animation: closeDoor 30s linear forwards;
     }
 </style>
 
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
     display_carton = false;
+    startAnimation();
 }}></Carton>
 <div class="mort"
     out:fade
-    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --runningDuration:{runningDuration}"
+    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --translateValue:{translateValue}"
     on:pointerdown="{onPointerDown}"
     on:touchstart|passive="{onPointerDown}"
     on:pointermove="{onPointerMove}"
@@ -330,7 +364,7 @@
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">
-        <div class="room_door" on:animationend=""></div>
+        <div class="room_door" class:room_door_animation="{!display_carton}" on:animationend="{next}"></div>
     </div>
     <div class="room_door_frame">
         <div class="room_door_frame_top"></div>
@@ -348,7 +382,7 @@
         <div class="icon"
              bind:this="{icon}"
              transition:fade>
-             <span class="icon__circle" class:loopCircle="{!isPointerDown && runningDuration === 60}"></span>
+             <span class="icon__circle" class:loopCircle="{!isPointerDown && speedOut}"></span>
         </div>
     {/if}
 </div>
