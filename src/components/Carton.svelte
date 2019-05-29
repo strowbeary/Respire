@@ -94,7 +94,7 @@
                 !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
                 fade_out_sand();
-                dispatch('next');
+                dispatch("next");
             } else {
                 yStart = 0;
                 yEnd = 0;

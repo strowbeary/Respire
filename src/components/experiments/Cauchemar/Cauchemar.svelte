@@ -2,6 +2,7 @@
     /*
     * MODULES
     * */
+    import {onMount, afterUpdate} from 'svelte';
     import {fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
@@ -13,14 +14,8 @@
     * */
     import placeholderVideo from 'assets/videos/placeholder.webm';
     export let canvasSize;
+    export let display_carton;
 
-    const carton_data ={
-        titleName: "Dans le brouillard",
-        timeContext: "24 heures avant l'examen",
-        spaceContext: "Chambre"
-    };
-    let display_carton = true;
-    let is_ready = true;
     let videoVisibility = true;
     let iconVisibility = true;
 
@@ -37,6 +32,19 @@
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
     $: opacityDay = circleTransformValue / (200 * scaleFactor);
+
+    onMount(() => {
+        if (display_carton) {
+            dispatch("ready");
+        }
+    });
+
+
+    afterUpdate(() => {
+        if (!display_carton) {
+            videoComponent.play();
+        }
+    });
 
     function updateCirclePosition(e) {
         let x = 0;
@@ -194,10 +202,6 @@
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
-    videoComponent.play();
-    display_carton = false;
-}}></Carton>
 {#if canvasSize.canvasWidth && videoVisibility}
     <video
         out:fade
