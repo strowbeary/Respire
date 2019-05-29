@@ -3,10 +3,39 @@ import {Animate, Easing, Sequence} from "lib/TimingKit";
 
 export let idea_number = 0;
 
-export const LEFT = 1;
-export right
+export const LEFT = -1;
+export const RIGHT = 1;
 
-export function Idea(constants, options) {
+const get_random_initial_options = side => ({
+    side,
+    position: Vector3(
+        side < 0 ? -spriteWidth / 2 : canvasWidth + spriteWidth / 2,
+        Math.round(Math.random() * canvasHeight),
+        0
+    ),
+    ejection_direction: Vector3(-side, 0, 0),
+    opacity: 1,
+    ejection_strength: Math.random() * spriteWidth + spriteWidth / 2
+});
+
+function create_position_animation (from, to) {
+    return {
+        x: Animate(
+            from.x,
+            to.x,
+            Easing.linear,
+            0.03
+        ),
+        y: Animate(
+            from.y,
+            to.y,
+            Easing.linear,
+            0.03
+        )
+    };
+}
+
+export function Idea (constants, parent) {
     const {
         canvasWidth,
         canvasHeight,
@@ -14,36 +43,24 @@ export function Idea(constants, options) {
         spriteHeight
     } = constants;
 
-    const final_position = Vector3(Math.round(Math.random() * canvasWidth), Math.round(Math.random() * canvasHeight), 0);
     const values = {
-        apparition_side: 1,
-        position: Vector3(-spriteWidth / 2, final_position.y, 0),
-        ejection_direction: Vector3(Math.random(), Math.random(), 0),
-        allowed_division: 1,
-        successful_division: 0,
+        ejection_direction: null,
+        position: null,
+        ejection_strength: null,
+        allowed_self_division: 1,
+        self_division: 0,
+        descendants_number: 0,
         dismissed: false,
         opacity: 0,
-        ...options
+        ...parent
     };
-
-        /*
-        values.position
-        .add(values.ejection_direction.multiply_scalar(Math.random() * spriteWidth + spriteWidth / 2))
+    const get_new_final_position = () => values.position
+        .add(values.ejection_direction.multiply_scalar(values.ejection_strength))
         .limit(0, canvasWidth, 0, canvasHeight, 0, 0);
-        */
 
-    const x_position_animation = Animate(
-        values.position.x,
-        final_position.x,
-        Easing.linear,
-        0.03
-    );
-    const y_position_animation = Animate(
-        values.position.y,
-        end_position.y,
-        Easing.linear,
-        0.03
-    );
+    let final_position = get_new_final_position();
+
+    let position_animation = create_position_animation(values.position, final_position);
 
     const opacity_animation = Animate(
         values.opacity,
@@ -51,34 +68,64 @@ export function Idea(constants, options) {
         Easing.linear,
         0.03
     );
+    opacity_animation.start();
 
-    function divide() {
-        if(values.successful_division < values.allowed_division) {
-            values.successful_division++;
-            return Idea(options, {
+    let division_hook = () => {};
+    let death_hook = () => {};
+
+    function on_division(hook) {
+        division_hook = hook;
+    }
+
+    function on_death(hook) {
+        death_hook = hook;
+    }
+
+    function create_child () {
+        if (values.self_division < values.allowed_self_division || values.descendants_number === 0) {
+            values.ejection_direction = Vector3(Math.random(), Math.random(), 0);
+            final_position = get_new_final_position();
+            position_animation = create_position_animation(values.position, final_position);
+
+            values.self_division++;
+            values.descendants_number++;
+            division_hook();
+
+            const new_child = Idea(options, {
                 position: values.position,
-                opacity: 1
+                ejection_direction: values.ejection_direction.multiply_scalar(-1),
+                ejection_strength: values.ejection_strength
             });
+            new_child.on_division(() => {
+                values.descendants_number++;
+                division_hook();
+            });
+            new_child.on_death(() => {
+                values.descendants_number--;
+                death_hook();
+            });
+
+            return new_child;
         }
     }
 
-    function appear() {
-
-    }
-
-    function tick() {
+    function tick () {
         values.opacity = opacity_animation.tick();
-        values.position = Vector3(x_position_animation.tick(), y_position_animation.tick(), 0);
+        values.position = Vector3(position_animation.x.tick(), position_animation.y.tick(), 0);
+        if (position_animation.x.is_ended_signal) {
+            values.ejection_direction = Vector3(Math.random(), Math.random(), 0);
+        }
     }
 
-    Sequence()
-        .add(Math.random() * 800, () => {
-            appear();
-        })
-        .start();
+    function kill() {
+        death_hook();
+    }
+
 
     return {
-        divide,
-        values
+        on_division,
+        on_death,
+        tick,
+        kill
     }
 }
