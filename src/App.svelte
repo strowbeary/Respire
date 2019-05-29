@@ -12,22 +12,9 @@
 
     const components = [Cauchemar, Foule, Idees, Pilule, Mort];
     let index = 0;
-    let display_carton = true;
-    let is_ready = false;
-
-    const carton_data ={
-        titleName: "Dans le brouillard",
-        timeContext: "24 heures avant l'examen",
-        spaceContext: "Chambre"
-    };
 
     function next(){
         index++;
-    }
-
-    function ready() {
-        is_ready = true;
-        console.log("ready");
     }
 </script>
 
@@ -49,8 +36,7 @@
 <!--<img class="overlay" src={anim_bg} alt="animated background">-->
 <AppWrapper let:canvasSize={canvasSize}>
     {#if canvasSize.canvasWidth}
-        <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80"></Carton>
-        <svelte:component this={components[index]} on:next="{next}" on:ready="{ready}" {canvasSize} {display_carton}></svelte:component>
+        <svelte:component this={components[index]} on:next="{next}" {canvasSize}></svelte:component>
     {/if}
 </AppWrapper>
 
