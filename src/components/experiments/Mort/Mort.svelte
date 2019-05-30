@@ -37,6 +37,7 @@
     let innerHeight;
     let mort;
     let open_door = true;
+    let blurValue = 0;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
@@ -137,11 +138,13 @@
             if (speedUp) {
                 speedUp = false;
                 speedUpRunning = true;
+                blurValue = 3;
                 anim = Animate(0, -400, Easing.linear, 0.01);
                 anim.start();
                 loop = requestAnimationFrame(translate);
             } else {
                 speedUpRunning = false;
+                blurValue = 0;
                 setTimeout(() => {
                     speedOut = true;
                 }, 1000);
@@ -242,6 +245,7 @@
         background-size: 400px 100%;
         height: 100%;
         width: 1200px;
+        filter: blur(calc(var(--blurValue) * 1px));
     }
 
     .light {
@@ -289,6 +293,15 @@
         }
     }
 
+    @keyframes darken {
+        0% {
+            border-color: dimgrey;
+        }
+        100% {
+            border-color: black;
+        }
+    }
+
     @keyframes run {
         0%, 100% {
             transform: translateX(-2%) translateY(-2%);
@@ -314,7 +327,12 @@
         width: calc(20% * 460/var(--canvasWidth));
         height: calc(20% * 460/var(--canvasWidth));
         background: transparent;
+        border: solid 1px dimgrey;
         z-index: 1;
+    }
+
+    .room_door_frame-light {
+        animation: darken 30s linear forwards;
     }
 
     .room_door_wrapper {
@@ -370,7 +388,7 @@
 <div class="mort"
     out:fade
     class:mort-anim="{open_door && !display_carton}"
-    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --translateValue:{translateValue}"
+    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth};--translateValue:{translateValue};--blurValue:{blurValue}"
     on:pointerdown="{onPointerDown}"
     on:touchstart|passive="{onPointerDown}"
     on:pointermove="{onPointerMove}"
@@ -382,7 +400,7 @@
     <div class="room_door_wrapper">
         <div class="room_door" class:room_door_animation="{!display_carton}" on:animationend="{next}"></div>
     </div>
-    <div class="room_door_frame">
+    <div class="room_door_frame" class:room_door_frame-light="{!display_carton}">
         <div class="room_door_frame_top">
             <div class="light-door" class:light-anim="{!display_carton}"></div>
         </div>
