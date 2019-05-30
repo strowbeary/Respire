@@ -258,7 +258,7 @@
     }
 
     function launchContainerAnim() {
-        containerPill.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.03);
+        containerPill.animWiggle = Animate(-Math.PI/12, 0, Easing.easeInOutCubic, 0.5);
         containerPill.animDirection = "left";
         containerPill.animWiggle.start();
     }
@@ -308,11 +308,11 @@
         }
         if (containerPill.animWiggle.is_ended_signal) {
             if (containerPill.animDirection === "left") {
-                containerPill.animWiggle = Animate(Math.PI/12, -Math.PI/12, Easing.easeOutCubic, 0.03);
+                containerPill.animWiggle = Animate(0, -Math.PI/12, Easing.easeInOutCubic, 0.5);
                 containerPill.animWiggle.start();
                 containerPill.animDirection = "right";
             } else {
-                containerPill.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.03);
+                containerPill.animWiggle = Animate(-Math.PI/12, 0, Easing.easeInOutCubic, 0.5);
                 containerPill.animWiggle.start();
                 containerPill.animDirection = "left";
             }
