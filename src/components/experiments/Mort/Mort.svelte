@@ -420,7 +420,7 @@
         <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
         <div class="light" class:light-anim="{!display_carton}"></div>
     </div>
-    {#if iconVisibility}
+    {#if iconVisibility && open_door}
         <div class="icon"
              bind:this="{icon}"
              transition:fade>
