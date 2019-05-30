@@ -6,4 +6,5 @@ ENV VIRTUAL_HOST=respire.remicaillot.fr
 ENV LETSENCRYPT_HOST=respire.remicaillot.fr
 ENV LETSENCRYPT_EMAIL=remi.caillot@edu.gobelins.fr
 
+RUN ls ./
 COPY ./dist /usr/share/nginx/html
