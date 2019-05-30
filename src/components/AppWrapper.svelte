@@ -26,18 +26,18 @@
         height: 100vh;
         width: 100vw;
         overflow: hidden;
-        background-color: darkgrey;
+        background-color: black;
     }
     .appWrapper { /* canvas with 9/16 ratio */
         width: 56.25vh;
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        background-color: white;
+        background-color: black;
+        overflow: hidden;
     }
 </style>
 
 <div class="appWrapper" bind:offsetWidth="{width}" bind:offsetHeight="{height}" bind:this="{appWrapper}">
-    <slot {canvasSize} name="canvas"></slot>
-    <slot name="carton"></slot>
+    <slot {canvasSize}></slot>
 </div>

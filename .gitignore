@@ -119,4 +119,5 @@ fabric.properties
 dist
 .DS_Store
 **/target/
-/public/
+
+public/

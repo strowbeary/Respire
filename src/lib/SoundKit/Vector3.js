@@ -71,6 +71,13 @@ export function Vector3(x, y, z) {
     function to_array() {
         return [x, y, z];
     }
+    function limit(x_min, x_max, y_min, y_max, z_min, z_max) {
+        return Vector3(
+            Math.max(x_min, Math.min(x , x_max)),
+            Math.max(y_min, Math.min(y , y_max)),
+            Math.max(z_min, Math.min(z , z_max)),
+        )
+    }
     return {
         clone,
         add,
@@ -90,6 +97,7 @@ export function Vector3(x, y, z) {
         is_equal_to,
         rotate,
         to_array,
+        limit,
         get x() {
             return x;
         },

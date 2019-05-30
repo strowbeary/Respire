@@ -46,7 +46,7 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
             ${() => {
                 return `
                 #${'sk_helper_' + sk_id}.sk_helper {
-                border: 1px solid #333;
+                border: 2px solid #333;
                 border-radius: 8px;
                 position: fixed;
                 top: 16px;
@@ -56,6 +56,13 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
                 display: flex;
                 flex-direction: column;
                 background: black;
+                transform: scale(0.5);
+                transform-origin: top right;
+                transition: transform 250ms, border 250ms;
+            }
+            #${'sk_helper_' + sk_id}.sk_helper:hover {
+                transform: scale(1);
+                border: 1px solid #333;
             }
             .sk_helper .inspector {
                 border-top: 1px solid #333;
@@ -146,9 +153,12 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
 
     (function loop(t) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        let non_spacialized_debbuger_id = 0;
         children.forEach(c => {
-            sound_debugger(ctx, canvas, c.options, c.name);
+            sound_debugger(ctx, canvas, c.options, c.name, non_spacialized_debbuger_id);
+            if(!c.options.spacialized){
+                non_spacialized_debbuger_id++;
+            }
         });
 
         scene_debugger(ctx, canvas, listener);

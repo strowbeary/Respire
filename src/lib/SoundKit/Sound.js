@@ -17,7 +17,7 @@ export function Sound(name, options) {
 
     async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-        const source = audio_context.createBufferSource();
+        let source = audio_context.createBufferSource();
         source.connect(gain_node);
         source.loop = options.loop;
 
@@ -55,13 +55,13 @@ export function Sound(name, options) {
             play() {
                 source.start(0);
             },
-            stop() {
-                let t = audio_context.currentTime - 0.01;
-                sources.forEach(source => {
-                    source.stop(t);
-                    source.disconnect();
-                    t += source.buffer.duration;
-                });
+            async stop(cb) {
+                const buffer = source.buffer;
+                source.disconnect();
+                source = audio_context.createBufferSource();
+                source.loop = options.loop;
+                source.buffer = buffer;
+                await source.connect(gain_node);
             },
             set_position(position) {
                 if (options.spacialized) {
@@ -103,7 +103,7 @@ export function Sound(name, options) {
     }
 }
 
-export function sound_debugger(ctx, canvas, options, name) {
+export function sound_debugger(ctx, canvas, options, name, non_spacialized_debbuger_id) {
     const canvas_center = Vector3(canvas.width / 2, 0, canvas.height / 2);
     const sound_position = options.position
         .multiply_scalar(canvas.width / 3 - 5)
@@ -146,8 +146,8 @@ export function sound_debugger(ctx, canvas, options, name) {
         ctx.beginPath();
         ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.font = "14px 'Fira Sans'";
-        ctx.textAlign = "center";
-        ctx.fillText(name, sound_position.x + 45, sound_position.z + 5);
+        ctx.textAlign = "left";
+        ctx.fillText("- " + name, sound_position.x + 25, sound_position.z + 5 + (non_spacialized_debbuger_id * 15));
         ctx.fill();
         ctx.closePath();
     }

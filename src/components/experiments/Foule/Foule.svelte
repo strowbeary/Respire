@@ -1,42 +1,104 @@
 <script>
+    /*
+    * MODULES
+    * */
+    import {createEventDispatcher, onDestroy} from "svelte";
     import Canvas from "components/Canvas.svelte";
     import AppWrapper from "components/AppWrapper.svelte";
-    import peopleImg from "assets/images/silhouette.png";
     import * as PIXI from "pixi.js";
+    import {Animate, Easing} from "lib/TimingKit";
+	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
+    import {DragIcon} from "components/effects/dragIcon";
+    import Carton from "components/Carton.svelte";
+	/*
+	* RESSOURCES
+	* */
+    import Camille from "assets/images/foule/Camille.png";
+    import Melanie from "assets/images/foule/Melanie.png";
+    import Remi from "assets/images/foule/Remi.png";
+    import P1 from "assets/images/foule/P1.png";
+    import P2 from "assets/images/foule/P2.png";
+    import P3 from "assets/images/foule/P3.png";
+    import P4 from "assets/images/foule/P4.png";
+    import P5 from "assets/images/foule/P5.png";
+    import P6 from "assets/images/foule/P6.png";
+    import P7 from "assets/images/foule/P7.png";
+    import P8 from "assets/images/foule/P8.png";
+    import Xindi from "assets/images/foule/Xindi.png";
 
+    const dispatch = createEventDispatcher();
 
+    const carton_data ={
+        titleName: "À contre-courant",
+        timeContext: "18 heures avant l'examen",
+        spaceContext: "Amphitheatre"
+    };
 
-    import {MaskedSprite} from "../../../utils/MaskedSprite.pixi"; import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
+    let display_carton = true;
+    let is_ready = false;
+    export let canvasSize;
 
     export let canvasProps;
-
+    let set_z_position = () => {};
+    let play_interaction_sound = () => {};
+    let start_audio = () => {};
     const appProperties = {
        transparent: true,
-       clearBeforeRender: false,
-       preserveDrawingBuffer: true,
        antialias: true
     };
 
-    let Graphics = PIXI.Graphics,
-        loader = PIXI.loader,
+    let loader = PIXI.loader,
         resources = PIXI.loader.resources,
-        Sprite = PIXI.Sprite;
+        Sprite = PIXI.Sprite,
+        Container = PIXI.Container;
 
-    let graphics = new Graphics();
-    let container = [];
-    let initialPos = [];
-    let initialScale = [];
-    let app, people, canvasWidth, canvasHeight;
+    let app, canvasWidth, canvasHeight;
+    let container = new Container();
+    let people = {};
+    function create_container_anim(from_value, to_value) {
+        return Animate(from_value, to_value, Easing.easeOutCubic, 0.03)
+    }
+    function create_person_anim(from_value, to_value) {
+        return Animate(from_value, to_value, Easing.linear, 0.03);
+    }
+    let container_anim = create_container_anim(0, 1);
+    let person_anim = create_person_anim(0, 1);
+    const imgAssets = {
+        P8,
+        P5,
+        P6,
+        P7,
+        P2,
+        //interactive
+        P1,
+        P4,
+        P3,
+        Camille,
+        Remi,
+        Melanie,
+        Xindi
+    };
+
+    const interactiveOrder = Object.keys(imgAssets).reverse();
+    let positions = [];
+    let interactiveCurrentIndex = 0;
+    let interactiveCurrentFinalPos;
+    let interactiveStartingPos;
+
+    let dragIcon;
 
     function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
-        app.stage.addChild(graphics);
+        app.stage.addChild(container);
 
-        if (!resources[peopleImg]) {
+        dragIcon = DragIcon(app.stage);
+
+        let imgToAdd = Object.values(imgAssets).filter(key => !resources[key]);
+        if (imgToAdd.length > 0) {
             loader
-                .add(peopleImg)
+                .add(imgToAdd)
                 .load(setup);
         } else {
             setup()
@@ -44,95 +106,268 @@
     }
 
     let scale;
+    let person;
+    let ending = false;
+
+    async function setInteractive() {
+         person = people[interactiveOrder[interactiveCurrentIndex]];
+
+        if (interactiveCurrentIndex < 7) {
+            interactiveCurrentFinalPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].end);
+            interactiveStartingPos = positionFromCanvasWidth(positions[interactiveCurrentIndex].start);
+            person.interactive = true;
+            person.buttonMode = true;
+            if (interactiveCurrentFinalPos > interactiveStartingPos) {
+                dragIcon.setDirection(1);
+            } else {
+                dragIcon.setDirection(-1);
+            }
+            dragIcon.setPosition(person.x, person.y - person.height * 0.25 + container.y);
+            dragIcon.initIconAnim(0, 0.5);
+            dragIcon.startIconAnim();
+
+            function onDragEnd() {
+                if (this.dragging) {
+                    this.dragging = false;
+                    // set the interaction data to null
+                    this.data = null;
+                    this.offset = 0;
+                    if ((this.direction === "left" && this.x < interactiveCurrentFinalPos) ||
+                        (this.direction === "right" && this.x > interactiveCurrentFinalPos)
+                       ) {
+                        this.x = interactiveCurrentFinalPos;
+                        person.interactive = false;
+                        if (interactiveCurrentIndex+1 < interactiveOrder.length) {
+                            interactiveCurrentIndex++;
+                            play_interaction_sound();
+                            if (interactiveCurrentIndex % 2 === 0) {
+                                container_anim = create_container_anim(container.y, container.y + (canvasHeight * 0.1));
+                                container_anim.start();
+                            } else {
+                                setInteractive();
+                            }
+                        }
+                    } else {
+                        person_anim = create_person_anim(this.x, interactiveStartingPos);
+                        person_anim.start();
+                        dragIcon.initIconAnim(0, 0.5);
+                        dragIcon.startIconAnim();
+                    }
+                }
+            }
+
+            person.on('pointerdown', function (event) {
+                        // store a reference to the data
+                        // the reason for this is because of multitouch
+                        // we want to track the movement of this particular touch
+                        if (!this.dragging) {
+                            this.data = event.data;
+                            this.dragging = true;
+                            this.offset = this.x - this.data.getLocalPosition(this.parent).x;
+                            this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
+                            dragIcon.initIconAnim(0.5, 0);
+                            dragIcon.startIconAnim();
+                            //reset after some time
+                            setTimeout(() => {
+                                if (this.dragging) {
+                                   this.dragging = false;
+                                   this.data = null;
+                                   this.offset = 0;
+                                   person_anim = create_person_anim(this.x, interactiveStartingPos);
+                                   person_anim.start();
+                                }
+                            }, 300);
+                        }
+                    })
+                    .on('pointerup', onDragEnd)
+                    .on('pointerupoutside', onDragEnd)
+                    .on('pointermove', function () {
+                        if (this.dragging) {
+                            let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
+                            if (this.direction === "left" && this.x >= interactiveCurrentFinalPos && this.x > newPos) {
+                                this.x = newPos;
+                            }
+                            if (this.direction === "right" && this.x <= interactiveCurrentFinalPos && this.x < newPos) {
+                                this.x = newPos;
+                            }
+                        }
+                    });
+        } else {
+            await Promise.all(["P8", "P5", "P6", "P7", "P2"]
+                .reverse()
+                .map(k => people[k])
+                .map((p, i) => {
+                    return new Promise(resolve => setTimeout(() => {
+                        p.anim.start();
+                        resolve();
+                    }, Math.random() * 200 + i * 400));
+                }));
+            container_anim = Animate(container.y, container.y + 2 * canvasHeight, Easing.easeInCubic, 0.007);
+            container_anim.start();
+            ending = true;
+        }
+    }
+
+    function generatePeople(resourceKey) {
+        let texture = resources[resourceKey].texture;
+        let sprite = new Sprite(texture);
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        return sprite;
+    }
+
+    function scalePeople(sprite, scaleValue) {
+        let {width} = sprite._texture.baseTexture;
+        scale = canvasWidth/width * scaleValue;
+        sprite.scale.set(scale);
+    }
+
+    function positionFromCanvasWidth(number) {
+        return number * canvasWidth;
+    }
+
+    function setPosition(keyName) {
+        switch (keyName) {
+            case "Xindi":
+                positions.unshift({start: 0.7, end: 0.9});
+                scalePeople(people[keyName], 0.85);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.9);
+                break;
+            case "Melanie":
+                positions.unshift({start: 0.2, end: 0.1});
+                scalePeople(people[keyName], 0.65);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.9);
+                break;
+            case "Remi":
+                positions.unshift({start: 0.5, end: 0.8});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.75);
+                break;
+            case "Camille":
+                positions.unshift({start: 0.2, end: 0.1});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.75);
+                break;
+            case "P3":
+                positions.unshift({start: 0.7, end: 0.9});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.65);
+                break;
+            case "P4":
+                positions.unshift({start: 0.3, end: 0.1});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
+                break;
+            case "P1":
+                positions.unshift({start: 0.5, end: 0.9});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.55);
+                break;
+            case "P2":
+                positions.unshift({start: 0.25, end: 0.1});
+                scalePeople(people[keyName], 0.55);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.4);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
+                break;
+            case "P7":
+                positions.unshift({start: 0.7, end: 0.9});
+                scalePeople(people[keyName], 0.7);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.3);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
+                break;
+            case "P6":
+                positions.unshift({start: 0.6, end: 0.9});
+                scalePeople(people[keyName], 0.6);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.2);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
+                break;
+            case "P5":
+                positions.unshift({start: 0.3, end: 0.1});
+                scalePeople(people[keyName], 0.6);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.25);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
+                break;
+            case "P8":
+                positions.unshift({start: 0.4, end: 0.15});
+                scalePeople(people[keyName], 0.8);
+                people[keyName].position.set(positionFromCanvasWidth(positions[0].start), canvasHeight * 0.2);
+
+                people[keyName].anim = Animate(positionFromCanvasWidth(positions[0].start), positionFromCanvasWidth(positions[0].end), Easing.easeOutQuad, 0.01)
+                break;
+            default:
+                break;
+        }
+    }
 
     async function setup() {
-        const {set_z_position} = await init_foule_sound_scene();
-        graphics.beginFill(0xFFFFFF, 0.1);
-        graphics.drawRect(0, 0, app.renderer.width, app.renderer.height);
-        graphics.endFill();
+        const sound_scene = await init_foule_sound_scene();
+        set_z_position = sound_scene.set_z_position;
+        play_interaction_sound = sound_scene.play_interaction_sound;
+        start_audio = sound_scene.start_audio;
 
-        let {width} = resources[peopleImg].texture.baseTexture;
-        scale = canvasWidth/width;
+        await Object.values(imgAssets).forEach((key) => {
+            let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === key);
+            let sprite = generatePeople(key);
 
-        people = new MaskedSprite(resources[peopleImg].texture, app, "prem");
-        people.anchor.x = 0.5;
-        people.scale.set(1);
-        people.position.set(0, 0);
-         people.interactive = true;
-                people.buttonMode = true;
-                people.on('pointerdown', function(event) {
-                    this.data = event.data;
-                    this.dragging = true;
-                    container.forEach(child => child.zIndex = 1);
-                    this.zIndex = 2;
-                })
-                .on('pointerup', function() {
-                    this.dragging = false;
-                    this.data = null;
-                })
-                .on('pointerupoutside', function(){
-                    this.dragging = false;
-                    this.data = null;
-                })
-                .on('pointermove', function(event){
-                    if (this.dragging) {
-                        this.x +=  event.data.originalEvent.movementX;
-                        this.y += event.data.originalEvent.movementY;
-                        set_z_position(Math.min(Math.max(0, (canvasHeight - this.y) / canvasHeight), 1));
-                    }
-                });
-
-        container.push(people);
-        app.stage.addChild(people);
-
-        people = new MaskedSprite(resources[peopleImg].texture, app, "sec");
-
-        people.anchor.x = 0.5;
-        people.anchor.y = 0.3;
-        people.scale.set(1);
-        people.position.set(canvasWidth, people.height/2);
-        people.interactive = true;
-        people.buttonMode = true;
-        people.on('pointerdown', function(event) {
-            this.data = event.data;
-            this.dragging = true;
-            container.forEach(child => child.zIndex = 1);
-            this.zIndex = 2;
-        })
-        .on('pointerup', function() {
-            this.dragging = false;
-            this.data = null;
-        })
-        .on('pointerupoutside', function(){
-            this.dragging = false;
-            this.data = null;
-        })
-        .on('pointermove', function(event){
-            if (this.dragging) {
-                this.x +=  event.data.originalEvent.movementX;
-                this.y += event.data.originalEvent.movementY;
-                set_z_position(Math.max(0, (canvasHeight - this.y) / canvasHeight));
+            people[keyName] = sprite;
+            setPosition(keyName);
+            if (keyName === "Xindi") {
+                setInteractive();
             }
+            container.addChild(sprite);
         });
-
-
-
-
-        container.push(people);
-        app.stage.addChild(people);
-
         app.ticker.add(delta => gameLoop(delta));
+        is_ready = true;
     }
 
-    function gameLoop(delta) {
+    function gameLoop() {
+        if (container_anim) {
+            const container_offset = container_anim.tick();
+            container.y = container_offset;
+            set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
+            if(container_anim.is_ended_signal) {
+                container_anim = null;
+                setInteractive();
 
+                if (ending) {
+                    dispatch("next");
+                }
+            }
+        }
+        if (person_anim) {
+            if (person_anim.is_running) {
+                person.x = person_anim.tick();
+            }
+            if (person_anim.is_ended_signal) {
+                person_anim = null;
+                dragIcon.initIconAnim(0, 0.5);
+                dragIcon.startIconAnim();
+            }
+        }
+        dragIcon.loop();
+        ["P8", "P5", "P6", "P7", "P2"]
+        .map(k => people[k])
+        .forEach(p => {
+            p.x = p.anim.tick()
+        })
     }
+
+    function next() {
+        display_carton = false;
+        start_audio();
+    }
+
+    onDestroy(() => {
+        app.destroy();
+    });
 </script>
 
-<AppWrapper>
-    <span slot="canvas" let:canvasSize={canvasSize}>
-        {#if canvasSize.canvasWidth}
-            <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
-        {/if}
-    </span>
-</AppWrapper>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
+    display_carton = false;
+    start_audio()
+}}></Carton>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>

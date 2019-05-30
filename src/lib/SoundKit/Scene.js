@@ -25,6 +25,7 @@ export async function Scene(options) {
     };
 
     const audio_context = new (window.AudioContext || window.webkitAudioContext)();
+    audio_context.suspend();
     const listener = Listener(audio_context);
     const main_gain_node = audio_context.createGain();
     const children = [];
@@ -52,6 +53,10 @@ export async function Scene(options) {
             return initialized_children.find(c => c.name === name);
         }
 
+        async function destroy() {
+            await audio_context.close();
+        }
+
         if (options.debug) {
             const {sk_debugger} = await import('./Debugger.js');
             sk_debugger(audio_context, listener, initialized_children, {
@@ -65,6 +70,7 @@ export async function Scene(options) {
             play,
             pause,
             get_children_by_name,
+            destroy,
             get volume() {
                 return main_gain_node.gain;
             },
@@ -73,6 +79,9 @@ export async function Scene(options) {
             },
             get children() {
                 return initialized_children;
+            },
+            get is_paused() {
+                return audio_context.state === "suspended";
             }
         }
     }
