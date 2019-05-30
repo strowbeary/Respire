@@ -43,7 +43,6 @@ export default (async () => {
     (function loop(t) {
         let volume_nappe = nappe_animation.tick();
         let volume_sable = sable_animation.tick();
-        console.log(volume_nappe);
         nappe_sound.set_volume(volume_nappe);
         sable_sound.set_volume(volume_sable);
         req_id = requestAnimationFrame(loop.bind({}, t + 1))

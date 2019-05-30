@@ -6,30 +6,30 @@
 
     const dispatch = createEventDispatcher();
 
-     export let globalSoundScene;
+    export let globalSoundScene;
 
-     afterUpdate(() => {
-         globalSoundScene
-                 .then(async scene => {
-                     const {audio_test_sound} = scene;
-                     Sequence()
-                         .add(0, () => {
-                             audio_test_sound.play()
-                         })
-                         .add(11000, () => {
-                             audio_test_sound.set_position(Vector3(-0.5, 0, 0));
-                             audio_test_sound.set_orientation(Vector3(1, 0, 0))
-                         })
-                         .add(3500, () => {
-                             audio_test_sound.set_position(Vector3(0.5, 0, 0));
-                             audio_test_sound.set_orientation(Vector3(-1, 0, 0))
-                         })
-                         .add(5000, () => {
-                             dispatch("next");
-                         })
-                         .start();
-                 });
-     })
+    afterUpdate(() => {
+        globalSoundScene
+            .then(async scene => {
+                const {audio_test_sound} = scene;
+                Sequence()
+                    .add(0, () => {
+                        audio_test_sound.play()
+                    })
+                    .add(11000, () => {
+                        audio_test_sound.set_position(Vector3(-0.5, 0, 0));
+                        audio_test_sound.set_orientation(Vector3(1, 0, 0))
+                    })
+                    .add(3500, () => {
+                        audio_test_sound.set_position(Vector3(0.5, 0, 0));
+                        audio_test_sound.set_orientation(Vector3(-1, 0, 0))
+                    })
+                    .add(5000, () => {
+                        dispatch("next");
+                    })
+                    .start();
+        });
+    })
 
 
 </script>

@@ -67,7 +67,6 @@
                      if (yEnd < yStart - parseFloat(getComputedStyle(title_scene).height)/10 &&
                          !xCumul.includes(false) &&
                          !yCumul.includes(false)) {
-                         console.log("start");
                          globalSoundScene.then(async scene => {
                              await scene.start();
                              scene.fade_in_nappe();
@@ -108,7 +107,6 @@
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        font-family: 'BeatriceDisplayDA', 'sans-serif';
         color: black;
         background-color: white;
         z-index: 1;
@@ -116,26 +114,29 @@
         justify-content: center;
         align-items: center;
     }
-    .title_screen > div {
+    .title__text {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-    .title_screen h1 {
+    .title__text h1 {
         font-weight: normal;
-        font-size: 50pt;
-        text-shadow: 0 0 1px black, 0 0 20px black;
+        font-size: calc(50px * var(--scaleFactor));;
+        text-shadow: 0 0 1px black, 0 0 calc(20px  * var(--scaleFactor)) black;
         color: transparent;
         text-transform: uppercase;
-        letter-spacing: 15px;
+        text-align: center;
+        letter-spacing: calc(12px  * var(--scaleFactor));
+        font-family: 'BeatriceDisplayDA', 'serif';
     }
-    .title_screen p {
-        font-family: "Optician Sans";
+    .title__text p {
         width: 70%;
         text-align: center;
-        margin-top: 50px;
+        font-size: calc(16px * var(--scaleFactor));
+        margin-top: calc(50px  * var(--scaleFactor));
         font-weight: lighter;
-        letter-spacing: 3px;
+        letter-spacing: calc(3px * var(--scaleFactor));
+        font-family: "Optician Sans", "sans-serif";
     }
     .icon {
         width: 100%;
@@ -153,9 +154,10 @@
         width: calc(var(--scaleFactor) * 40px);
         height: calc(var(--scaleFactor) * 40px);
     }
+
     .loopCircle {
-            animation: wiggle 1.5s infinite ease-out;
-        }
+        animation: wiggle 1.5s infinite ease-out;
+    }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
@@ -170,9 +172,9 @@
     on:pointerup="{onPointerUp}"
     on:touchend="{onPointerUp}"
     transition:fade>
-    <div>
+    <div class="title__text">
         <h1>Respire</h1>
-         <p>Cette expérience nécessite le port d'un casque</p>
+        <p>Cette expérience nécessite le port d'un casque</p>
     </div>
     <div class="icon"
         bind:this="{icon}"
