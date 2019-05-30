@@ -2,12 +2,13 @@
     /*
     * MODULES
     * */
+    import {onMount, afterUpdate} from 'svelte';
     import {fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
     import Carton from 'components/Carton.svelte';
     import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
-
+    import {Animate, Easing} from "lib/TimingKit";
     /*
     * RESSOURCES
     * */
@@ -21,6 +22,7 @@
     };
     let display_carton = true;
     let is_ready = true;
+
     let videoVisibility = true;
     let iconVisibility = true;
 
@@ -33,6 +35,8 @@
     let innerHeight;
     let alarmClock;
     let videoComponent;
+    let circleResetAnim;
+    let loop;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
@@ -58,9 +62,18 @@
 
     function onPointerDown(e) {
         if (icon) {
-            e.preventDefault();
-            isPointerDown = true;
-            updateCirclePosition(e);
+            let x = 0;
+            if(e.touches) {
+                x = e.touches[0].clientX;
+            } else {
+                x = e.clientX;
+            }
+            let start = icon.getBoundingClientRect().left;
+            if (Math.abs(start - x) < 50) {
+                e.preventDefault();
+                isPointerDown = true;
+                updateCirclePosition(e);
+            }
         }
     }
 
@@ -76,10 +89,22 @@
             if (circleTransformValue === (200 * window.innerHeight / 824)) {
                 iconVisibility = false;
                 isPointerDown = false;
-                setTimeout(next, 1000);
+                setTimeout(next, 2000);
             } else {
+                circleResetAnim = Animate(circleTransformValue, 0, Easing.easeInQuad, 0.05);
+                circleResetAnim.start();
+                loop = requestAnimationFrame(reset);
                 isPointerDown = false;
             }
+        }
+    }
+
+    function reset() {
+        if (circleTransformValue > 0) {
+            circleTransformValue = circleResetAnim.tick();
+            loop = requestAnimationFrame(reset);
+        } else {
+            cancelAnimationFrame(loop);
         }
     }
 
@@ -134,8 +159,8 @@
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
         background-color: black;
-        width: calc(var(--scaleFactor) * 30px);
-        height: calc(var(--scaleFactor) * 30px);
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
         transform: var(--circleTransform);
     }
 
@@ -178,6 +203,7 @@
     }
 
     .hour {
+        position: absolute;
         color: white;
         font-size: calc(var(--scaleFactor) * 85px);
         font-family: 'BeatriceDisplayDA', 'serif';
@@ -185,7 +211,9 @@
         border: solid 1px white;
         padding: 10px;
         filter: blur(1px);
-        opacity: calc(1 - var(--opacityDay));
+        opacity: calc(1 - var(--opacityDay)*2);
+        pointer-events: none;
+        z-index: 2;
     }
 
     video {
@@ -195,8 +223,8 @@
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
-    videoComponent.play();
     display_carton = false;
+    videoComponent.play();
 }}></Carton>
 {#if canvasSize.canvasWidth && videoVisibility}
     <video

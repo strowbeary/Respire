@@ -113,14 +113,11 @@
         graphicsEye.scale.set(4);
         graphicsEye.endFill();
         background.mask = graphicsEye;
-        background.filters = [new filters.BlurFilter(4, 4)];
+        background.filters = [new filters.BlurFilter(0, 4)];
 
         scaleAnim = Animate(6, 1, Easing.bounceOut, 0.0025);
         heightAnim = Animate(1.5, 0, Easing.bounceOut, 0.0025);
         blurAnim = Animate(0, 4, Easing.bounceOut, 0.0025);
-        scaleAnim.start();
-        heightAnim.start();
-        blurAnim.start();
     }
 
     function loadImages() {
@@ -261,7 +258,7 @@
     }
 
     function launchContainerAnim() {
-        containerPill.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.03);
+        containerPill.animWiggle = Animate(-Math.PI/12, 0, Easing.easeInOutCubic, 0.5);
         containerPill.animDirection = "left";
         containerPill.animWiggle.start();
     }
@@ -311,11 +308,11 @@
         }
         if (containerPill.animWiggle.is_ended_signal) {
             if (containerPill.animDirection === "left") {
-                containerPill.animWiggle = Animate(Math.PI/12, -Math.PI/12, Easing.easeOutCubic, 0.03);
+                containerPill.animWiggle = Animate(0, -Math.PI/12, Easing.easeInOutCubic, 0.5);
                 containerPill.animWiggle.start();
                 containerPill.animDirection = "right";
             } else {
-                containerPill.animWiggle = Animate(-Math.PI/12, Math.PI/12, Easing.easeOutCubic, 0.03);
+                containerPill.animWiggle = Animate(-Math.PI/12, 0, Easing.easeInOutCubic, 0.5);
                 containerPill.animWiggle.start();
                 containerPill.animDirection = "left";
             }
@@ -357,12 +354,12 @@
        }
 
        if (blurAnim.is_running) {
-           background.filters = [new filters.BlurFilter(blurAnim.tick(), 4)];
+           background.filters[0].blur = blurAnim.tick();
        }
 
        if (blurAnim.is_ended_signal) {
            if (success) {
-               background.filters = [];
+               background.filters[0].blur = 0;
                setTimeout(() => {
                    dispatch("next")
                }, 2000);
@@ -370,6 +367,12 @@
                launchScene();
            }
        }
+    }
+
+    function launchClosedEye() {
+        scaleAnim.start();
+        heightAnim.start();
+        blurAnim.start();
     }
 
     function launchBlurAnim() {
@@ -417,5 +420,6 @@
 
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
     display_carton = false;
+    launchClosedEye();
 }}></Carton>
 <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>

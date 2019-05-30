@@ -6,7 +6,7 @@ export function Sound(name, options) {
         volume: 1,
         loop: false,
         streaming: true,
-        spatialized: false,
+        spacialized: false,
         oriented: false,
         position: Vector3(0, 0, 0),
         orientation: Vector3(0, 0, -1),
@@ -77,7 +77,7 @@ export function Sound(name, options) {
             },
             set_volume(volume) {
                 options.volume = volume;
-                gain_node.gain.setValueAtTime(volume, audio_context.currentTime)
+                gain_node.gain.setValueAtTime(volume, audio_context.currentTime);
             },
             set_loop(loop) {
                 options.loop = loop;
@@ -151,5 +151,4 @@ export function sound_debugger(ctx, canvas, options, name, non_spacialized_debbu
         ctx.fill();
         ctx.closePath();
     }
-
 }
