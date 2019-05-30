@@ -35,8 +35,8 @@
     let circleTransformValue = 0;
     let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
-    let runningDuration = 60;
     let mort;
+    let open_door = true;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
@@ -118,7 +118,8 @@
     }
 
     function next() {
-        alert("mort");
+        open_door = false;
+        //alert("mort");
         //dispatch("next");
     }
 
@@ -144,7 +145,9 @@
                 setTimeout(() => {
                     speedOut = true;
                 }, 1000);
-                startAnimation();
+                if (open_door) {
+                    startAnimation();
+                }
             }
         }
     }
@@ -177,6 +180,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .mort-anim {
         animation: run 1s linear infinite;
     }
 
@@ -216,7 +222,7 @@
       height: 100%;
       display: block;
       position: absolute;
-      background: white;
+      background: black;
       backface-visibility: hidden;
       overflow: hidden;
       transform-style: preserve-3d;
@@ -238,6 +244,20 @@
         width: 1200px;
     }
 
+    .light {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: translateZ(0px);
+        background-color: black;
+    }
+
+    .light-door {
+        width: 100%;
+        height: 100%;
+        background-color: black;
+    }
+
     .room_wall-left .wallpaper {
         transform: translate3d(calc(var(--translateValue) * 1px), 0, 0);
     }
@@ -247,22 +267,8 @@
         transform: translate3d(calc(var(--translateValue) * -1px), 0, 0);
     }
 
-    @keyframes slideRight{
-        0%{
-          transform: translate3d(0, 0, 0);
-        }
-        100%{
-          transform: translate3d(400px, 0, 0);
-        }
-    }
-
-    @keyframes slide{
-        0%{
-          transform: translate3d(0, 0, 0);
-        }
-        100%{
-          transform: translate3d(-400px, 0, 0);
-        }
+    .light-anim {
+        animation: lessLight 30s linear forwards;
     }
 
     @keyframes closeDoor {
@@ -271,6 +277,15 @@
         }
         100% {
             transform: perspective(100px) rotateY(0deg) translateX(50%);
+        }
+    }
+
+    @keyframes lessLight {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 100%;
         }
     }
 
@@ -354,6 +369,7 @@
 }}></Carton>
 <div class="mort"
     out:fade
+    class:mort-anim="{open_door && !display_carton}"
     style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --translateValue:{translateValue}"
     on:pointerdown="{onPointerDown}"
     on:touchstart|passive="{onPointerDown}"
@@ -367,16 +383,24 @@
         <div class="room_door" class:room_door_animation="{!display_carton}" on:animationend="{next}"></div>
     </div>
     <div class="room_door_frame">
-        <div class="room_door_frame_top"></div>
-        <div class="room_door_frame_left"></div>
+        <div class="room_door_frame_top">
+            <div class="light-door" class:light-anim="{!display_carton}"></div>
+        </div>
+        <div class="room_door_frame_left">
+            <div class="light-door" class:light-anim="{!display_carton}"></div>
+        </div>
         <div class="room_door_frame_space"></div>
-        <div class="room_door_frame_right"></div>
+        <div class="room_door_frame_right">
+            <div class="light-door" class:light-anim="{!display_carton}"></div>
+        </div>
     </div>
     <div class="room_wall room_wall-left">
         <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+        <div class="light" class:light-anim="{!display_carton}"></div>
     </div>
     <div class="room_wall room_wall-right">
         <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+        <div class="light" class:light-anim="{!display_carton}"></div>
     </div>
     {#if iconVisibility}
         <div class="icon"
