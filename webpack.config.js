@@ -131,7 +131,8 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             hash: true,
-            filename: './index.html' //relative to root of the application
+            filename: './index.html',
+            title: "Respire"
         }),
         new WorkboxPlugin.GenerateSW({
             clientsClaim: true,
