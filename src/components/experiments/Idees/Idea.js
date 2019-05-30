@@ -54,6 +54,7 @@ export function Idea (constants, parent) {
         opacity: 0,
         ...parent
     };
+
     const get_new_final_position = () => values.position
         .add(values.ejection_direction.multiply_scalar(values.ejection_strength))
         .limit(0, canvasWidth, 0, canvasHeight, 0, 0);
