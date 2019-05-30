@@ -9,8 +9,8 @@
     /*
     * RESSOURCES
     * */
-    import SandVertical from "assets/images/carton/sandVerticalWhite.png";
-    import SandHorizontal from "assets/images/carton/Sand_test_horizontal 3.png";
+    import SandVertical from "assets/images/carton/sandVerticalBlack.png";
+    import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
 
     const dispatch = createEventDispatcher();
 
