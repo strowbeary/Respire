@@ -31,7 +31,6 @@
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
     global_audio_scene_init.then(global_audio_scene => {
-            global_audio_scene.fade_in_nappe();
             fade_out_sand = global_audio_scene.fade_out_sable;
     });
 
