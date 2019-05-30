@@ -9,7 +9,7 @@
     /*
     * RESSOURCES
     * */
-    import SandVertical from "assets/images/carton/sandVerticalBlack.png";
+    import SandVertical from "assets/images/carton/sand_vertical.png";
     import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
 
     const dispatch = createEventDispatcher();
@@ -159,7 +159,7 @@
         text-align: center;
         color: transparent;
         text-shadow: 0 0 1px #000;
-        margin-bottom: calc(var(--scaleFactor) * 50px);
+        margin-bottom: calc(var(--scaleFactor) * 40px);
         font-family: 'BeatriceDisplayDA', 'serif';
         font-weight: 100;
         letter-spacing: 1px;
@@ -167,14 +167,13 @@
 
     .carton__timeContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        text-transform: uppercase;
-        margin-bottom: calc(var(--scaleFactor) * 20px);
-        font-family: 'Optician Sans', 'serif';
+        margin-bottom: calc(var(--scaleFactor) * 40px);
+        font-family: 'CormorantGaramond', 'serif';
     }
 
     .carton__spaceContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        font-family: 'Optician Sans', 'serif';
+        font-family: 'CormorantGaramond', 'serif';
     }
 
     .icon {
@@ -195,8 +194,8 @@
         justify-content: center;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 1px) #000;
-        width: calc(var(--scaleFactor) * 40px);
-        height: calc(var(--scaleFactor) * 40px);
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
         opacity: 0;
     }
 

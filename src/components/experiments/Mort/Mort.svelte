@@ -207,8 +207,8 @@
         justify-content: center;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 1px) #fff;
-        width: calc(var(--scaleFactor) * 40px);
-        height: calc(var(--scaleFactor) * 40px);
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
         opacity: 0;
     }
 

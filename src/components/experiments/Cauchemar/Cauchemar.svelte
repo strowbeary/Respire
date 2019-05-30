@@ -159,8 +159,8 @@
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 2px) #fff;
         background-color: black;
-        width: calc(var(--scaleFactor) * 30px);
-        height: calc(var(--scaleFactor) * 30px);
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
         transform: var(--circleTransform);
     }
 

@@ -121,22 +121,23 @@
     }
     .title__text h1 {
         font-weight: normal;
-        font-size: calc(50px * var(--scaleFactor));;
+        font-size: calc(70px * var(--scaleFactor));;
         text-shadow: 0 0 1px black, 0 0 calc(20px  * var(--scaleFactor)) black;
         color: transparent;
         text-transform: uppercase;
         text-align: center;
         letter-spacing: calc(12px  * var(--scaleFactor));
+        transform: translateX(calc(12px  * var(--scaleFactor)));
         font-family: 'BeatriceDisplayDA', 'serif';
     }
     .title__text p {
-        width: 70%;
+        width: 60%;
         text-align: center;
         font-size: calc(16px * var(--scaleFactor));
         margin-top: calc(50px  * var(--scaleFactor));
         font-weight: lighter;
-        letter-spacing: calc(3px * var(--scaleFactor));
-        font-family: "Optician Sans", "sans-serif";
+        letter-spacing: calc(1px * var(--scaleFactor));
+        font-family: "CormorantGaramond", "sans-serif";
     }
     .icon {
         width: 100%;
@@ -151,8 +152,8 @@
         justify-content: center;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 1px) #000;
-        width: calc(var(--scaleFactor) * 40px);
-        height: calc(var(--scaleFactor) * 40px);
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
     }
 
     .loopCircle {
