@@ -15,7 +15,7 @@
 	import Box from "assets/images/pilule/Box.png";
 	import Pill from "assets/images/pilule/Pill.png";
 	import Ticket from "assets/images/pilule/Ticket.png";
-	import backgroundImg from "assets/images/pilule/Cours.jpg";
+	import backgroundImg from "assets/images/pilule/cours.png";
 	export let canvasSize;
 
     const carton_data = {
