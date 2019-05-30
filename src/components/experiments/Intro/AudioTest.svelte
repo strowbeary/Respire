@@ -32,6 +32,8 @@
                     .add(3500, () => {
                         audio_test_sound.set_position(Vector3(0.5, 0, 0));
                         audio_test_sound.set_orientation(Vector3(-1, 0, 0));
+                    })
+                    .add(1000, () => {
                         right = true;
                         left = false;
                     })

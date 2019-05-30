@@ -122,8 +122,7 @@
     .title__text h1 {
         font-weight: normal;
         font-size: calc(70px * var(--scaleFactor));;
-        text-shadow: 0 0 1px black, 0 0 calc(20px  * var(--scaleFactor)) black;
-        color: transparent;
+        color: black;
         text-transform: uppercase;
         text-align: center;
         letter-spacing: calc(12px  * var(--scaleFactor));
