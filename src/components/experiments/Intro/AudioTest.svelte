@@ -1,14 +1,21 @@
 <script>
     import {fly, fade} from 'svelte/transition';
-    import {createEventDispatcher, afterUpdate} from "svelte";
+    import {createEventDispatcher, onMount} from "svelte";
     import {Sequence} from "lib/TimingKit";
     import {Vector3} from "lib/SoundKit";
+
+    import Casque from "assets/images/intro/casque.png";
+    import CasqueLeft from "assets/images/intro/casque_left.png";
+    import CasqueRight from "assets/images/intro/casque_right.png";
+
+    let left = false;
+    let right = false;
 
     const dispatch = createEventDispatcher();
 
     export let globalSoundScene;
 
-    afterUpdate(() => {
+    onMount(() => {
         globalSoundScene
             .then(async scene => {
                 const {audio_test_sound} = scene;
@@ -18,13 +25,18 @@
                     })
                     .add(11000, () => {
                         audio_test_sound.set_position(Vector3(-0.5, 0, 0));
-                        audio_test_sound.set_orientation(Vector3(1, 0, 0))
+                        audio_test_sound.set_orientation(Vector3(1, 0, 0));
+                        right = false;
+                        left = true;
                     })
                     .add(3500, () => {
                         audio_test_sound.set_position(Vector3(0.5, 0, 0));
-                        audio_test_sound.set_orientation(Vector3(-1, 0, 0))
+                        audio_test_sound.set_orientation(Vector3(-1, 0, 0));
+                        right = true;
+                        left = false;
                     })
                     .add(5000, () => {
+                        right = false;
                         dispatch("next");
                     })
                     .start();
@@ -48,9 +60,24 @@
         justify-content: center;
         align-items: center;
     }
+
+    .casque {
+        width: 100%;
+    }
+
+    .over {
+        position: absolute;
+        z-index: 1;
+    }
 </style>
 
-<div
-    class="audio_test"
+<div class="audio_test"
     transition:fade>
+    <img src="{Casque}" alt="casque" class="casque"/>
+    {#if left}
+        <img src="{CasqueLeft}" alt="casque-left" class="casque over" transition:fade/>
+    {/if}
+    {#if right}
+        <img src="{CasqueRight}" alt="casque-right" class="casque over" transition:fade/>
+    {/if}
 </div>
