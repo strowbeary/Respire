@@ -32,11 +32,12 @@
     height: 100vh;
     mix-blend-mode: difference;
     pointer-events: none;
-    z-index: 10000
+    z-index: 10000;
+    opacity: 0.5;
 }
 </style>
 
-<!--<img class="overlay" src={anim_bg} alt="animated background">-->
+<img class="overlay" src={anim_bg} alt="animated background">
 <AppWrapper let:canvasSize={canvasSize}>
     {#if canvasSize.canvasWidth}
         <svelte:component this={components[index]} on:next="{next}" {canvasSize} globalSoundScene={global_sound_scene}></svelte:component>
