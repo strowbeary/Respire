@@ -1,132 +1,131 @@
 import {Vector3} from "lib/SoundKit";
-import {Animate, Easing, Sequence} from "lib/TimingKit";
+import {Animate, Easing, Keyframes, Sequence} from "lib/TimingKit";
 
-export let idea_number = 0;
-
-export const LEFT = -1;
-export const RIGHT = 1;
-
-const get_random_initial_options = side => ({
-    side,
-    position: Vector3(
-        side < 0 ? -spriteWidth / 2 : canvasWidth + spriteWidth / 2,
-        Math.round(Math.random() * canvasHeight),
-        0
-    ),
-    ejection_direction: Vector3(-side, 0, 0),
-    opacity: 1,
-    ejection_strength: Math.random() * spriteWidth + spriteWidth / 2
-});
+let idea_number = 0;
+const MAX_IDEA = 40;
 
 function create_position_animation (from, to) {
     return {
         x: Animate(
             from.x,
             to.x,
-            Easing.linear,
-            0.03
+            Easing.easeInOutQuad,
+            0.01
         ),
         y: Animate(
             from.y,
             to.y,
-            Easing.linear,
-            0.03
+            Easing.easeInOutQuad,
+            0.01
         )
     };
 }
 
-export function Idea (constants, parent) {
-    const {
-        canvasWidth,
-        canvasHeight,
-        spriteWidth,
-        spriteHeight
-    } = constants;
+export function Idea ({canvasWidth, canvasHeight}, parent) {
+
+    idea_number++;
+    console.log(idea_number);
 
     const values = {
         ejection_direction: null,
         position: null,
         ejection_strength: null,
-        allowed_self_division: 1,
+        allowed_self_division: 2,
         self_division: 0,
         descendants_number: 0,
         dismissed: false,
-        opacity: 0,
+        opacity: 1,
+        line_event_bus: null,
+        spriteWidth: null,
+        spriteHeight: null,
+        display_offset: Vector3(0, 0, 0),
         ...parent
     };
 
+    values.line_event_bus.addEventListener("divide", () => {
+        values.descendants_number++;
+    });
+
+    values.line_event_bus.addEventListener("death", () => {
+        values.descendants_number--;
+    });
+
     const get_new_final_position = () => values.position
-        .add(values.ejection_direction.multiply_scalar(values.ejection_strength))
-        .limit(0, canvasWidth, 0, canvasHeight, 0, 0);
+        .add(values.ejection_direction.multiply_scalar(values.ejection_strength));
 
     let final_position = get_new_final_position();
 
-    let position_animation = create_position_animation(values.position, final_position);
+    let position_animation = create_position_animation(
+        values.position,
+        final_position.limit(0, canvasWidth, 0, canvasHeight, 0, 0)
+    );
 
-    const opacity_animation = Animate(
+    position_animation.x.start();
+    position_animation.y.start();
+
+    let opacity_animation = Animate(
         values.opacity,
         1,
         Easing.linear,
         0.03
     );
-    opacity_animation.start();
-
-    let division_hook = () => {};
-    let death_hook = () => {};
-
-    function on_division(hook) {
-        division_hook = hook;
-    }
-
-    function on_death(hook) {
-        death_hook = hook;
-    }
 
     function create_child () {
-        if (values.self_division < values.allowed_self_division || values.descendants_number === 0) {
-            values.ejection_direction = Vector3(Math.random(), Math.random(), 0);
+        console.log("is dismissed", values.dismissed);
+        if ((values.self_division < values.allowed_self_division || values.descendants_number === 0) && !values.dismissed) {
+            values.ejection_direction = Vector3(0, 1, 0).rotateXY(Math.random() * Math.PI * 2);
             final_position = get_new_final_position();
-            position_animation = create_position_animation(values.position, final_position);
-
             values.self_division++;
-            values.descendants_number++;
-            division_hook();
 
-            const new_child = Idea(options, {
+            const new_child = Idea({canvasWidth, canvasHeight}, {
                 position: values.position,
                 ejection_direction: values.ejection_direction.multiply_scalar(-1),
-                ejection_strength: values.ejection_strength
-            });
-            new_child.on_division(() => {
-                values.descendants_number++;
-                division_hook();
-            });
-            new_child.on_death(() => {
-                values.descendants_number--;
-                death_hook();
+                ejection_strength: values.ejection_strength,
+                line_event_bus: values.line_event_bus
             });
 
-            return new_child;
+            values.line_event_bus.dispatchEvent(new CustomEvent("divide", {
+                detail: {
+                    new_child
+                }
+            }));
         }
     }
+    const reproduction_seq = Sequence();
+    for(let i = values.allowed_self_division; i > 0; i--) {
+        reproduction_seq.add(5000 + Math.random() * 3000, () => (idea_number < MAX_IDEA) && create_child())
+    }
+    reproduction_seq.start();
 
-    function tick () {
+    function tick (container, sprite) {
         values.opacity = opacity_animation.tick();
-        values.position = Vector3(position_animation.x.tick(), position_animation.y.tick(), 0);
-        if (position_animation.x.is_ended_signal) {
-            values.ejection_direction = Vector3(Math.random(), Math.random(), 0);
+        if(opacity_animation.is_ended_signal) {
+            values.line_event_bus.dispatchEvent(new CustomEvent("death"));
+            container.removeChild(sprite);
         }
+        values.position = Vector3(position_animation.x.tick(), position_animation.y.tick(), 0).add(values.display_offset);
     }
 
     function kill() {
-        death_hook();
+        opacity_animation = Animate(
+            1,
+            0,
+            Easing.linear,
+            0.03
+        );
+        opacity_animation.start();
+        values.dismissed = true;
+    }
+
+    function set_display_offset(v) {
+        values.display_offset = v;
     }
 
 
     return {
-        on_division,
-        on_death,
         tick,
-        kill
+        kill,
+        values,
+        set_display_offset
     }
 }
