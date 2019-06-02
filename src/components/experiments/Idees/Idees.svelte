@@ -179,7 +179,10 @@ import idea_image from "assets/images/idees/Idea_small.png";
             line_event_bus.addEventListener("death", e => {
                 blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.01);
                 blurAnim.start();
-                const all_dismissed = Ideas.reduce((a, controller) => controller.values.dismissed && a);
+                const all_dismissed = Ideas.reduce((a, {controller}) => {
+                    console.log(controller);
+                    return controller.values.dismissed && a
+                });
                 console.log("all dismissed", all_dismissed);
                 if(all_dismissed) {
                     setTimeout(() => {
