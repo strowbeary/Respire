@@ -4,8 +4,9 @@
 }
 
 @font-face {
-    font-family: "Optician Sans";
-    src: url("assets/fonts/Optician-Sans.ttf");
+    font-family: "CormorantGaramond";
+    src: url("assets/fonts/CormorantGaramond-SemiBold.ttf");
+    font-weight: 600;
 }
 
 @keyframes falling {
