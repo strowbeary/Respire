@@ -1,0 +1,9 @@
+FROM nginx:alpine
+
+EXPOSE 9003:80
+
+ENV VIRTUAL_HOST=respire.remicaillot.fr
+ENV LETSENCRYPT_HOST=respire.remicaillot.fr
+ENV LETSENCRYPT_EMAIL=remi.caillot@edu.gobelins.fr
+
+COPY ./public /usr/share/nginx/html
