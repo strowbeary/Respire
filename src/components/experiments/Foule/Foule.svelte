@@ -30,7 +30,7 @@
     const carton_data ={
         titleName: "À contre-courant",
         timeContext: "18 heures avant l'examen",
-        spaceContext: "Amphitheatre"
+        spaceContext: "Amphithéâtre"
     };
 
     let display_carton = true;
