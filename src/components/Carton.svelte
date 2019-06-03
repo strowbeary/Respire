@@ -232,6 +232,14 @@
         height: 100%;
     }
 
+    .sand--vertical--right {
+        left: 6px;
+    }
+
+    .sand--vertical--right.sand--vertical.falling {
+        animation: falling linear 4s infinite;
+    }
+
     .sand--vertical.falling {
         animation: falling linear 5s infinite;
     }
@@ -268,6 +276,8 @@
         <div class="sand sand--container" class:fadeIn="{ready}">
             <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
             <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+            <div class="sand--vertical sand--vertical--top sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+            <div class="sand--vertical sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
         </div>
         <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
     </div>
