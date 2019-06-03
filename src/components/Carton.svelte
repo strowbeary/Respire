@@ -81,9 +81,9 @@
         if (isPointerDown) {
             e.preventDefault();
 
-            if(e.touches) {
-                yEnd = e.touches[0].clientY;
-                xEnd = e.touches[0].clientX;
+            if(e.type === "touchend") {
+                yEnd = e.changedTouches[0].clientY;
+                xEnd = e.changedTouches[0].clientX;
             } else {
                 yEnd = e.clientY;
                 xEnd = e.clientX;
@@ -255,11 +255,11 @@
         transition:fade
         style="--scaleFactor:{scaleFactor}"
         on:pointerdown="{onPointerDown}"
-        on:touchstart|passive="{onPointerDown}"
+        on:touchstart="{onPointerDown}"
         on:pointermove="{onPointerMove}"
-        on:touchmove|passive="{onPointerMove}"
+        on:touchmove="{onPointerMove}"
         on:pointerup="{onPointerUp}"
-        on:touchend|passive="{onPointerUp}"
+        on:touchend="{onPointerUp}"
         bind:this="{carton}">
         <div class="carton__text">
             <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>

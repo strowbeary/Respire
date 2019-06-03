@@ -89,9 +89,9 @@
     function onPointerUp(e) {
         if (isPointerDown) {
             e.preventDefault();
-            if(e.touches) {
-                yEnd = e.touches[0].clientY;
-                xEnd = e.touches[0].clientX;
+            if (e.type === "touchend") {
+                yEnd = e.changedTouches[0].clientY;
+                xEnd = e.changedTouches[0].clientX;
             } else {
                 yEnd = e.clientY;
                 xEnd = e.clientX;
@@ -392,7 +392,9 @@
     on:touchstart="{onPointerDown}"
     on:pointerdown="{onPointerDown}"
     on:pointermove="{onPointerMove}"
+    on:touchmove="{onPointerMove}"
     on:pointerup="{onPointerUp}"
+    on:touchend="{onPointerUp}"
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">
