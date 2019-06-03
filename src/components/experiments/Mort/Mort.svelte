@@ -280,7 +280,7 @@
             transform: perspective(100px) rotateY(90deg) translateX(50%);
         }
         100% {
-            transform: perspective(100px) rotateY(0deg) translateX(50%);
+            transform: perspective(100px) rotateY(-1deg) translateX(50%);
         }
     }
 

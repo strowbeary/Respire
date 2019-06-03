@@ -21,7 +21,7 @@ export function DragIcon(container, isVertical) {
     let vertical = isVertical;
     slideAnim.start();
     interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
-    interactiveIcon.drawCircle(0, 0, 20);
+    interactiveIcon.drawCircle(0, 0, 35);
     interactiveIcon.alpha = alpha;
 
     container.addChild(interactiveIcon);
@@ -30,9 +30,9 @@ export function DragIcon(container, isVertical) {
         interactiveIcon.clear();
         interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
         if (!vertical) {
-            interactiveIcon.drawCircle(newPos, 0, 20);
+            interactiveIcon.drawCircle(newPos, 0, 35);
         } else {
-            interactiveIcon.drawCircle(0, -newPos, 20);
+            interactiveIcon.drawCircle(0, -newPos, 35);
         }
     }
 
