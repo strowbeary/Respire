@@ -168,9 +168,7 @@
     on:pointerdown="{onPointerDown}"
     on:touchstart="{onPointerDown}"
     on:pointermove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
     on:pointerup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
     transition:fade>
     <div class="title__text">
         <h1>Respire</h1>
