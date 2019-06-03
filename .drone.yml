@@ -1,0 +1,35 @@
+kind: pipeline
+name: default
+
+steps:
+    - name: Build website
+      image: node
+      commands:
+          - npm install
+          - npm run build
+    - name: Build & push to local docker registery
+      image: plugins/docker
+      settings:
+          registry: registery.remicaillot.fr
+          auto_tag: true
+          repo: registery.remicaillot.fr/respire
+          dockerfile: ./Dockerfile
+    - name: Deploy to server
+      image: docker:dind
+      volumes:
+        - name: dockersock
+          path: /var/run/docker.sock
+      commands:
+        - docker pull registery.remicaillot.fr/respire:latest
+        - docker stop respire
+        - docker rm respire
+        - docker run --name respire --hostname respire.remicaillot.fr -d registery.remicaillot.fr/respire
+volumes:
+    - name: dockersock
+      host:
+          path: /var/run/docker.sock
+trigger:
+    branch:
+        - master
+    event:
+        - push
