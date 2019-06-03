@@ -9,8 +9,8 @@
     /*
     * RESSOURCES
     * */
-    import SandVertical from "assets/images/carton/sandVerticalWhite.png";
-    import SandHorizontal from "assets/images/carton/Sand_test_horizontal 3.png";
+    import SandVertical from "assets/images/carton/sand_vertical.png";
+    import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
 
     const dispatch = createEventDispatcher();
 
@@ -31,7 +31,6 @@
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
     global_audio_scene_init.then(global_audio_scene => {
-            global_audio_scene.fade_in_nappe();
             fade_out_sand = global_audio_scene.fade_out_sable;
     });
 
@@ -94,7 +93,7 @@
                 !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
                 fade_out_sand();
-                dispatch('next');
+                dispatch("next");
             } else {
                 yStart = 0;
                 yEnd = 0;
@@ -132,9 +131,9 @@
         max-width: 100vw;
         max-height: 177.78vw;
         font-family: 'Arial', 'sans-serif';
-        background-color: black;
-        color: white;
-        z-index: 1;
+        color: black;
+        background-color: white;
+        z-index: 2;
         display: flex;
         justify-content: center;
     }
@@ -146,13 +145,21 @@
         justify-content: center;
         align-items: center;
     }
-
+    .carton__background {
+        position: absolute;
+        width: 56.25vh;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 177.78vw;
+        background-color: white;
+        z-index: 1;
+    }
     .carton__titleName {
         font-size: calc(var(--scaleFactor) * 60px);
         text-align: center;
         color: transparent;
-        text-shadow: 0 0 1px #fff;
-        margin-bottom: calc(var(--scaleFactor) * 50px);
+        text-shadow: 0 0 1px #000;
+        margin-bottom: calc(var(--scaleFactor) * 40px);
         font-family: 'BeatriceDisplayDA', 'serif';
         font-weight: 100;
         letter-spacing: 1px;
@@ -160,14 +167,13 @@
 
     .carton__timeContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        text-transform: uppercase;
-        margin-bottom: calc(var(--scaleFactor) * 20px);
-        font-family: 'Optician Sans', 'serif';
+        margin-bottom: calc(var(--scaleFactor) * 40px);
+        font-family: 'CormorantGaramond', 'serif';
     }
 
     .carton__spaceContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        font-family: 'Optician Sans', 'serif';
+        font-family: 'CormorantGaramond', 'serif';
     }
 
     .icon {
@@ -187,9 +193,9 @@
         display: flex;
         justify-content: center;
         border-radius: 50%;
-        border: solid calc(var(--scaleFactor) * 1px) #fff;
-        width: calc(var(--scaleFactor) * 40px);
-        height: calc(var(--scaleFactor) * 40px);
+        border: solid calc(var(--scaleFactor) * 1px) #000;
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
         opacity: 0;
     }
 
@@ -237,32 +243,35 @@
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
-<div class="carton"
-    out:fade
-    style="--scaleFactor:{scaleFactor}"
-    on:pointerdown="{onPointerDown}"
-    on:touchstart|passive="{onPointerDown}"
-    on:pointermove="{onPointerMove}"
-    on:touchmove|passive="{onPointerMove}"
-    on:pointerup="{onPointerUp}"
-    on:touchend|passive="{onPointerUp}"
-    bind:this="{carton}">
-    <div class="carton__text">
-        <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
-        <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
-        <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+    <div class="carton"
+        transition:fade
+        style="--scaleFactor:{scaleFactor}"
+        on:pointerdown="{onPointerDown}"
+        on:touchstart|passive="{onPointerDown}"
+        on:pointermove="{onPointerMove}"
+        on:touchmove|passive="{onPointerMove}"
+        on:pointerup="{onPointerUp}"
+        on:touchend|passive="{onPointerUp}"
+        bind:this="{carton}">
+        <div class="carton__text">
+            <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
+            <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
+            <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+        </div>
+        {#if ready && fade_out_sand}
+           <div class="icon"
+                bind:this="{icon}"
+                transition:fade>
+                <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+           </div>
+        {/if}
+        <div class="sand sand--container" class:fadeIn="{ready}">
+            <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+            <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+        </div>
+        <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
     </div>
-    {#if ready && fade_out_sand}
-       <div class="icon"
-            bind:this="{icon}"
-            transition:fade>
-            <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
-       </div>
+    {#if timeContext === "24 heures avant l'examen" || timeContext === "5 minutes avant l'examen" }
+        <div class="carton__background" out:fade></div>
     {/if}
-    <div class="sand sand--container" class:fadeIn="{ready}">
-        <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-        <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-    </div>
-    <img src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
-</div>
 {/if}

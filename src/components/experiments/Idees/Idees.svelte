@@ -1,5 +1,5 @@
 <script>
-    /*
+        /*
     * MODULES
     * */
     import {createEventDispatcher, onDestroy} from 'svelte';
@@ -7,7 +7,7 @@
     import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
     import {MaskedSprite} from "utils/MaskedSprite.pixi.js";
-    import {Animate, Easing} from "lib/TimingKit";
+        import {Animate, Easing, Sequence} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
@@ -15,9 +15,13 @@
 	/*
 	* RESSOURCES
 	* */
-    import Idea from "assets/images/idees/Idea_small.png";
+import idea_image from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
+    import {Idea} from "./Idea";
+    import {Vector3} from "lib/SoundKit";
+
     export let canvasSize;
+
 
     const dispatch = createEventDispatcher();
 
@@ -47,8 +51,12 @@
     let app, canvasWidth, canvasHeight;
     let container = new Container();
     let prof;
+
+
+    let blurAnim = Animate(0, 0, Easing.easeInOutQuad, 0.01);
+    let blurValue = 0;
     const imgAssets = {
-        Idea
+        idea_image
     };
 
     const loadOption = {
@@ -57,7 +65,6 @@
         crossOrigin:''
     };
 
-    let ideas = [];
     let dragIcon;
 
     async function init(data) {
@@ -68,6 +75,41 @@
         dragIcon = DragIcon(app.stage);
         loadImages();
     }
+
+    function setInteractive(sprite, controller) {
+            let dragging = false;
+            let old_x = 0;
+            let old_y = 0;
+            function on_end(e) {
+                dragging = false;
+                if(
+                    (controller.values.position.x < 0 || controller.values.position.x > canvasWidth) ||
+                    (controller.values.position.y < 0 || controller.values.position.y > canvasHeight)
+                ) {
+                    controller.kill();
+                }
+            }
+            sprite.on('pointerdown', e => {
+                    dragging = true;
+                    old_x = e.data.global.x;
+                    old_y = e.data.global.y;
+                })
+                .on('pointerup',on_end)
+                .on('pointerupoutside', on_end)
+                .on('pointermove', e => {
+                    if (dragging) {
+                        const offset_x = (e.data.global.x - old_x) + controller.values.display_offset.x;
+                        const offset_y = controller.values.display_offset.y - (e.data.global.y - old_y);
+                        old_x = e.data.global.x;
+                        old_y = e.data.global.y;
+                        controller.set_display_offset(Vector3(
+                            Math.round(offset_x),
+                            Math.round(offset_y),
+                            0
+                        ));
+                    }
+                });
+        }
 
     async function loadImages() {
         if (!resources[Prof]) {
@@ -84,7 +126,7 @@
         }
     }
 
-    function generateAnimatedSprite(resourceKey, direction) {
+    function generateAnimatedSprite(resourceKey) {
         let sprite = new PixiApngAndGif(resourceKey, resources).sprite;
         sprite.hitArea = new RoundedRectangle(-240, -50, 480, 100, 150);
         sprite.buttonMode = true;
@@ -92,193 +134,15 @@
         sprite.anchor.y = 0.5;
         sprite.scaleDefault = canvasWidth/sprite.width * 0.65;
         sprite.scale.set(sprite.scaleDefault);
-        sprite.direction = direction || "up";
         return sprite;
     }
 
-    function positionFromCanvasWidth(number) {
-      return number * canvasWidth;
-    }
+    const Ideas = [];
 
-    function setPosition(keyName) {
-         switch(keyName){
-            case "Idea1":
-                ideas[keyName].positions = {start: 0.15, end: -ideas[keyName].width/2};
-                ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.9);
-                ideas[keyName].isFirst = true;
-                dragIcon.setDirection(-1);
-                dragIcon.setPosition(positionFromCanvasWidth(ideas[keyName].positions.start), ideas[keyName].y);
-                dragIcon.initIconAnim(0, 1);
-                break;
-            case "Idea2":
-                ideas[keyName].positions = {start: 0.95, end: positionFromCanvasWidth(1) + ideas[keyName].width/2};
-                ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.5);
-                break;
-            case "Idea3":
-                ideas[keyName].positions = {start: 0.15, end: -ideas[keyName].width/2};
-                ideas[keyName].position.set(ideas[keyName].positions.end, canvasHeight * 0.1);
-                break;
-            default:
-                break;
-         }
-    }
+    const LEFT = -1;
+    const RIGHT = 1;
 
-    async function create_clone(sprite, keyName) {
-        if (Object.keys(ideas).length < 30 && Object.keys(ideas).length > 0) {
-            let assetKey = keyName.split('-')[0];
-            //if multiple assets
-            //let clone = generateAnimatedSprite(imgAssets[assetKey]);
-            let clone = generateAnimatedSprite(imgAssets["Idea"], sprite.direction);
-            let index = Object.keys(ideas).filter(key => key.includes(assetKey)).length;
-            let name = assetKey + '-' + index;
-            ideas[name] = clone;
-            if (sprite.direction === "up") {
-                if (sprite.y - sprite.height/6 > sprite.height/6) {
-                    clone.position.set(sprite.x, sprite.y);
-                    clone.parentKey = keyName;
-                    sprite.childKey = name;
-                } else {
-                    clone.direction = "down";
-                    let parentSprite = Object.keys(ideas)
-                        .filter(key => key.includes(assetKey))
-                        .map(key => ideas[key])
-                        .reduce((prev, curr) => prev.y < curr.y ? prev : curr);
-                    parentSprite.childKey = name;
-                    clone.position.set(parentSprite.x, parentSprite.y);
-                    clone.parentKey = Object.keys(ideas).filter(key => ideas[key] === parentSprite)[0];
-                }
-            } if (sprite.direction === "down") {
-                if (sprite.y > canvasHeight - sprite.height/6) {
-                    clone.position.set(sprite.x, sprite.y);
-                    clone.parentKey = keyName;
-                    sprite.childKey = name;
-                } else {
-                    clone.direction = "up";
-                    let parentSprite = Object.keys(ideas)
-                        .filter(key => key.includes(assetKey))
-                        .map(key => ideas[key])
-                        .reduce((prev, curr) => prev.y > curr.y ? prev : curr);
-                    parentSprite.childKey = name;
-                    clone.position.set(parentSprite.x, parentSprite.y);
-                    clone.parentKey = Object.keys(ideas).filter(key => ideas[key] === parentSprite)[0];
-                }
-            }
-            clone.alpha = 0;
-            //ideas[keyName].anim_scale = Animate(1, 1.2, Easing.linear, 0.005);
-            //clone.anim_scale = Animate(1, 1.2, Easing.linear, 0.005);
-            clone.anim_opacity = Animate(0, 1, Easing.linear, 0.005);
-            setInteractive(clone);
-            //ideas[keyName].anim_scale.start();
-            //clone.anim_scale.start();
-            clone.anim_opacity.start();
-            container.addChild(clone);
-        }
-    }
 
-    function move_clone(keyName) {
-        let sprite = ideas[keyName];
-        let parent = ideas[sprite.parentKey];
-        if (parent && sprite) {
-            sprite.interactive = false;
-            parent.interactive = false;
-            sprite.anim_scale_y = Animate(sprite.scaleDefault, sprite.scaleDefault/2, Easing.easeInOutQuad, 0.05);
-            parent.anim_scale_y = Animate(parent.scaleDefault, parent.scaleDefault/2, Easing.easeInOutQuad, 0.05);
-            if (sprite.direction === "up") {
-                sprite.anim_position_y = Animate(sprite.y, sprite.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-                parent.anim_position_y = Animate(parent.y, parent.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
-            } else if (sprite.direction === "down") {
-                sprite.anim_position_y = Animate(sprite.y, sprite.y + sprite.height/6, Easing.easeInOutQuad, 0.01);
-                parent.anim_position_y = Animate(parent.y, parent.y - sprite.height/6, Easing.easeInOutQuad, 0.01);
-            }
-            if (parent.isFirst) {
-                dragIcon.initIconAnim(1, 0);
-                dragIcon.startIconAnim();
-            }
-            sprite.anim_scale_y.start();
-            parent.anim_scale_y.start();
-            sprite.anim_position_y.start();
-            parent.anim_position_y.start();
-            blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
-            blurAnim.start();
-        }
-    }
-
-    function onDragEnd() {
-        if (this.dragging) {
-            this.dragging = false;
-            this.data = null;
-
-            if (this.x < 0 || this.x > canvasWidth - this.width/2) {
-                let keyName = Object.keys(ideas).find(key => ideas[key] === this);
-                if (keyName) {
-                    container.removeChild(this);
-                    delete ideas[keyName];
-
-                    blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.05);
-                    blurAnim.start();
-
-                    if (this.childKey) {
-                        container.removeChild(ideas[this.childKey]);
-                        delete ideas[this.childKey];
-                        //this.childKey = "";
-                        let property = keyName.split('-')[0];
-                        let sprites = Object.keys(ideas).filter(key => key.includes(keyName.split('-')[0]));
-                        if (sprites.length > 0) {
-                            let sprite = ideas[sprites[sprites.length - 1]];
-                            create_clone(sprite, property);
-                        }
-                    }
-                }
-            } else if (this.childKey) {
-                ideas[this.childKey].anim_opacity = Animate(0, 1, Easing.linear, 0.001);
-                ideas[this.childKey].anim_opacity.start();
-
-                if (this.isFirst) {
-                    dragIcon.setPosition(this.x, this.y);
-                    dragIcon.initIconAnim(0, 0.5);
-                    dragIcon.startIconAnim();
-                }
-            } else if (this.isFirst) {
-                dragIcon.setPosition(this.x, this.y);
-                dragIcon.initIconAnim(0, 0.5);
-                dragIcon.startIconAnim();
-            }
-        }
-    }
-
-    function setInteractive(sprite) {
-        sprite.on('pointerdown', function (event) {
-                  if (!this.dragging) {
-                      this.data = event.data;
-                      this.dragging = true;
-                      this.offset = this.x - this.data.getLocalPosition(this.parent).x;
-                      this.direction = "left";
-
-                      if (this.isFirst) {
-                          dragIcon.initIconAnim(0.5, 0);
-                          dragIcon.startIconAnim();
-                      }
-
-                      //normalement, comme le clone n'est pas interactif, il est impossible de l'avoir éjecté avant
-                      if (this.childKey && ideas[this.childKey]) { //on ne permet pas que le clone encore dans la sprite continue de faire sa vie
-                          ideas[this.childKey].anim_opacity = null;
-                          ideas[this.childKey].alpha = 0;
-                      }
-                  }
-              })
-              .on('pointerup', onDragEnd)
-              .on('pointerupoutside', onDragEnd)
-              .on('pointermove', function () {
-                  if (this.dragging) {
-                      let newPos = this.data.getLocalPosition(this.parent).x + this.offset;
-                      this.x = newPos;
-
-                      if (this.childKey && ideas[this.childKey]) {
-                          ideas[this.childKey].x = newPos;
-                      }
-                  }
-              });
-    }
 
     async function setup() {
         prof = new Sprite(resources[Prof].texture);
@@ -288,137 +152,84 @@
         prof.position.set(canvasWidth/2, canvasHeight/2);
         prof.filters = [new filters.BlurFilter(0.1)];
         container.addChild(prof);
-
-        for (let i = 1; i < 4; i++) {
-            let sprite = generateAnimatedSprite(imgAssets["Idea"]);
-            ideas["Idea"+i] = sprite;
-            setPosition("Idea"+i);
-            setInteractive(sprite);
+        function create_initial_idea(side, height) {
+            const sprite = generateAnimatedSprite(imgAssets["idea_image"]);
             sprite.interactive = true;
+            const line_event_bus = new EventTarget();
+            const controller = Idea(
+                {canvasWidth, canvasHeight},
+                {
+                    side,
+                    position: Vector3(
+                        side < 0 ? -sprite.width / 2 : canvasWidth + sprite.width / 2,
+                        height,
+                        0
+                    ),
+                    ejection_direction: Vector3(-side, 0, 0),
+                    opacity: 1,
+                    ejection_strength: sprite.width - 50,
+                    line_event_bus,
+                    spriteWidth: sprite.width,
+                    spriteHeight: sprite.height
+                }
+            );
+
+            setInteractive(sprite, controller);
+
+            line_event_bus.addEventListener("death", e => {
+                blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.01);
+                blurAnim.start();
+                const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
+                console.log("all dismissed", all_dismissed);
+                if(all_dismissed) {
+                    setTimeout(() => {
+                        const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
+                        if(all_dismissed) {
+                            dispatch("next");
+                        }
+                    }, 2000);
+                }
+            });
+            blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
+            blurAnim.start();
+            line_event_bus.addEventListener("divide", e => {
+                blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
+                blurAnim.start();
+                const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
+                new_sprite.interactive = true;
+                setInteractive(new_sprite, e.detail.new_child);
+                Ideas.push({
+                    controller: e.detail.new_child,
+                    sprite: new_sprite
+                });
+                container.addChild(new_sprite);
+            });
+            Ideas.push({
+                controller,
+                sprite
+            });
             container.addChild(sprite);
         }
-        //if multiple assets
-        /*Object.values(imgAssets).forEach((resourceKey) => {
-            let keyName = Object.keys(imgAssets).find(keyName => imgAssets[keyName] === resourceKey);
-            let sprite = generateAnimatedSprite(resourceKey);
-            ideas[keyName] = sprite;
-            setPosition(keyName);
-            setInteractive(sprite);
-            sprite.interactive = true;
-            container.addChild(sprite);
-        });*/
-        setTimeout(() => {
-            setAppearAnimation("Idea1");
-        }, 10000);
-        setTimeout(() => {
-            setAppearAnimation("Idea2");
-        }, 12000);
-        setTimeout(() => {
-           setAppearAnimation("Idea3");
-        }, 15000);
+
         app.ticker.add(delta => gameLoop(delta));
+        Sequence()
+            .add(10000, () => create_initial_idea(RIGHT, 300))
+            .add(2000, () => create_initial_idea(LEFT, 600))
+            .add(3000, () => create_initial_idea(RIGHT, 800))
+            .start();
         is_ready = true;
     }
 
-    function setAppearAnimation(keyName) {
-        let sprite = ideas[keyName];
-        sprite.anim_position_x = Animate(sprite.positions.end, positionFromCanvasWidth(sprite.positions.start), Easing.linear, 0.03);
-        sprite.anim_position_x.start();
-        blurAnim = Animate(blurValue, blurValue + 0.5, Easing.linear, 0.03);
-        blurAnim.start();
-    };
-
-    let blurAnim;
-    let blurValue = 0;
-
     function gameLoop() {
-        dragIcon.loop();
-        if (Object.keys(ideas).length > 0) {
-            for (let property in ideas) {
-                if (ideas[property].anim_position_x) {
-                    let sprite = ideas[property];
-                    if (sprite.anim_position_x.is_running) {
-                        sprite.x = sprite.anim_position_x.tick();
-                    }
-                    if (sprite.anim_position_x.is_ended_signal) {
-                        sprite.anim_position_x = null;
-                        if (sprite.isFirst) {
-                            dragIcon.startIconAnim();
-                        }
-                        create_clone(sprite, property);
-                    }
-                }
-                if (ideas[property].anim_opacity) {
-                    let sprite = ideas[property];
-                    if (sprite.anim_opacity.is_running) {
-                        sprite.alpha = sprite.anim_opacity.tick();
-                    }
-                    if (sprite.anim_opacity.is_ended_signal) {
-                        sprite.anim_opacity = null;
-                        move_clone(property); //si on commence à bouger, alors on ne peut cliquer sur aucune des sprites en mouvement
-                    }
-                }
-                /*if (ideas[property].anim_scale) {
-                    let sprite = ideas[property];
-                    if (sprite.anim_scale.is_running) {
-                        sprite.scale.set(sprite.anim_scale.tick());
-                    }
-                }*/
-                if (ideas[property].anim_scale_y) {
-                    let sprite = ideas[property];
-                    if (sprite.anim_scale_y.is_running) {
-                        sprite.scale.set(sprite.scaleDefault, sprite.anim_scale_y.tick());
-                    }
+        Ideas.forEach(({controller, sprite}, i) => {
+            controller.tick(container, sprite, i);
+            const position = controller.values.position.to_array();
+            sprite.position.set(...position);
+            sprite.alpha = controller.values.opacity;
+        });
+        blurValue = blurAnim.tick();
+        prof.filters[0].blur = blurValue;
 
-                    if (sprite.anim_scale_y.is_ended_signal) {
-                        if (Math.abs(sprite.scale.y - sprite.scaleDefault/2) < 0.1) {
-                           sprite.anim_scale_y = Animate(sprite.scaleDefault/2, sprite.scaleDefault, Easing.easeInQuad, 0.1);
-                           sprite.anim_scale_y.start();
-                        } else {
-                            sprite.anim_scale_y = null;
-                        }
-                    }
-                }
-                if (ideas[property].anim_position_y) {
-                    let sprite = ideas[property];
-                    if (sprite.anim_position_y.is_running) {
-                        sprite.y = sprite.anim_position_y.tick();
-                    }
-                    if (sprite.anim_position_y.is_ended_signal) {
-                        sprite.anim_position_y = null;
-                        if (sprite.childKey) {
-                            sprite.childKey = "";
-                        }
-                        if (sprite.parentKey) {
-                            sprite.parentKey = "";
-                            create_clone(sprite, property);
-                        }
-                        if (sprite.isFirst) {
-                           dragIcon.setPosition(sprite.x, sprite.y);
-                           dragIcon.initIconAnim(0, 1);
-                           dragIcon.startIconAnim();
-                        }
-                        sprite.interactive = true;
-                    }
-                }
-            }
-        }
-        if (blurAnim) {
-            if (blurAnim.is_running) {
-                prof.filters[0].blur = blurAnim.tick();
-            }
-            if (blurAnim.is_ended_signal) {
-                blurValue = blurAnim.tick();
-                blurAnim = null;
-
-                if (Object.keys(ideas).length === 0) {
-                    prof.filters = [];
-                    setTimeout(() => {
-                        dispatch("next");
-                    }, 2000);
-                }
-            }
-        }
     }
 
     function next() {

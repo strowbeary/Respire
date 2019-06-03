@@ -5,19 +5,23 @@ export function Vector3(x, y, z) {
     }
 
     function add(v) {
-        return Vector3(x + v.x, y, z + v.z);
+        return Vector3(x + v.x, y - v.y, z + v.z);
     }
 
     function sub(v) {
-        return Vector3(x - v.x, y, z - v.z);
+        return Vector3(x - v.x, y - v.y, z - v.z);
     }
 
     function invert() {
         return Vector3(-x, y, -z);
     }
 
+    function multiply(v) {
+        return Vector3(x * v.x, y * v.y, z * v.z);
+    }
+
     function multiply_scalar(s) {
-        return Vector3(x * s, y, z * s);
+        return Vector3(x * s, y * s, z * s);
     }
 
     function divide_scalar(s) {
@@ -64,18 +68,33 @@ export function Vector3(x, y, z) {
     function rotate(theta) {
         return Vector3(
             x * Math.cos(theta) - z * Math.sin(theta),
-            y,
+            0,
             x * Math.sin(theta) + z * Math.cos(theta)
+        )
+    }
+    function rotateXY(theta) {
+        return Vector3(
+            x * Math.cos(theta) - y * Math.sin(theta),
+            x * Math.sin(theta) + y * Math.cos(theta),
+            0
         )
     }
     function to_array() {
         return [x, y, z];
     }
+
     function limit(x_min, x_max, y_min, y_max, z_min, z_max) {
         return Vector3(
             Math.max(x_min, Math.min(x , x_max)),
             Math.max(y_min, Math.min(y , y_max)),
             Math.max(z_min, Math.min(z , z_max)),
+        )
+    }
+    function limit_bounce(x_min, x_max, y_min, y_max, z_min, z_max) {
+        return Vector3(
+           x_max - (Math.max(x, x_min) % x_max),
+           y_max - (Math.max(y, y_min) % y_max),
+           z_max - (Math.max(z, z_min) % z_max),
         )
     }
     return {
@@ -98,6 +117,9 @@ export function Vector3(x, y, z) {
         rotate,
         to_array,
         limit,
+        rotateXY,
+        multiply,
+        limit_bounce,
         get x() {
             return x;
         },

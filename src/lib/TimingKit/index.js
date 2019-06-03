@@ -18,7 +18,8 @@ export function Sequence() {
     }
 
     return {
-        add
+        add,
+        start
     }
 }
 

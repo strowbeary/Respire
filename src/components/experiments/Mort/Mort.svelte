@@ -6,7 +6,7 @@
     import {createEventDispatcher} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
     import Carton from 'components/Carton.svelte';
-
+    import {Animate, Easing} from 'lib/TimingKit';
     /*
     * RESSOURCES
     * */
@@ -21,6 +21,12 @@
     let display_carton = true;
     let is_ready = true;
     let iconVisibility = true;
+    let anim;
+    let translateValue = 0;
+    let loop;
+    let speedUp = false;
+    let speedUpRunning = false;
+    let speedOut = true;
 
     const dispatch = createEventDispatcher();
 
@@ -29,8 +35,9 @@
     let circleTransformValue = 0;
     let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
-    let runningDuration = 60;
     let mort;
+    let open_door = true;
+    let blurValue = 0;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
@@ -45,18 +52,20 @@
     let yLast;
 
     function onPointerDown(e) {
-        if(e.touches) {
-            yStart = e.touches[0].clientY;
-            xStart = e.touches[0].clientX;
-        } else {
-            yStart = e.clientY;
-            xStart = e.clientX;
-        }
+        if (speedOut) {
+            if(e.touches) {
+                yStart = e.touches[0].clientY;
+                xStart = e.touches[0].clientX;
+            } else {
+                yStart = e.clientY;
+                xStart = e.clientX;
+            }
 
-        if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
-            e.preventDefault();
-            yLast = parseFloat(getComputedStyle(mort).height);
-            isPointerDown = true;
+            if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
+                e.preventDefault();
+                yLast = parseFloat(getComputedStyle(mort).height);
+                isPointerDown = true;
+            }
         }
     }
 
@@ -90,10 +99,8 @@
             if (yEnd < yStart - parseFloat(getComputedStyle(mort).height)/10 &&
                 !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
-                runningDuration = 30;
-                setTimeout(() => {
-                    runningDuration = 60;
-                }, 3000);
+                speedUp = true;
+                speedOut = false;
                 reset();
             } else {
                 reset();
@@ -112,8 +119,40 @@
     }
 
     function next() {
-        dispatch("next");
-        console.log("fin");
+        open_door = false;
+        //alert("mort");
+        //dispatch("next");
+    }
+
+    function startAnimation() {
+        anim = Animate(0, -400, Easing.linear, 0.005);
+        anim.start();
+        loop = requestAnimationFrame(translate);
+    }
+
+    function translate() {
+        if (anim.is_running) {
+            translateValue = anim.tick();
+            loop = requestAnimationFrame(translate);
+        } else {
+            if (speedUp) {
+                speedUp = false;
+                speedUpRunning = true;
+                blurValue = 3;
+                anim = Animate(0, -400, Easing.linear, 0.01);
+                anim.start();
+                loop = requestAnimationFrame(translate);
+            } else {
+                speedUpRunning = false;
+                blurValue = 0;
+                setTimeout(() => {
+                    speedOut = true;
+                }, 1000);
+                if (open_door) {
+                    startAnimation();
+                }
+            }
+        }
     }
 </script>
 
@@ -144,6 +183,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .mort-anim {
         animation: run 1s linear infinite;
     }
 
@@ -165,11 +207,10 @@
         justify-content: center;
         border-radius: 50%;
         border: solid calc(var(--scaleFactor) * 1px) #fff;
-        width: calc(var(--scaleFactor) * 40px);
-        height: calc(var(--scaleFactor) * 40px);
+        width: calc(var(--scaleFactor) * 70px);
+        height: calc(var(--scaleFactor) * 70px);
         opacity: 0;
     }
-
 
     .room {
       width: 100%;
@@ -184,7 +225,7 @@
       height: 100%;
       display: block;
       position: absolute;
-      background: white;
+      background: black;
       backface-visibility: hidden;
       overflow: hidden;
       transform-style: preserve-3d;
@@ -204,35 +245,34 @@
         background-size: 400px 100%;
         height: 100%;
         width: 1200px;
+        filter: blur(calc(var(--blurValue) * 1px));
+    }
+
+    .light {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: translateZ(0px);
+        background-color: black;
+    }
+
+    .light-door {
+        width: 100%;
+        height: 100%;
+        background-color: black;
     }
 
     .room_wall-left .wallpaper {
-        animation: slide 6s linear infinite;
-        animation-duration: calc(100ms * var(--runningDuration));
+        transform: translate3d(calc(var(--translateValue) * 1px), 0, 0);
     }
 
     .room_wall-right .wallpaper {
         right: 0;
-        animation: slideRight 6s linear infinite;
-        animation-duration: calc(100ms * var(--runningDuration));
+        transform: translate3d(calc(var(--translateValue) * -1px), 0, 0);
     }
 
-    @keyframes slideRight{
-        0%{
-          transform: translate3d(0, 0, 0);
-        }
-        100%{
-          transform: translate3d(400px, 0, 0);
-        }
-    }
-
-    @keyframes slide{
-        0%{
-          transform: translate3d(0, 0, 0);
-        }
-        100%{
-          transform: translate3d(-400px, 0, 0);
-        }
+    .light-anim {
+        animation: lessLight 30s linear forwards;
     }
 
     @keyframes closeDoor {
@@ -241,6 +281,24 @@
         }
         100% {
             transform: perspective(100px) rotateY(0deg) translateX(50%);
+        }
+    }
+
+    @keyframes lessLight {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 100%;
+        }
+    }
+
+    @keyframes darken {
+        0% {
+            border-color: dimgrey;
+        }
+        100% {
+            border-color: black;
         }
     }
 
@@ -269,7 +327,12 @@
         width: calc(20% * 460/var(--canvasWidth));
         height: calc(20% * 460/var(--canvasWidth));
         background: transparent;
+        border: solid 1px dimgrey;
         z-index: 1;
+    }
+
+    .room_door_frame-light {
+        animation: darken 30s linear forwards;
     }
 
     .room_door_wrapper {
@@ -311,16 +374,21 @@
         width: 50%;
         height: 60%;
         background-color: black;
+    }
+
+    .room_door_animation {
         animation: closeDoor 30s linear forwards;
     }
 </style>
 
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
     display_carton = false;
+    startAnimation();
 }}></Carton>
 <div class="mort"
     out:fade
-    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth}; --runningDuration:{runningDuration}"
+    class:mort-anim="{open_door && !display_carton}"
+    style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth};--translateValue:{translateValue};--blurValue:{blurValue}"
     on:pointerdown="{onPointerDown}"
     on:touchstart|passive="{onPointerDown}"
     on:pointermove="{onPointerMove}"
@@ -330,25 +398,33 @@
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">
-        <div class="room_door" on:animationend=""></div>
+        <div class="room_door" class:room_door_animation="{!display_carton}" on:animationend="{next}"></div>
     </div>
-    <div class="room_door_frame">
-        <div class="room_door_frame_top"></div>
-        <div class="room_door_frame_left"></div>
+    <div class="room_door_frame" class:room_door_frame-light="{!display_carton}">
+        <div class="room_door_frame_top">
+            <div class="light-door" class:light-anim="{!display_carton}"></div>
+        </div>
+        <div class="room_door_frame_left">
+            <div class="light-door" class:light-anim="{!display_carton}"></div>
+        </div>
         <div class="room_door_frame_space"></div>
-        <div class="room_door_frame_right"></div>
+        <div class="room_door_frame_right">
+            <div class="light-door" class:light-anim="{!display_carton}"></div>
+        </div>
     </div>
     <div class="room_wall room_wall-left">
         <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+        <div class="light" class:light-anim="{!display_carton}"></div>
     </div>
     <div class="room_wall room_wall-right">
         <div class="wallpaper" style="background-image: url({Wallpaper})"></div>
+        <div class="light" class:light-anim="{!display_carton}"></div>
     </div>
-    {#if iconVisibility}
+    {#if iconVisibility && open_door}
         <div class="icon"
              bind:this="{icon}"
              transition:fade>
-             <span class="icon__circle" class:loopCircle="{!isPointerDown && runningDuration === 60}"></span>
+             <span class="icon__circle" class:loopCircle="{!isPointerDown && speedOut}"></span>
         </div>
     {/if}
 </div>
