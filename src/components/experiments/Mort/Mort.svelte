@@ -218,11 +218,11 @@
     }
 
     .room_wall-right {
-        transform: perspective(50px) rotateY(-90deg) translateZ(calc(-200px * var(--canvasWidth)/400));
+        transform: perspective(50px) rotateY(-90deg) translateZ(calc(-1px * var(--canvasWidth)/2));
     }
 
     .room_wall-left {
-        transform: perspective(50px) rotateY(90deg) translateZ(calc(-200px * var(--canvasWidth)/400));
+        transform: perspective(50px) rotateY(90deg) translateZ(calc(-1px * var(--canvasWidth)/2));
     }
 
     .wallpaper {
@@ -240,6 +240,7 @@
         height: 100%;
         transform: translateZ(0px);
         background-color: black;
+        border: solid 1px black;
     }
 
     .light-door {
@@ -302,16 +303,16 @@
 
     .room_door_light {
         position: absolute;
-        width: calc(20% * 460/var(--canvasWidth));
-        height: calc(20% * 460/var(--canvasWidth));
+        width: 20%;
+        height: 20%;
         background: white;
         z-index: 1;
     }
 
     .room_door_wrapper, .room_door_frame {
         position: absolute;
-        width: calc(20% * 460/var(--canvasWidth));
-        height: calc(20% * 460/var(--canvasWidth));
+        width: 20%;
+        height: 20%;
         background: transparent;
         border: solid 1px dimgrey;
         z-index: 1;
