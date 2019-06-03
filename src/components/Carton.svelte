@@ -255,11 +255,9 @@
         transition:fade
         style="--scaleFactor:{scaleFactor}"
         on:pointerdown="{onPointerDown}"
-        on:touchstart|passive="{onPointerDown}"
+        on:touchstart="{onPointerDown}"
         on:pointermove="{onPointerMove}"
-        on:touchmove|passive="{onPointerMove}"
         on:pointerup="{onPointerUp}"
-        on:touchend|passive="{onPointerUp}"
         bind:this="{carton}">
         <div class="carton__text">
             <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
@@ -281,7 +279,5 @@
         </div>
         <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
     </div>
-    {#if timeContext === "24 heures avant l'examen" || timeContext === "5 minutes avant l'examen" }
-        <div class="carton__background" out:fade></div>
-    {/if}
+    <div class="carton__background" out:fade></div>
 {/if}

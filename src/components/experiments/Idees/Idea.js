@@ -2,7 +2,7 @@ import {Vector3} from "lib/SoundKit";
 import {Animate, Easing, Keyframes, Sequence} from "lib/TimingKit";
 
 let idea_number = 0;
-const MAX_IDEA = 40;
+const MAX_IDEA = 30;
 
 function create_position_animation (from, to) {
     return {
@@ -80,7 +80,7 @@ export function Idea ({canvasWidth, canvasHeight}, parent) {
             const new_child = Idea({canvasWidth, canvasHeight}, {
                 position: values.position,
                 ejection_direction: values.ejection_direction.multiply_scalar(-1),
-                ejection_strength: values.ejection_strength,
+                ejection_strength: values.ejection_strength + (Math.random() * 200 - 100),
                 line_event_bus: values.line_event_bus
             });
 
