@@ -74,10 +74,8 @@
 
             if(e.type === "touchend") {
                 yEnd = e.changedTouches[0].clientY;
-                xEnd = e.changedTouches[0].clientX;
             } else {
                 yEnd = e.clientY;
-                xEnd = e.clientX;
             }
 
             if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
@@ -87,8 +85,6 @@
             } else {
                 yStart = 0;
                 yEnd = 0;
-                xStart = 0;
-                xEnd = 0;
                 isPointerDown = false;
                 yCumul = [];
             }

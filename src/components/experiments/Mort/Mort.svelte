@@ -70,10 +70,8 @@
             let y;
             if (e.touches) {
                 y = e.touches[0].clientY;
-                x = e.touches[0].clientX;
             } else {
                 y = e.clientY;
-                x = e.clientX;
             }
             yCumul.push(y <= yLast + 20);
             yLast = y;
