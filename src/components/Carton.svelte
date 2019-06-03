@@ -35,10 +35,7 @@
     });
 
     let yStart = 0;
-    let xStart = 0;
     let yEnd = 0;
-    let xEnd = 0;
-    let xCumul = [];
     let yCumul = [];
     let yLast;
 
@@ -46,10 +43,8 @@
         if (visible) {
             if(e.touches) {
                 yStart = e.touches[0].clientY;
-                xStart = e.touches[0].clientX;
             } else {
                 yStart = e.clientY;
-                xStart = e.clientX;
             }
 
             if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
@@ -62,17 +57,13 @@
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            let x;
             let y;
             if (e.touches) {
                 y = e.touches[0].clientY;
-                x = e.touches[0].clientX;
             } else {
                 y = e.clientY;
-                x = e.clientX;
             }
-            xCumul.push(Math.abs(x - xStart) < 50);
-            yCumul.push(y <= yLast);
+            yCumul.push(y <= yLast + 20);
             yLast = y;
         }
     }
@@ -90,7 +81,6 @@
             }
 
             if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
-                !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
                 fade_out_sand();
                 dispatch("next");
@@ -100,7 +90,6 @@
                 xStart = 0;
                 xEnd = 0;
                 isPointerDown = false;
-                xCumul = [];
                 yCumul = [];
             }
         }
@@ -254,11 +243,11 @@
     <div class="carton"
         transition:fade
         style="--scaleFactor:{scaleFactor}"
-        on:pointerdown="{onPointerDown}"
+        on:mousedown="{onPointerDown}"
         on:touchstart="{onPointerDown}"
-        on:pointermove="{onPointerMove}"
+        on:mousemove="{onPointerMove}"
         on:touchmove="{onPointerMove}"
-        on:pointerup="{onPointerUp}"
+        on:mouseup="{onPointerUp}"
         on:touchend="{onPointerUp}"
         bind:this="{carton}">
         <div class="carton__text">

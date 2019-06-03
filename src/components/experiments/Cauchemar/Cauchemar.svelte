@@ -260,9 +260,9 @@
 <div class="alarmClock"
     out:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
-    on:pointermove="{onPointerMove}"
+    on:mousemove="{onPointerMove}"
     on:touchmove="{onPointerMove}"
-    on:pointerup="{onPointerUp}"
+    on:mouseup="{onPointerUp}"
     on:touchend="{onPointerUp}"
     bind:this="{alarmClock}">
     <span class="hour">
@@ -277,7 +277,7 @@
         <div class="icon"
              bind:this="{icon}"
              transition:fade
-             on:pointerdown="{onPointerDown}"
+             on:mousedown="{onPointerDown}"
              on:touchstart="{onPointerDown}">
              <div class="icon__line"></div>
              <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
