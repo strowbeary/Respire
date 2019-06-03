@@ -146,5 +146,5 @@ module.exports = {
             }],
         })
     ],
-    devtool: prod ? false : 'source-map'
+    devtool: 'source-map'
 };
