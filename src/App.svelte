@@ -14,7 +14,7 @@
     import Carton from 'components/Carton.svelte';
 
     const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees, Pilule, Mort];
-    let index = 0;
+    let index = 4;
 
     function next(){
         index++;

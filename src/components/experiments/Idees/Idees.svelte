@@ -27,7 +27,7 @@
     const carton_data ={
         titleName: "Les idées noires",
         timeContext: "17 heures avant l'examen",
-        spaceContext: "Amphitheatre"
+        spaceContext: "Amphithéâtre"
     };
 
     let display_carton = true;
@@ -141,7 +141,62 @@
     const LEFT = -1;
     const RIGHT = 1;
 
+    function create_initial_idea(side, height) {
+        const sprite = generateAnimatedSprite(imgAssets["idea_image"]);
+        sprite.interactive = true;
+        const line_event_bus = new EventTarget();
+        const controller = Idea(
+            {canvasWidth, canvasHeight},
+            {
+                side,
+                position: Vector3(
+                    side < 0 ? -sprite.width / 2 : canvasWidth + sprite.width / 2,
+                    height,
+                    0
+                ),
+                ejection_direction: Vector3(-side, 0, 0),
+                opacity: 1,
+                ejection_strength: sprite.width - 50,
+                line_event_bus,
+                spriteWidth: sprite.width,
+                spriteHeight: sprite.height
+            }
+        );
 
+        setInteractive(sprite, controller);
+
+        line_event_bus.addEventListener("death", e => {
+            blurValue -= 0.5;
+            const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
+            console.log("all dismissed", all_dismissed);
+            if(all_dismissed) {
+                setTimeout(() => {
+                    const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
+                    if(all_dismissed) {
+                        dispatch("next");
+                    }
+                }, 2000);
+            }
+        });
+
+        blurValue += 0.5;
+        line_event_bus.addEventListener("divide", e => {
+            blurValue += 0.5;
+            const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
+            new_sprite.interactive = true;
+            setInteractive(new_sprite, e.detail.new_child);
+            Ideas.push({
+                controller: e.detail.new_child,
+                sprite: new_sprite
+            });
+            container.addChild(new_sprite);
+        });
+        Ideas.push({
+            controller,
+            sprite
+        });
+        container.addChild(sprite);
+    }
 
     async function setup() {
         prof = new Sprite(resources[Prof].texture);
@@ -151,71 +206,10 @@
         prof.position.set(canvasWidth/2, canvasHeight/2);
         prof.filters = [new filters.BlurFilter(0.1)];
         container.addChild(prof);
-        function create_initial_idea(side, height) {
-            const sprite = generateAnimatedSprite(imgAssets["idea_image"]);
-            sprite.interactive = true;
-            const line_event_bus = new EventTarget();
-            const controller = Idea(
-                {canvasWidth, canvasHeight},
-                {
-                    side,
-                    position: Vector3(
-                        side < 0 ? -sprite.width / 2 : canvasWidth + sprite.width / 2,
-                        height,
-                        0
-                    ),
-                    ejection_direction: Vector3(-side, 0, 0),
-                    opacity: 1,
-                    ejection_strength: sprite.width - 50,
-                    line_event_bus,
-                    spriteWidth: sprite.width,
-                    spriteHeight: sprite.height
-                }
-            );
 
-            setInteractive(sprite, controller);
-
-            line_event_bus.addEventListener("death", e => {
-                blurAnim = Animate(blurValue, blurValue - 0.5, Easing.easeInOutQuad, 0.01);
-                blurAnim.start();
-                const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
-                console.log("all dismissed", all_dismissed);
-                if(all_dismissed) {
-                    setTimeout(() => {
-                        const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
-                        if(all_dismissed) {
-                            dispatch("next");
-                        }
-                    }, 2000);
-                }
-            });
-            blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
-            blurAnim.start();
-            line_event_bus.addEventListener("divide", e => {
-                blurAnim = Animate(blurValue, blurValue + 0.5, Easing.easeInOutQuad, 0.01);
-                blurAnim.start();
-                const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
-                new_sprite.interactive = true;
-                setInteractive(new_sprite, e.detail.new_child);
-                Ideas.push({
-                    controller: e.detail.new_child,
-                    sprite: new_sprite
-                });
-                container.addChild(new_sprite);
-            });
-            Ideas.push({
-                controller,
-                sprite
-            });
-            container.addChild(sprite);
-        }
 
         app.ticker.add(delta => gameLoop(delta));
-        Sequence()
-            .add(10000, () => create_initial_idea(RIGHT, 300))
-            .add(2000, () => create_initial_idea(LEFT, 600))
-            .add(3000, () => create_initial_idea(RIGHT, 800))
-            .start();
+
         is_ready = true;
     }
 
@@ -226,13 +220,17 @@
             sprite.position.set(...position);
             sprite.alpha = controller.values.opacity;
         });
-        blurValue = blurAnim.tick();
         prof.filters[0].blur = blurValue;
 
     }
 
     function next() {
         display_carton = false;
+        Sequence()
+            .add(8000, () => create_initial_idea(RIGHT, 200))
+            .add(2000, () => create_initial_idea(LEFT, 500))
+            .add(3000, () => create_initial_idea(RIGHT, 800))
+            .start();
     }
 
     onDestroy(() => {
