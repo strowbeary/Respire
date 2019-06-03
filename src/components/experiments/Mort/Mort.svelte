@@ -10,7 +10,7 @@
     /*
     * RESSOURCES
     * */
-    import Wallpaper from "assets/images/mort/wallpaper.png";
+    import Wallpaper from "assets/images/mort/wallpaper_bw.png";
     export let canvasSize;
 
     const carton_data ={
@@ -280,7 +280,7 @@
             transform: perspective(100px) rotateY(90deg) translateX(50%);
         }
         100% {
-            transform: perspective(100px) rotateY(-1deg) translateX(50%);
+            transform: perspective(100px) rotateY(-5deg) translateX(50%);
         }
     }
 
