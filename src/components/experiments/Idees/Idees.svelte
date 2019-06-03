@@ -4,10 +4,9 @@
     * */
     import {createEventDispatcher, onDestroy} from 'svelte';
     import Canvas from "components/Canvas.svelte";
-    import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
     import {MaskedSprite} from "utils/MaskedSprite.pixi.js";
-        import {Animate, Easing, Sequence} from "lib/TimingKit";
+    import {Animate, Easing, Sequence} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
@@ -15,7 +14,7 @@
 	/*
 	* RESSOURCES
 	* */
-import idea_image from "assets/images/idees/Idea_small.png";
+    import idea_image from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
     import {Idea} from "./Idea";
     import {Vector3} from "lib/SoundKit";
