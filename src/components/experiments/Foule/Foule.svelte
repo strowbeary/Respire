@@ -4,7 +4,6 @@
     * */
     import {createEventDispatcher, onDestroy} from "svelte";
     import Canvas from "components/Canvas.svelte";
-    import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
     import {Animate, Easing} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";

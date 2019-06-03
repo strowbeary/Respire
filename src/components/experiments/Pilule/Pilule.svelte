@@ -4,7 +4,6 @@
     * */
     import {createEventDispatcher, onDestroy} from 'svelte';
     import Canvas from "components/Canvas.svelte";
-    import AppWrapper from "components/AppWrapper.svelte";
     import * as PIXI from "pixi.js";
     import {Animate, Easing} from "lib/TimingKit";
     import {DragIcon} from "components/effects/dragIcon";
@@ -225,7 +224,7 @@
     async function setupPill() {
         containerPill.pivot.x = containerPill.width / 2;
         containerPill.pivot.y = containerPill.height / 2;
-        containerPill.x = canvasWidth + canvasWidth.width / 2;
+        containerPill.x = canvasWidth / 2;
         containerPill.y = canvasHeight / 2;
 
         await Object.values(imgAssets).forEach((key) => {
@@ -254,6 +253,7 @@
         graphicsPill.alpha = 0;
 
         containerPill.rotation = -Math.PI/12;
+        containerPill.alpha = 0;
         containerPill.cacheAsBitmap = true;
     }
 
@@ -271,8 +271,8 @@
     }
 
     function hitBoxTest() {
-        return !graphicsPill.graphicsData[0].shape.contains(piluleSprite.position.x - piluleSprite.width/2, piluleSprite.position.y + piluleSprite.height/2)
-                           || !graphicsPill.graphicsData[0].shape.contains(piluleSprite.position.x + piluleSprite.width/2, piluleSprite.position.y - piluleSprite.height/2);
+        return !graphicsPill.graphicsData[0].shape.contains(piluleSprite.x - piluleSprite.width/2, piluleSprite.y + piluleSprite.height/2)
+                           || !graphicsPill.graphicsData[0].shape.contains(piluleSprite.x + piluleSprite.width/2, piluleSprite.y - piluleSprite.height/2);
     }
 
     function gameLoopPill() {
@@ -322,19 +322,21 @@
     let success = false;
 
     function launchScene() {
-      containerEye.cacheAsBitmap = true;
-      containerPill.cacheAsBitmap = true;
       currentScene = null;
 
       if (success) {
-          containerEye.animTranslate = Animate(-canvasWidth - canvasWidth/2, canvasWidth/2, Easing.easeInQuad, 0.01);
-          containerPill.animTranslate = Animate(canvasWidth/2, canvasWidth + canvasWidth/2, Easing.easeInQuad, 0.01);
+          containerEye.animOpacity = Animate(0, 1, Easing.easeInQuad, 0.01);
+          containerPill.animOpacity = Animate(1, 0, Easing.easeInQuad, 0.01);
+          containerEye.cacheAsBitmap = true;
+          containerPill.cacheAsBitmap = true;
       } else {
-          containerEye.animTranslate = Animate(canvasWidth/2, -canvasWidth - canvasWidth/2, Easing.easeInQuad, 0.01);
-          containerPill.animTranslate = Animate(canvasWidth + canvasWidth/2, canvasWidth/2, Easing.easeInQuad, 0.01);
+          containerEye.animOpacity = Animate(1, 0, Easing.easeInQuad, 0.01);
+          containerPill.animOpacity = Animate(0, 1, Easing.easeInQuad, 0.01);
+          containerEye.cacheAsBitmap = true;
+          containerPill.cacheAsBitmap = false;
       }
-      containerEye.animTranslate.start();
-      containerPill.animTranslate.start();
+      containerEye.animOpacity.start();
+      containerPill.animOpacity.start();
     }
 
     function gameLoopEye() {
@@ -389,13 +391,13 @@
             gameLoopPill();
         }
 
-        if (containerEye.animTranslate && containerPill.animTranslate) {
-           if (containerEye.animTranslate.is_running && containerPill.animTranslate.is_running) {
-               containerEye.x = containerEye.animTranslate.tick();
-               containerPill.x = containerPill.animTranslate.tick();
+        if (containerEye.animOpacity && containerPill.animOpacity) {
+           if (containerEye.animOpacity.is_running && containerPill.animOpacity.is_running) {
+               containerEye.alpha = containerEye.animOpacity.tick();
+               containerPill.alpha = containerPill.animOpacity.tick();
            }
 
-           if (containerEye.animTranslate.is_ended_signal && containerPill.animTranslate.is_ended_signal) {
+           if (containerEye.animOpacity.is_ended_signal && containerPill.animOpacity.is_ended_signal) {
                if (success) {
                    currentScene = "eye";
                    containerEye.cacheAsBitmap = false;

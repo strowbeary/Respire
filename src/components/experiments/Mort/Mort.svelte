@@ -389,12 +389,10 @@
     out:fade
     class:mort-anim="{open_door && !display_carton}"
     style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth};--translateValue:{translateValue};--blurValue:{blurValue}"
+    on:touchstart="{onPointerDown}"
     on:pointerdown="{onPointerDown}"
-    on:touchstart|passive="{onPointerDown}"
     on:pointermove="{onPointerMove}"
-    on:touchmove|passive="{onPointerMove}"
     on:pointerup="{onPointerUp}"
-    on:touchend|passive="{onPointerUp}"
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">

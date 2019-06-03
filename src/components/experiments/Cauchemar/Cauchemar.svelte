@@ -5,7 +5,6 @@
     import {onMount, afterUpdate} from 'svelte';
     import {fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
-    import AppWrapper from 'components/AppWrapper.svelte';
     import Carton from 'components/Carton.svelte';
     import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
     import {Animate, Easing} from "lib/TimingKit";
@@ -240,9 +239,7 @@
     out:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
     on:pointermove="{onPointerMove}"
-    on:touchmove|passive="{onPointerMove}"
     on:pointerup="{onPointerUp}"
-    on:touchend|passive="{onPointerUp}"
     bind:this="{alarmClock}">
     <span class="hour">
         08:00
@@ -257,7 +254,7 @@
              bind:this="{icon}"
              transition:fade
              on:pointerdown="{onPointerDown}"
-             on:touchstart|passive="{onPointerDown}">
+             on:touchstart="{onPointerDown}">
              <div class="icon__line"></div>
              <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
         </div>
