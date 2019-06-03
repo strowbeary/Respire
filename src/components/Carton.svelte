@@ -281,7 +281,5 @@
         </div>
         <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
     </div>
-    {#if timeContext === "24 heures avant l'examen" || timeContext === "5 minutes avant l'examen" }
-        <div class="carton__background" out:fade></div>
-    {/if}
+    <div class="carton__background" out:fade></div>
 {/if}

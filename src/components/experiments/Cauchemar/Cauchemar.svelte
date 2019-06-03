@@ -11,7 +11,7 @@
     /*
     * RESSOURCES
     * */
-    import placeholderVideo from 'assets/videos/placeholder.webm';
+    import placeholderVideo from 'assets/videos/placeholder.webm'; import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
 
     const carton_data ={
@@ -20,7 +20,7 @@
         spaceContext: "Chambre"
     };
     let display_carton = true;
-    let is_ready = true;
+    let is_ready = false;
 
     let videoVisibility = true;
     let iconVisibility = true;
@@ -40,6 +40,17 @@
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
     $: opacityDay = circleTransformValue / (200 * scaleFactor);
+    let audio_scene;
+
+    init_cauchemar_sound_scene().then(a => {
+        audio_scene = a;
+        audio_scene.start_audio();
+        is_ready = true;
+    });
+    async function init() {
+          display_carton = false;
+          videoComponent.play();
+    }
 
     function updateCirclePosition(e) {
         let x = 0;
@@ -58,6 +69,7 @@
             circleTransformValue = x - start - circleRadius;
         }
     }
+
 
     function onPointerDown(e) {
         if (icon) {
@@ -88,6 +100,7 @@
             if (circleTransformValue === (200 * window.innerHeight / 824)) {
                 iconVisibility = false;
                 isPointerDown = false;
+                audio_scene.stop_alarm_clock();
                 setTimeout(next, 2000);
             } else {
                 circleResetAnim = Animate(circleTransformValue, 0, Easing.easeInQuad, 0.05);
@@ -109,6 +122,7 @@
 
     function onFirstVideoEnd() {
         videoVisibility = false;
+        audio_scene.trigger_alarm_clock();
     }
 
     function next() {
@@ -221,10 +235,7 @@
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={() => {
-    display_carton = false;
-    videoComponent.play();
-}}></Carton>
+<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
 {#if canvasSize.canvasWidth && videoVisibility}
     <video
         out:fade
@@ -247,7 +258,7 @@
         08:00
     </span>
     <div class="day">
-        {#if opacityDay === 1}
+        {#if opacityDay >= 1}
             <PreparationAnim value="jeans"></PreparationAnim>
         {/if}
     </div>
