@@ -17,7 +17,7 @@
     import idea_image from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
     import {Idea} from "./Idea";
-    import {Vector3} from "lib/SoundKit";
+    import {Vector3} from "lib/SoundKit"; import {init_ideas_sound_scene} from "components/experiments/Idees/Ideas.sound";
 
     export let canvasSize;
 
@@ -65,7 +65,7 @@
     };
 
     let dragIcon;
-
+    let audio_scene;
     async function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
@@ -73,12 +73,15 @@
         app.stage.addChild(container);
         dragIcon = DragIcon(app.stage);
         loadImages();
+
+
     }
 
     function setInteractive(sprite, controller) {
             let dragging = false;
             let old_x = 0;
             let old_y = 0;
+
             function on_end(e) {
                 dragging = false;
                 if(
@@ -88,6 +91,7 @@
                     controller.kill();
                 }
             }
+
             sprite.on('pointerdown', e => {
                     dragging = true;
                     old_x = e.data.global.x;
@@ -180,7 +184,10 @@
         });
 
         blurValue += 0.5;
+
+        audio_scene.play_a_whisper();
         line_event_bus.addEventListener("divide", e => {
+            audio_scene.play_a_whisper();
             blurValue += 0.5;
             const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
             new_sprite.interactive = true;
@@ -207,7 +214,8 @@
         prof.filters = [new filters.BlurFilter(0.1)];
         container.addChild(prof);
 
-
+        audio_scene = await init_ideas_sound_scene();
+        await audio_scene.start_audio();
         app.ticker.add(delta => gameLoop(delta));
 
         is_ready = true;

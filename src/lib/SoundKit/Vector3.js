@@ -131,3 +131,4 @@ export function Vector3(x, y, z) {
         },
     }
 }
+Vector3.zero = Vector3(0, 0, 0);
