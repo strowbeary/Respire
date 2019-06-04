@@ -235,35 +235,37 @@
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
-    <div class="carton"
-        transition:fade
-        style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
-        on:mousedown="{onPointerDown}"
-        on:touchstart|passive="{onPointerDown}"
-        on:mousemove="{onPointerMove}"
-        on:touchmove|passive="{onPointerMove}"
-        on:mouseup="{onPointerUp}"
-        on:touchend|passive="{onPointerUp}"
-        bind:this="{carton}">
-        <div class="carton__text">
-            <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
-            <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
-            <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+    <div out:fade>
+        <div class="carton"
+            in:fade
+            style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
+            on:mousedown="{onPointerDown}"
+            on:touchstart|passive="{onPointerDown}"
+            on:mousemove="{onPointerMove}"
+            on:touchmove|passive="{onPointerMove}"
+            on:mouseup="{onPointerUp}"
+            on:touchend|passive="{onPointerUp}"
+            bind:this="{carton}">
+            <div class="carton__text">
+                <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
+                <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
+                <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+            </div>
+            {#if ready && fade_out_sand}
+                <div class="icon"
+                     bind:this="{icon}"
+                     transition:fade>
+                     <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+                </div>
+            {/if}
+            <div class="sand sand--container" class:fadeIn="{ready}">
+                <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+                <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+                <div class="sand--vertical sand--vertical--top sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+                <div class="sand--vertical sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+            </div>
+            <img in:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
         </div>
-        {#if ready && fade_out_sand}
-           <div class="icon"
-                bind:this="{icon}"
-                transition:fade>
-                <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
-           </div>
-        {/if}
-        <div class="sand sand--container" class:fadeIn="{ready}">
-            <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            <div class="sand--vertical sand--vertical--top sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            <div class="sand--vertical sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-        </div>
-        <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
+        <div class="carton__background" style="background-image: url({lightBackground})"></div>
     </div>
-    <div class="carton__background" out:fade style="background-image: url({lightBackground})"></div>
 {/if}
