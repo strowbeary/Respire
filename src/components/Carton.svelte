@@ -10,7 +10,7 @@
     * RESSOURCES
     * */
     import SandVertical from "assets/images/carton/sand_vertical.png";
-    import SandHorizontal from "assets/images/carton/Sand_test_horizontal.png";
+    import SandHorizontal from "assets/images/carton/Sand_horizontal_fixed.png";
 
     const dispatch = createEventDispatcher();
 
