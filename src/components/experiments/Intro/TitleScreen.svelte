@@ -2,6 +2,7 @@
     import {fly, fade} from 'svelte/transition';
     import global_sound_scene from "./../../../global.sound";
     import {createEventDispatcher} from "svelte";
+    import lightBackground from "assets/images/light_background.png";
 
     const dispatch = createEventDispatcher();
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
@@ -74,7 +75,7 @@
 </script>
 
 <style>
-@keyframes wiggle {
+    @keyframes wiggle {
         0%, 100% {
             transform: translate3d(0, 0, 0);
             opacity: 0;
@@ -95,6 +96,7 @@
         height: 100%;
         color: black;
         background-color: white;
+        background-size: cover;
         z-index: 1;
         display: flex;
         justify-content: center;
@@ -150,7 +152,7 @@
 <div
     bind:this="{title_scene}"
     class="title_screen"
-    style="--scaleFactor:{scaleFactor}"
+    style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
     on:mousedown="{onPointerDown}"
     on:touchstart|passive="{onPointerDown}"
     on:mousemove="{onPointerMove}"

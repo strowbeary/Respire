@@ -11,6 +11,7 @@
     * */
     import SandVertical from "assets/images/carton/sand_vertical.png";
     import SandHorizontal from "assets/images/carton/Sand_horizontal_fixed.png";
+    import lightBackground from "assets/images/light_background.png";
 
     const dispatch = createEventDispatcher();
 
@@ -116,10 +117,10 @@
         font-family: 'Arial', 'sans-serif';
         color: black;
         background-color: white;
+        background-size: cover;
         z-index: 2;
         display: flex;
         justify-content: center;
-        background-size: cover;
     }
     .carton__text {
         height: 100%;
@@ -236,7 +237,7 @@
 {#if visible}
     <div class="carton"
         transition:fade
-        style="--scaleFactor:{scaleFactor}"
+        style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
         on:mousedown="{onPointerDown}"
         on:touchstart|passive="{onPointerDown}"
         on:mousemove="{onPointerMove}"

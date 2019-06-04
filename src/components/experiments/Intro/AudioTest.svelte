@@ -7,6 +7,7 @@
     import Casque from "assets/images/intro/casque.png";
     import CasqueLeft from "assets/images/intro/casque_left.png";
     import CasqueRight from "assets/images/intro/casque_right.png";
+    import lightBackground from "assets/images/light_background.png";
 
     let left = false;
     let right = false;
@@ -54,6 +55,8 @@
         width: 100%;
         height: 100%;
         color: black;
+        background-color: white;
+        background-size: cover;
         z-index: 1;
         display: flex;
         justify-content: center;
@@ -70,7 +73,7 @@
     }
 </style>
 
-<div class="audio_test"
+<div class="audio_test" style="background-image: url({lightBackground})"
     transition:fade>
     <img src="{Casque}" alt="casque" class="casque"/>
     {#if left}

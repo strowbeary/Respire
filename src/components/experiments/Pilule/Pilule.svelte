@@ -15,6 +15,7 @@
 	import Pill from "assets/images/pilule/Pill.png";
 	import Ticket from "assets/images/pilule/Ticket.png";
 	import backgroundImg from "assets/images/pilule/cours.png";
+	import lightBackground from "assets/images/light_background.png";
 	export let canvasSize;
 
     const carton_data = {
@@ -30,7 +31,7 @@
     const dispatch = createEventDispatcher();
 
     const appProperties = {
-       backgroundColor: 0xffffff,
+       transparent: true,
        antialias: true
     };
 
@@ -420,8 +421,20 @@
     });
 </script>
 
+<style>
+    .background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-color: white;
+        z-index: -1;
+    }
+</style>
+
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
     display_carton = false;
     launchClosedEye();
 }}></Carton>
+<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
 <Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>

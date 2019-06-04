@@ -16,6 +16,7 @@
 	* */
     import idea_image from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
+    import lightBackground from "assets/images/light_background.png";
     import {Idea} from "./Idea";
     import {Vector3} from "lib/SoundKit"; import {init_ideas_sound_scene} from "components/experiments/Idees/Ideas.sound";
 
@@ -35,7 +36,7 @@
 
     export let canvasProps;
     const appProperties = {
-       backgroundColor: 0xffffff,
+       transparent: true,
        antialias: true
     };
 
@@ -277,5 +278,15 @@
     });
 </script>
 
+<style>
+    .background {
+        position: absolute;
+        background-size: cover;
+        background-color: white;
+        z-index: -1;
+    }
+</style>
+
 <Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
-<Canvas {appProperties} {canvasSize} on:pixiApp="{init}" bgColor="white"></Canvas>
+<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>

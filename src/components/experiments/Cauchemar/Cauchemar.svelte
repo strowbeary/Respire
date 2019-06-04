@@ -13,6 +13,7 @@
     * */
     import placeholderVideo from 'assets/videos/placeholder.webm';
     import cadre from "assets/images/cauchemar/cadre.png";
+    import lightBackground from "assets/images/light_background.png";
     import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
 
@@ -219,6 +220,7 @@
         right: 0;
         bottom: 0;
         background-color: #fff;
+        background-size: cover;
         mix-blend-mode: difference;
         z-index: 1;
         opacity: var(--opacityDay);
@@ -271,7 +273,7 @@
     <span class="hour" style="background-image: url({cadre})">
         08:00
     </span>
-    <div class="day">
+    <div class="day" style="background-image: url({lightBackground})">
         {#if opacityDay >= 1}
             <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>
         {/if}

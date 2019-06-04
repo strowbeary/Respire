@@ -1,5 +1,5 @@
 <script>
-   import {onMount} from "svelte"
+   import {onMount} from "svelte";
 
    let height;
    let width;
@@ -33,7 +33,6 @@
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        background-color: black;
         overflow: hidden;
     }
 </style>
