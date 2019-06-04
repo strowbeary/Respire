@@ -105,8 +105,7 @@
 
     function next() {
         open_door = false;
-        //alert("mort");
-        //dispatch("next");
+        dispatch("next");
     }
 
     function startAnimation() {
