@@ -245,6 +245,19 @@
         z-index: 2;
     }
 
+    @keyframes wink {
+        0%, 100% {
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+
+    .hour_number {
+        animation: wink 1s linear infinite;
+    }
+
     video {
         object-fit: cover;
         width: 100%;
@@ -270,9 +283,9 @@
     on:mouseup="{onPointerUp}"
     on:touchend|passive="{onPointerUp}"
     bind:this="{alarmClock}">
-    <span class="hour" style="background-image: url({cadre})">
-        08:00
-    </span>
+    <div class="hour" style="background-image: url({cadre})">
+        <span class="hour_number">08:00</span>
+    </div>
     <div class="day" style="background-image: url({lightBackground})">
         {#if opacityDay >= 1}
             <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>

@@ -15,7 +15,7 @@
     import Credits from 'components/experiments/Outro/Credits.svelte';
 
     const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees, Pilule, Mort, Message, Credits];
-    let index = 4;
+    let index = 0;
 
     function next(){
         index++;
