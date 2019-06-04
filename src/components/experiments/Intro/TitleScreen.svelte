@@ -20,69 +20,72 @@
     let yCumul = [];
     let yLast;
     let isPointerDown = false;
-     function onPointerDown(e) {
-             if(e.touches) {
-                 yStart = e.touches[0].clientY;
-                 xStart = e.touches[0].clientX;
-             } else {
-                 yStart = e.clientY;
-                 xStart = e.clientX;
-             }
+    function onPointerDown(e) {
+        if (e.touches) {
+            yStart = e.touches[0].clientY;
+            xStart = e.touches[0].clientX;
+        } else {
+            yStart = e.clientY;
+            xStart = e.clientX;
+        }
 
-             if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
-                 e.preventDefault();
-                 yLast = parseFloat(getComputedStyle(title_scene).height);
-                 isPointerDown = true;
-             }
-         }
-         function onPointerMove(e) {
-                 if (isPointerDown) {
-                     let x;
-                     let y;
-                     if (e.touches) {
-                         y = e.touches[0].clientY;
-                         x = e.touches[0].clientX;
-                     } else {
-                         y = e.clientY;
-                         x = e.clientX;
-                     }
-                     xCumul.push(Math.abs(x - xStart) < 50);
-                     yCumul.push(y <= yLast);
-                     yLast = y;
-                 }
-             }
+        if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
+            e.preventDefault();
+            yLast = parseFloat(getComputedStyle(title_scene).height);
+            isPointerDown = true;
+        }
+    }
 
-             function onPointerUp(e) {
-                 if (isPointerDown) {
-                     e.preventDefault();
+    function onPointerMove(e) {
+        if (isPointerDown) {
+            let x;
+            let y;
 
-                     if(e.touches) {
-                         yEnd = e.touches[0].clientY;
-                         xEnd = e.touches[0].clientX;
-                     } else {
-                         yEnd = e.clientY;
-                         xEnd = e.clientX;
-                     }
+            if (e.touches) {
+                y = e.touches[0].clientY;
+                x = e.touches[0].clientX;
+                console.log(x, y);
+            } else {
+                y = e.clientY;
+                x = e.clientX;
+            }
+            xCumul.push(Math.abs(x - xStart) < 50);
+            yCumul.push(y <= yLast);
+            yLast = y;
+        }
+    }
 
-                     if (yEnd < yStart - parseFloat(getComputedStyle(title_scene).height)/10 &&
-                         !xCumul.includes(false) &&
-                         !yCumul.includes(false)) {
-                         globalSoundScene.then(async scene => {
-                             await scene.start();
-                             scene.fade_in_nappe();
-                         });
-                         dispatch('next');
-                     } else {
-                         yStart = 0;
-                         yEnd = 0;
-                         xStart = 0;
-                         xEnd = 0;
-                         isPointerDown = false;
-                         xCumul = [];
-                         yCumul = [];
-                     }
-                 }
-             }
+    function onPointerUp(e) {
+        if (isPointerDown) {
+            e.preventDefault();
+
+            if (e.type === "touchend") {
+                yEnd = e.changedTouches[0].clientY;
+                xEnd = e.changedTouches[0].clientX;
+            } else {
+                yEnd = e.clientY;
+                xEnd = e.clientX;
+            }
+
+            if (yEnd < yStart - parseFloat(getComputedStyle(title_scene).height)/10 &&
+                !xCumul.includes(false) &&
+                !yCumul.includes(false)) {
+                globalSoundScene.then(async scene => {
+                    await scene.start();
+                    scene.fade_in_nappe();
+                });
+                dispatch('next');
+            } else {
+                yStart = 0;
+                yEnd = 0;
+                xStart = 0;
+                xEnd = 0;
+                isPointerDown = false;
+                xCumul = [];
+                yCumul = [];
+            }
+        }
+    }
 </script>
 
 <style>
@@ -168,7 +171,9 @@
     on:pointerdown="{onPointerDown}"
     on:touchstart="{onPointerDown}"
     on:pointermove="{onPointerMove}"
+    on:touchmove="{onPointerMove}"
     on:pointerup="{onPointerUp}"
+    on:touchend="{onPointerUp}"
     transition:fade>
     <div class="title__text">
         <h1>Respire</h1>

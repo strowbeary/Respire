@@ -74,7 +74,7 @@
     function onPointerDown(e) {
         if (icon) {
             let x = 0;
-            if(e.touches) {
+            if (e.touches) {
                 x = e.touches[0].clientX;
             } else {
                 x = e.clientX;
@@ -250,7 +250,9 @@
     out:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
     on:pointermove="{onPointerMove}"
+    on:touchmove="{onPointerMove}"
     on:pointerup="{onPointerUp}"
+    on:touchend="{onPointerUp}"
     bind:this="{alarmClock}">
     <span class="hour">
         08:00
