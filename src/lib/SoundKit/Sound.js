@@ -52,19 +52,18 @@ export function Sound(name, options) {
             async play() {
                 source = audio_context.createBufferSource();
                 source.buffer = buffer;
-                source.connect(gain_node);
                 source.loop = options.loop;
+                await source.connect(gain_node);
                 source.start(0);
                 source.onended = () => {
                     console.log("ended");
                 }
             },
             async stop() {
-                source.disconnect();
-                source = audio_context.createBufferSource();
-                source.loop = options.loop;
-                source.buffer = buffer;
-                await source.connect(gain_node);
+                if(source) {
+                    source.disconnect();
+                    source = null;
+                }
             },
             set_position(position) {
                 if (options.spacialized) {

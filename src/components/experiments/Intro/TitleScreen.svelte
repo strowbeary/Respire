@@ -13,20 +13,16 @@
 
 
     let yStart = 0;
-    let xStart = 0;
     let yEnd = 0;
-    let xEnd = 0;
-    let xCumul = [];
     let yCumul = [];
     let yLast;
     let isPointerDown = false;
+
     function onPointerDown(e) {
         if (e.touches) {
             yStart = e.touches[0].clientY;
-            xStart = e.touches[0].clientX;
         } else {
             yStart = e.clientY;
-            xStart = e.clientX;
         }
 
         if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
@@ -38,19 +34,14 @@
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            let x;
             let y;
 
             if (e.touches) {
                 y = e.touches[0].clientY;
-                x = e.touches[0].clientX;
-                console.log(x, y);
             } else {
                 y = e.clientY;
-                x = e.clientX;
             }
-            xCumul.push(Math.abs(x - xStart) < 50);
-            yCumul.push(y <= yLast);
+            yCumul.push(y <= yLast + 20);
             yLast = y;
         }
     }
@@ -61,14 +52,11 @@
 
             if (e.type === "touchend") {
                 yEnd = e.changedTouches[0].clientY;
-                xEnd = e.changedTouches[0].clientX;
             } else {
                 yEnd = e.clientY;
-                xEnd = e.clientX;
             }
 
             if (yEnd < yStart - parseFloat(getComputedStyle(title_scene).height)/10 &&
-                !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
                 globalSoundScene.then(async scene => {
                     await scene.start();
@@ -78,10 +66,7 @@
             } else {
                 yStart = 0;
                 yEnd = 0;
-                xStart = 0;
-                xEnd = 0;
                 isPointerDown = false;
-                xCumul = [];
                 yCumul = [];
             }
         }
@@ -168,11 +153,11 @@
     bind:this="{title_scene}"
     class="title_screen"
     style="--scaleFactor:{scaleFactor}"
-    on:pointerdown="{onPointerDown}"
+    on:mousedown="{onPointerDown}"
     on:touchstart="{onPointerDown}"
-    on:pointermove="{onPointerMove}"
+    on:mousemove="{onPointerMove}"
     on:touchmove="{onPointerMove}"
-    on:pointerup="{onPointerUp}"
+    on:mouseup="{onPointerUp}"
     on:touchend="{onPointerUp}"
     transition:fade>
     <div class="title__text">

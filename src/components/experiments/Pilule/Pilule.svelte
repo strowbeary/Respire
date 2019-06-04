@@ -189,7 +189,7 @@
                   if (!this.dragging) {
                       this.data = event.data;
                       this.dragging = true;
-                      dragIcon.initIconAnim(0.5, 0);
+                      dragIcon.initIconAnim(0.7, 0);
                       dragIcon.startIconAnim();
                       this.offsetY = this.y - this.data.getLocalPosition(this.parent).y;
                       this.offsetX = this.x - this.data.getLocalPosition(this.parent).x;
@@ -214,7 +214,7 @@
                       }
                   }
               });
-        dragIcon = DragIcon(containerPill, true);
+        dragIcon = DragIcon(containerPill, true, 0x000000);
         dragIcon.setDirection(1);
         dragIcon.setPosition(sprite.x, sprite.y);
     }
@@ -297,7 +297,7 @@
                piluleSprite.animFall_y = null;
                piluleSprite.interactive = true;
                launchContainerAnim();
-               dragIcon.initIconAnim(0, 0.5);
+               dragIcon.initIconAnim(0, 0.7);
                dragIcon.startIconAnim();
             }
 
@@ -405,7 +405,7 @@
                } else {
                    currentScene = "pill";
                    containerPill.cacheAsBitmap = false;
-                   dragIcon.initIconAnim(0, 0.5);
+                   dragIcon.initIconAnim(0, 0.7);
                    dragIcon.startIconAnim();
                    launchContainerAnim();
                }

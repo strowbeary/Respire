@@ -11,9 +11,10 @@
     import Idees from "components/experiments/Idees/Idees.svelte";
     import Pilule from "components/experiments/Pilule/Pilule.svelte";
     import Mort from "components/experiments/Mort/Mort.svelte";
-    import Carton from 'components/Carton.svelte';
+    import Message from 'components/experiments/Outro/Message.svelte';
+    import Credits from 'components/experiments/Outro/Credits.svelte';
 
-    const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees, Pilule, Mort];
+    const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees, Pilule, Mort, Message, Credits];
     let index = 0;
 
     function next(){

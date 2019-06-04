@@ -11,7 +11,8 @@
     /*
     * RESSOURCES
     * */
-    import placeholderVideo from 'assets/videos/placeholder.webm'; import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
+    import placeholderVideo from 'assets/videos/placeholder.webm';
+    import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
 
     const carton_data ={
@@ -30,7 +31,6 @@
     let icon;
     let isPointerDown = false;
     let circleTransformValue = 0;
-    let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
     let alarmClock;
     let videoComponent;
@@ -39,8 +39,10 @@
     let current_preparation_anim = "";
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
+    $: circleRadius = 35 * scaleFactor;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
-    $: opacityDay = circleTransformValue / (200 * scaleFactor);
+    $: opacityDay = circleTransformValue / (200 * scaleFactor - circleRadius);
+
     let audio_scene;
 
     init_cauchemar_sound_scene().then(a => {
@@ -64,13 +66,12 @@
         let end = icon.getBoundingClientRect().right;
         if (x < start) {
             circleTransformValue = -circleRadius;
-        } else if (x > end) {
-            circleTransformValue = 200 * window.innerHeight / 824;
+        } else if (x > end - circleRadius) {
+            circleTransformValue = 200 * window.innerHeight / 824 - circleRadius;
         } else {
             circleTransformValue = x - start - circleRadius;
         }
     }
-
 
     function onPointerDown(e) {
         if (icon) {
@@ -98,7 +99,7 @@
     function onPointerUp(e) {
         if (isPointerDown) {
             e.preventDefault();
-            if (circleTransformValue === (200 * window.innerHeight / 824)) {
+            if (circleTransformValue === (200 * window.innerHeight / 824 - circleRadius)) {
                 iconVisibility = false;
                 isPointerDown = false;
                 audio_scene.stop_alarm_clock();
@@ -147,7 +148,7 @@
             transform: translateX(0);
             opacity: 1;
         }
-        30% {
+        50% {
             opacity: 1;
         }
         100% {
@@ -260,9 +261,9 @@
 <div class="alarmClock"
     out:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
-    on:pointermove="{onPointerMove}"
+    on:mousemove="{onPointerMove}"
     on:touchmove="{onPointerMove}"
-    on:pointerup="{onPointerUp}"
+    on:mouseup="{onPointerUp}"
     on:touchend="{onPointerUp}"
     bind:this="{alarmClock}">
     <span class="hour">
@@ -277,7 +278,7 @@
         <div class="icon"
              bind:this="{icon}"
              transition:fade
-             on:pointerdown="{onPointerDown}"
+             on:mousedown="{onPointerDown}"
              on:touchstart="{onPointerDown}">
              <div class="icon__line"></div>
              <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
