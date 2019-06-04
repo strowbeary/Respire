@@ -21,8 +21,12 @@
     }
 </style>
 
-{#if value === "jeans"}
+{#if value === ""}
+
+{:else if  value === "jeans"}
     <img src="{jeansImg}" alt="jeans" transition:fade/>
 {:else if value === "coffee"}
+    <img src="{coffeeImg}" alt="coffee" transition:fade/>
+{:else if value === "porte"}
     <img src="{coffeeImg}" alt="coffee" transition:fade/>
 {/if}

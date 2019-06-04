@@ -17,9 +17,6 @@ export function Sound(name, options) {
 
     async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-        let source = audio_context.createBufferSource();
-        source.connect(gain_node);
-        source.loop = options.loop;
 
         let panner = null;
 
@@ -49,14 +46,20 @@ export function Sound(name, options) {
 
         const response = await fetch(options.url);
         const audio_raw_data = await response.arrayBuffer();
-        source.buffer = await audio_context.decodeAudioData(audio_raw_data);
-
+        let source;
+        const buffer = await audio_context.decodeAudioData(audio_raw_data);
         return {
-            play() {
+            async play() {
+                source = audio_context.createBufferSource();
+                source.buffer = buffer;
+                source.connect(gain_node);
+                source.loop = options.loop;
                 source.start(0);
+                source.onended = () => {
+                    console.log("ended");
+                }
             },
-            async stop(cb) {
-                const buffer = source.buffer;
+            async stop() {
                 source.disconnect();
                 source = audio_context.createBufferSource();
                 source.loop = options.loop;
