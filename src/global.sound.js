@@ -50,15 +50,17 @@ export default (async () => {
 
     return {
         async start() {
-            console.log("Play global");
             return await init_scene.play();
         },
         fade_out_sable() {
             sable_animation = Animate(0.7, 0, Easing.easeInQuad, 0.05);
             sable_animation.start();
         },
+        fade_in_sable() {
+            sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.05);
+            sable_animation.start();
+        },
         fade_in_nappe() {
-            console.log("start_sound");
             sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);
             sable_animation.start();
             nappe_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);

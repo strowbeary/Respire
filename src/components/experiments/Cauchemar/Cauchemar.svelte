@@ -16,6 +16,7 @@
     import lightBackground from "assets/images/light_background.png";
     import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
+    export let global_sound_scene;
 
     const carton_data ={
         titleName: "Dans le brouillard",
@@ -266,7 +267,7 @@
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
+<Carton {...carton_data} global_audio_scene="{global_sound_scene}" visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
 {#if videoVisibility}
     <video
         out:fade

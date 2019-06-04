@@ -1,5 +1,6 @@
 import {Vector3} from "./Vector3";
 import {angle_vector, canvas_arrow} from "./utils";
+import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
 
 export function Sound(name, options) {
     options = {
@@ -17,8 +18,15 @@ export function Sound(name, options) {
 
     async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-
+        const effects = [LowPassEffect];
         let panner = null;
+
+        const effect_node = (effects
+            .map(effect => effect(audio_context))
+            .reduce((p_f, c_f, i) => {
+                c_f.connect(p_f);
+            return c_f;
+        }, main_node));
 
         if (options.spacialized) {
             panner = audio_context.createPanner();
@@ -31,7 +39,7 @@ export function Sound(name, options) {
             }
 
             gain_node.connect(panner);
-            panner.connect(main_node);
+            panner.connect(effect_node);
 
             panner.setPosition(...options.position.to_array());
             panner.setOrientation(...options.orientation.to_array());
@@ -39,7 +47,7 @@ export function Sound(name, options) {
 
             options.position = Vector3(0, 0, 0);
             options.orientation = Vector3(0, 0, 0);
-            gain_node.connect(main_node);
+            gain_node.connect(effect_node);
         }
         gain_node.gain.setValueAtTime(options.volume, audio_context.currentTime);
 

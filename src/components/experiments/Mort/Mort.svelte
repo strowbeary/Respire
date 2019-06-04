@@ -119,23 +119,21 @@
         if (anim.is_running) {
             translateValue = anim.tick();
             loop = requestAnimationFrame(translate);
+        } else if (speedUp) {
+            speedUp = false;
+            speedUpRunning = true;
+            blurValue = 3;
+            anim = Animate(0, -400, Easing.linear, 0.01);
+            anim.start();
+            loop = requestAnimationFrame(translate);
         } else {
-            if (speedUp) {
-                speedUp = false;
-                speedUpRunning = true;
-                blurValue = 3;
-                anim = Animate(0, -400, Easing.linear, 0.01);
-                anim.start();
-                loop = requestAnimationFrame(translate);
-            } else {
-                speedUpRunning = false;
-                blurValue = 0;
-                setTimeout(() => {
-                    speedOut = true;
-                }, 1000);
-                if (open_door) {
-                    startAnimation();
-                }
+            speedUpRunning = false;
+            blurValue = 0;
+            setTimeout(() => {
+                speedOut = true;
+            }, 1000);
+            if (open_door) {
+                startAnimation();
             }
         }
     }
