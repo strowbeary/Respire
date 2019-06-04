@@ -16,7 +16,7 @@ export async function init_cauchemar_sound_scene() {
         }),
         Sound("preparation", {
             url: preparation_sound_url,
-            volume: 1.5
+            volume: 1.7
         }),
     );
 
@@ -35,6 +35,9 @@ export async function init_cauchemar_sound_scene() {
         },
         play_preparation_sound() {
             preparation_sound.play();
+        },
+        destroy() {
+            init_scene.destroy();
         }
     }
 

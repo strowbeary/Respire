@@ -107,7 +107,10 @@
                     .add(11827, () => current_preparation_anim = "jeans")
                     .add(9604, () => current_preparation_anim = "coffee")
                     .add(19914, () => current_preparation_anim = "")
-                    .add(9337, () => dispatch("next"))
+                    .add(9337, () => {
+                        audio_scene.destroy();
+                        dispatch("next");
+                    })
                     .start();
             } else {
                 circleResetAnim = Animate(circleTransformValue, 0, Easing.easeInQuad, 0.05);

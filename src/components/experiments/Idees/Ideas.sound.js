@@ -77,6 +77,9 @@ export async function init_ideas_sound_scene() {
             whispers[current_whisper].set_position(position);
             whispers[current_whisper].play();
             current_whisper = (current_whisper + 1) % whispers.length;
+        },
+        destroy() {
+            init_scene.destroy();
         }
     }
 }
