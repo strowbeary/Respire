@@ -93,7 +93,7 @@ export function Idea ({canvasWidth, canvasHeight}, parent) {
     }
     const reproduction_seq = Sequence();
     for(let i = values.allowed_self_division; i > 0; i--) {
-        reproduction_seq.add(5000 + Math.random() * 3000, () => (idea_number < MAX_IDEA) && create_child())
+        reproduction_seq.add(4000 + Math.random() * 4000, () => (idea_number < MAX_IDEA) && create_child())
     }
     reproduction_seq.start();
 
