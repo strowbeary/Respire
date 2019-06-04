@@ -111,16 +111,15 @@
 
     .carton {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         font-family: 'Arial', 'sans-serif';
         color: black;
         background-color: white;
         z-index: 2;
         display: flex;
         justify-content: center;
+        background-size: cover;
     }
     .carton__text {
         height: 100%;
@@ -132,11 +131,10 @@
     }
     .carton__background {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         background-color: white;
+        background-size: cover;
         z-index: 1;
     }
     .carton__titleName {
@@ -240,11 +238,11 @@
         transition:fade
         style="--scaleFactor:{scaleFactor}"
         on:mousedown="{onPointerDown}"
-        on:touchstart="{onPointerDown}"
+        on:touchstart|passive="{onPointerDown}"
         on:mousemove="{onPointerMove}"
-        on:touchmove="{onPointerMove}"
+        on:touchmove|passive="{onPointerMove}"
         on:mouseup="{onPointerUp}"
-        on:touchend="{onPointerUp}"
+        on:touchend|passive="{onPointerUp}"
         bind:this="{carton}">
         <div class="carton__text">
             <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
@@ -266,5 +264,5 @@
         </div>
         <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
     </div>
-    <div class="carton__background" out:fade></div>
+    <div class="carton__background" out:fade style="background-image: url({lightBackground})"></div>
 {/if}

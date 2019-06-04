@@ -51,12 +51,9 @@
 <style>
     .audio_test {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         color: black;
-        background-color: white;
         z-index: 1;
         display: flex;
         justify-content: center;

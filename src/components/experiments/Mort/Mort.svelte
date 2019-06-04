@@ -159,10 +159,8 @@
 
     .mort {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         z-index: 0;
         display: flex;
         justify-content: center;
@@ -366,12 +364,12 @@
     out:fade
     class:mort-anim="{open_door && !display_carton}"
     style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth};--translateValue:{translateValue};--blurValue:{blurValue}"
-    on:touchstart="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
     on:mousedown="{onPointerDown}"
     on:mousemove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
     on:mouseup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">

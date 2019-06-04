@@ -91,10 +91,8 @@
     }
     .title_screen {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         color: black;
         background-color: white;
         z-index: 1;
@@ -154,11 +152,11 @@
     class="title_screen"
     style="--scaleFactor:{scaleFactor}"
     on:mousedown="{onPointerDown}"
-    on:touchstart="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
     on:mousemove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
     on:mouseup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
     transition:fade>
     <div class="title__text">
         <h1>Respire</h1>
