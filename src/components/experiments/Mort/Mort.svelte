@@ -66,7 +66,6 @@
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            let x;
             let y;
             if (e.touches) {
                 y = e.touches[0].clientY;
@@ -411,7 +410,7 @@
         <div class="icon"
              bind:this="{icon}"
              transition:fade>
-             <span class="icon__circle" class:loopCircle="{!isPointerDown && speedOut}"></span>
+             <span class="icon__circle" class:loopCircle="{!isPointerDown && speedOut && open_door}"></span>
         </div>
     {/if}
 </div>
