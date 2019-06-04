@@ -4,14 +4,14 @@ import {Animate, Easing, Keyframes} from "lib/TimingKit";
 let Graphics = PIXI.Graphics;
 
 function createIconAnim(from_value, to_value) {
-    return Animate(from_value, to_value, Easing.easeInCubic, 0.05);
+    return Animate(from_value, to_value, Easing.easeInCubic, 0.1);
 }
 
 function createSlideAnim(from_value, to_value) {
     return Animate(from_value, to_value, Easing.easeOutCubic, 0.01);
 }
 
-export function DragIcon(container, isVertical) {
+export function DragIcon(container, isVertical, color = 0xFFFFFF) {
     const interactiveIcon = new Graphics();
     const lineWidth = 100;
     let alpha = 0;
@@ -19,8 +19,9 @@ export function DragIcon(container, isVertical) {
     let finalPosition = 0;
     let slideAnim = createSlideAnim(0, 1);
     let vertical = isVertical;
+    let lineColor = color;
     slideAnim.start();
-    interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
+    interactiveIcon.lineStyle(1, lineColor, 1);
     interactiveIcon.drawCircle(0, 0, 35);
     interactiveIcon.alpha = alpha;
 
@@ -28,7 +29,7 @@ export function DragIcon(container, isVertical) {
 
     function draw(newPos) {
         interactiveIcon.clear();
-        interactiveIcon.lineStyle(1, 0xFFFFFF, 1);
+        interactiveIcon.lineStyle(1, lineColor, 1);
         if (!vertical) {
             interactiveIcon.drawCircle(newPos, 0, 35);
         } else {

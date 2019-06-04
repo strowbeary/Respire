@@ -122,7 +122,7 @@
                 dragIcon.setDirection(-1);
             }
             dragIcon.setPosition(person.x, person.y - person.height * 0.25 + container.y);
-            dragIcon.initIconAnim(0, 0.5);
+            dragIcon.initIconAnim(0, 0.7);
             dragIcon.startIconAnim();
 
             function onDragEnd() {
@@ -149,7 +149,7 @@
                     } else {
                         person_anim = create_person_anim(this.x, interactiveStartingPos);
                         person_anim.start();
-                        dragIcon.initIconAnim(0, 0.5);
+                        dragIcon.initIconAnim(0, 0.7);
                         dragIcon.startIconAnim();
                     }
                 }
@@ -164,7 +164,7 @@
                             this.dragging = true;
                             this.offset = this.x - this.data.getLocalPosition(this.parent).x;
                             this.direction = this.x > interactiveCurrentFinalPos? "left": "right";
-                            dragIcon.initIconAnim(0.5, 0);
+                            dragIcon.initIconAnim(0.7, 0);
                             dragIcon.startIconAnim();
                             //reset after some time
                             setTimeout(() => {
@@ -344,7 +344,7 @@
             }
             if (person_anim.is_ended_signal) {
                 person_anim = null;
-                dragIcon.initIconAnim(0, 0.5);
+                dragIcon.initIconAnim(0, 0.7);
                 dragIcon.startIconAnim();
             }
         }

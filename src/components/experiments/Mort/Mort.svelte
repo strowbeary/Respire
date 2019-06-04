@@ -10,7 +10,7 @@
     /*
     * RESSOURCES
     * */
-    import Wallpaper from "assets/images/mort/wallpaper_bw.png";
+    import Wallpaper from "assets/images/mort/couloir2.png";
     export let canvasSize;
 
     const carton_data ={
@@ -44,10 +44,7 @@
     $: opacityDay = circleTransformValue / (200 * scaleFactor);
 
     let yStart = 0;
-    let xStart = 0;
     let yEnd = 0;
-    let xEnd = 0;
-    let xCumul = [];
     let yCumul = [];
     let yLast;
 
@@ -55,10 +52,8 @@
         if (speedOut) {
             if(e.touches) {
                 yStart = e.touches[0].clientY;
-                xStart = e.touches[0].clientX;
             } else {
                 yStart = e.clientY;
-                xStart = e.clientX;
             }
 
             if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
@@ -71,17 +66,13 @@
 
     function onPointerMove(e) {
         if (isPointerDown) {
-            let x;
             let y;
             if (e.touches) {
                 y = e.touches[0].clientY;
-                x = e.touches[0].clientX;
             } else {
                 y = e.clientY;
-                x = e.clientX;
             }
-            xCumul.push(Math.abs(x - xStart) < 50);
-            yCumul.push(y <= yLast);
+            yCumul.push(y <= yLast + 20);
             yLast = y;
         }
     }
@@ -91,13 +82,10 @@
             e.preventDefault();
             if (e.type === "touchend") {
                 yEnd = e.changedTouches[0].clientY;
-                xEnd = e.changedTouches[0].clientX;
             } else {
                 yEnd = e.clientY;
-                xEnd = e.clientX;
             }
             if (yEnd < yStart - parseFloat(getComputedStyle(mort).height)/10 &&
-                !xCumul.includes(false) &&
                 !yCumul.includes(false)) {
                 speedUp = true;
                 speedOut = false;
@@ -111,17 +99,13 @@
     function reset() {
         yStart = 0;
         yEnd = 0;
-        xStart = 0;
-        xEnd = 0;
         isPointerDown = false;
-        xCumul = [];
         yCumul = [];
     }
 
     function next() {
         open_door = false;
-        //alert("mort");
-        //dispatch("next");
+        dispatch("next");
     }
 
     function startAnimation() {
@@ -232,11 +216,11 @@
     }
 
     .room_wall-right {
-        transform: perspective(50px) rotateY(-90deg) translateZ(calc(-200px * var(--canvasWidth)/400));
+        transform: perspective(50px) rotateY(-90deg) translateZ(calc(-1px * var(--canvasWidth)/2));
     }
 
     .room_wall-left {
-        transform: perspective(50px) rotateY(90deg) translateZ(calc(-200px * var(--canvasWidth)/400));
+        transform: perspective(50px) rotateY(90deg) translateZ(calc(-1px * var(--canvasWidth)/2));
     }
 
     .wallpaper {
@@ -254,6 +238,7 @@
         height: 100%;
         transform: translateZ(0px);
         background-color: black;
+        border: solid 1px black;
     }
 
     .light-door {
@@ -316,16 +301,16 @@
 
     .room_door_light {
         position: absolute;
-        width: calc(20% * 460/var(--canvasWidth));
-        height: calc(20% * 460/var(--canvasWidth));
+        width: 20%;
+        height: 20%;
         background: white;
         z-index: 1;
     }
 
     .room_door_wrapper, .room_door_frame {
         position: absolute;
-        width: calc(20% * 460/var(--canvasWidth));
-        height: calc(20% * 460/var(--canvasWidth));
+        width: 20%;
+        height: 20%;
         background: transparent;
         border: solid 1px dimgrey;
         z-index: 1;
@@ -390,10 +375,10 @@
     class:mort-anim="{open_door && !display_carton}"
     style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth};--translateValue:{translateValue};--blurValue:{blurValue}"
     on:touchstart="{onPointerDown}"
-    on:pointerdown="{onPointerDown}"
-    on:pointermove="{onPointerMove}"
+    on:mousedown="{onPointerDown}"
+    on:mousemove="{onPointerMove}"
     on:touchmove="{onPointerMove}"
-    on:pointerup="{onPointerUp}"
+    on:mouseup="{onPointerUp}"
     on:touchend="{onPointerUp}"
     bind:this="{mort}">
     <div class="room_door_light"></div>
@@ -424,7 +409,7 @@
         <div class="icon"
              bind:this="{icon}"
              transition:fade>
-             <span class="icon__circle" class:loopCircle="{!isPointerDown && speedOut}"></span>
+             <span class="icon__circle" class:loopCircle="{!isPointerDown && speedOut && open_door}"></span>
         </div>
     {/if}
 </div>
