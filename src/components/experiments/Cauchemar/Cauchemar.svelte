@@ -102,6 +102,7 @@
                 iconVisibility = false;
                 isPointerDown = false;
                 audio_scene.stop_alarm_clock();
+
                 audio_scene.play_preparation_sound();
                 Sequence()
                     .add(11827, () => current_preparation_anim = "jeans")

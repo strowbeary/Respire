@@ -185,6 +185,7 @@
 
         blurValue += 0.5;
 
+
         audio_scene.play_a_whisper(Vector3(
             controller.final_position.x,
             0,
@@ -216,6 +217,7 @@
                 1,
                 canvasHeight
             )));
+
             blurValue += 0.5;
             const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
             new_sprite.interactive = true;
