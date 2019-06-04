@@ -12,6 +12,7 @@
     let title_scene;
 
 
+    let is_ready = true;
     let yStart = 0;
     let yEnd = 0;
     let yCumul = [];
@@ -19,17 +20,20 @@
     let isPointerDown = false;
 
     function onPointerDown(e) {
-        if (e.touches) {
-            yStart = e.touches[0].clientY;
-        } else {
-            yStart = e.clientY;
+        if(is_ready) {
+             if (e.touches) {
+                        yStart = e.touches[0].clientY;
+                    } else {
+                        yStart = e.clientY;
+                    }
+
+                    if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
+                        e.preventDefault();
+                        yLast = parseFloat(getComputedStyle(title_scene).height);
+                        isPointerDown = true;
+                    }
         }
 
-        if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
-            e.preventDefault();
-            yLast = parseFloat(getComputedStyle(title_scene).height);
-            isPointerDown = true;
-        }
     }
 
     function onPointerMove(e) {
@@ -61,8 +65,9 @@
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
+                    dispatch('next');
+                    is_ready= false;
                 });
-                dispatch('next');
             } else {
                 yStart = 0;
                 yEnd = 0;
@@ -164,9 +169,11 @@
         <h1>Respire</h1>
         <p>Cette expérience nécessite le port d'un casque</p>
     </div>
-    <div class="icon"
-        bind:this="{icon}"
-        transition:fade>
-        <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
-    </div>
+    {#if is_ready}
+        <div class="icon"
+            bind:this="{icon}"
+            transition:fade>
+            <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+        </div>
+    {/if}
 </div>

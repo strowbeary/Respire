@@ -7,7 +7,7 @@
     import {createEventDispatcher} from 'svelte';
     import Carton from 'components/Carton.svelte';
     import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
-    import {Animate, Easing, Sequence} from "lib/TimingKit";
+    import {Animate, Easing, Planning, Sequence} from "lib/TimingKit";
     /*
     * RESSOURCES
     * */
@@ -105,11 +105,28 @@
                 audio_scene.stop_alarm_clock();
 
                 audio_scene.play_preparation_sound();
-                Sequence()
+                Planning()
                     .add(11827, () => current_preparation_anim = "jeans")
-                    .add(9604, () => current_preparation_anim = "coffee")
-                    .add(19914, () => current_preparation_anim = "")
-                    .add(9337, () => {
+                    .add(21467, () => current_preparation_anim = "")
+                    .add(26431, () => current_preparation_anim = "glass_start")
+                    .add(29884, () => current_preparation_anim = "glass_loop")
+                    .add(35839, () => current_preparation_anim = "glass_end")
+                    .add(40199, () => current_preparation_anim = "")
+                    .add(41425, () => current_preparation_anim = "door")
+                    .add(49609, () => {
+                        current_preparation_anim = "";
+                        const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);
+                        let req_id = null;
+                         (function loop(t) {
+                                audio_scene.set_preparation_volume(volume_preparation_sound_anim.tick());
+                                if(volume_preparation_sound_anim.is_ended_signal) {
+                                    cancelAnimationFrame(req_id);
+                                } else {
+                                    req_id = requestAnimationFrame(loop.bind({}, t + 1))
+                                }
+                            })(0);
+                    })
+                    .add(50682, () => {
                         audio_scene.destroy();
                         dispatch("next");
                     })
@@ -167,6 +184,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        top: 0;
     }
 
     .icon {
@@ -257,7 +275,7 @@
         src={placeholderVideo}
         on:ended={onFirstVideoEnd}
     ></video>
-{/if}
+{:else}
 <div class="alarmClock"
     out:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
@@ -285,3 +303,4 @@
         </div>
     {/if}
 </div>
+{/if}

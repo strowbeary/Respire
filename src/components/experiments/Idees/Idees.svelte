@@ -17,7 +17,8 @@
     import idea_image from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
     import {Idea} from "./Idea";
-    import {Vector3} from "lib/SoundKit"; import {init_ideas_sound_scene} from "components/experiments/Idees/Ideas.sound";
+    import {Vector3} from "lib/SoundKit";
+    import {init_ideas_sound_scene} from "components/experiments/Idees/Ideas.sound";
 
     export let canvasSize;
 

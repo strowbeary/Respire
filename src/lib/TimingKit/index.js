@@ -22,6 +22,28 @@ export function Sequence() {
         start
     }
 }
+export function Planning() {
+    const events = [];
+
+    function start() {
+        events.forEach(step => {
+            setTimeout(step.cb, step.time);
+        });
+    }
+
+    function add(time, cb) {
+        events.push({time, cb});
+        return {
+            add,
+            start
+        };
+    }
+
+    return {
+        add,
+        start
+    }
+}
 
 export function Animate(from_value, to_value, easing_function, step) {
     let increment = 0;
