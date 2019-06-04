@@ -4,11 +4,12 @@ import whisper_02_sound_url from "assets/sounds/Ideas/whipser_02.wav";
 import whisper_03_sound_url from "assets/sounds/Ideas/whipser_03.wav";
 import whisper_04_sound_url from "assets/sounds/Ideas/whipser_04.wav";
 import whisper_05_sound_url from "assets/sounds/Ideas/whipser_05.wav";
+import cours_litterature_sound_url from "assets/sounds/Ideas/cours_litterature.wav";
 
 export async function init_ideas_sound_scene() {
 
     const scene = await Scene({
-        debug: false
+        debug: true
     });
 
     scene.add(
@@ -47,6 +48,13 @@ export async function init_ideas_sound_scene() {
             position: Vector3(0, 0, 0),
             orientation: Vector3(1, 0, 0)
         }),
+        Sound("cours_litterature", {
+            url: cours_litterature_sound_url,
+            volume: 1,
+            spacialized: true,
+            position: Vector3(0, 0, 0),
+            orientation: Vector3(1, 0, 0)
+        }),
     );
 
     const init_scene = await scene.init();
@@ -62,7 +70,11 @@ export async function init_ideas_sound_scene() {
         async start_audio() {
             await init_scene.play();
         },
-        play_a_whisper() {
+        play_course() {
+            init_scene.get_children_by_name("cours_litterature").play();
+        },
+        play_a_whisper(position) {
+            whispers[current_whisper].set_position(position);
             whispers[current_whisper].play();
             current_whisper = (current_whisper + 1) % whispers.length;
         }

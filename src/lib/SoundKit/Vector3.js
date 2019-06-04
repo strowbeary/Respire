@@ -24,6 +24,13 @@ export function Vector3(x, y, z) {
         return Vector3(x * s, y * s, z * s);
     }
 
+    function divide(v) {
+        if(v.x === 0 || v.y === 0 || v.z === 0) {
+            throw Error("Can't divide by zero");
+        }
+        return Vector3(x / v.x, y / v.y, z / v.z);
+    }
+
     function divide_scalar(s) {
         if(s === 0) {
             throw Error("Can't divide by zero");
@@ -120,6 +127,7 @@ export function Vector3(x, y, z) {
         rotateXY,
         multiply,
         limit_bounce,
+        divide,
         get x() {
             return x;
         },

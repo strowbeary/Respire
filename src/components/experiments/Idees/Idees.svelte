@@ -185,9 +185,37 @@
 
         blurValue += 0.5;
 
-        audio_scene.play_a_whisper();
+        audio_scene.play_a_whisper(Vector3(
+            controller.final_position.x,
+            0,
+            controller.final_position.y
+        )
+        .sub(Vector3(
+            canvasWidth / 2,
+            0,
+            canvasHeight / 2
+        ))
+        .divide(Vector3(
+            canvasWidth,
+            1,
+            canvasHeight
+        )));
         line_event_bus.addEventListener("divide", e => {
-            audio_scene.play_a_whisper();
+            audio_scene.play_a_whisper(Vector3(
+                e.detail.new_child.final_position.x,
+                0,
+                e.detail.new_child.final_position.y
+            )
+            .sub(Vector3(
+                canvasWidth / 2,
+                0,
+                canvasHeight / 2
+            ))
+            .divide(Vector3(
+                canvasWidth,
+                1,
+                canvasHeight
+            )));
             blurValue += 0.5;
             const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
             new_sprite.interactive = true;
@@ -217,7 +245,6 @@
         audio_scene = await init_ideas_sound_scene();
         await audio_scene.start_audio();
         app.ticker.add(delta => gameLoop(delta));
-
         is_ready = true;
     }
 
@@ -234,6 +261,7 @@
 
     function next() {
         display_carton = false;
+        audio_scene.play_course();
         Sequence()
             .add(8000, () => create_initial_idea(RIGHT, 200))
             .add(2000, () => create_initial_idea(LEFT, 500))

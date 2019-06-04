@@ -126,6 +126,9 @@ export function Idea ({canvasWidth, canvasHeight}, parent) {
         tick,
         kill,
         values,
-        set_display_offset
+        set_display_offset,
+        get final_position() {
+            return final_position.limit(0, canvasWidth, 0, canvasHeight, 0, 0)
+        }
     }
 }

@@ -7,7 +7,7 @@
     import {createEventDispatcher} from 'svelte';
     import Carton from 'components/Carton.svelte';
     import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
-    import {Animate, Easing} from "lib/TimingKit";
+    import {Animate, Easing, Sequence} from "lib/TimingKit";
     /*
     * RESSOURCES
     * */
@@ -36,6 +36,7 @@
     let videoComponent;
     let circleResetAnim;
     let loop;
+    let current_preparation_anim = "";
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
@@ -101,7 +102,13 @@
                 iconVisibility = false;
                 isPointerDown = false;
                 audio_scene.stop_alarm_clock();
-                setTimeout(next, 2000);
+                audio_scene.play_preparation_sound();
+                Sequence()
+                    .add(11827, () => current_preparation_anim = "jeans")
+                    .add(9604, () => current_preparation_anim = "coffee")
+                    .add(19914, () => current_preparation_anim = "")
+                    .add(9337, () => dispatch("next"))
+                    .start();
             } else {
                 circleResetAnim = Animate(circleTransformValue, 0, Easing.easeInQuad, 0.05);
                 circleResetAnim.start();
@@ -259,7 +266,7 @@
     </span>
     <div class="day">
         {#if opacityDay >= 1}
-            <PreparationAnim value="jeans"></PreparationAnim>
+            <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>
         {/if}
     </div>
     {#if iconVisibility}
