@@ -196,14 +196,6 @@
         opacity: 0;
     }
 
-    .room {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      display: flex;
-      align-items: center;
-    }
-
     .room_wall {
       width: 100%;
       height: 100%;
