@@ -2,7 +2,6 @@ import { Scene, Sound, Vector3 } from "lib/SoundKit";
 import alarm_clock_sound_url from "assets/sounds/Cauchemar/alam_clock.wav";
 import preparation_sound_url from "assets/sounds/Cauchemar/STE-005.wav";
 
-
 export async function init_cauchemar_sound_scene() {
     const scene = await Scene({
         debug: false
@@ -23,6 +22,7 @@ export async function init_cauchemar_sound_scene() {
     const init_scene = await scene.init();
     const alarm_clock_sound = init_scene.get_children_by_name("alarm_clock");
     const preparation_sound = init_scene.get_children_by_name("preparation");
+
     return {
         async start_audio() {
             await init_scene.play();
@@ -32,6 +32,7 @@ export async function init_cauchemar_sound_scene() {
         },
         stop_alarm_clock() {
             alarm_clock_sound.stop();
+
         },
         play_preparation_sound() {
             preparation_sound.play();
