@@ -17,7 +17,7 @@
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        background-color: black;
+        background-color: white;
         z-index: 2;
         display: flex;
         justify-content: center;
@@ -34,6 +34,7 @@
         font-weight: lighter;
         letter-spacing: calc(1px * var(--scaleFactor));
         font-family: "CormorantGaramond", "sans-serif";
+        mix-blend-mode: difference;
     }
     .credits__text img {
         width: 50%;
@@ -43,9 +44,6 @@
     }
     .credits__text ul {
         list-style-type: none;
-    }
-    .credits__text p, .title__text ul {
-        width: 60%;
     }
     .credits__text li a {
         text-decoration: none;
@@ -67,10 +65,10 @@
     style="--scaleFactor:{scaleFactor}"
     transition:fade>
     <div class="credits__text">
-        <img src="{logo_gobelins}">
-        <img src="{logo_cci}" class="separator">
+        <img src="{logo_gobelins}" alt="gobelins">
+        <img src="{logo_cci}" class="separator" alt="cci">
         <p>Réalisé par :</p>
-        <ul class="">
+        <ul>
             <li>
                 <a href="https://remicaillot.fr"
                    rel="noopener noreferrer"
