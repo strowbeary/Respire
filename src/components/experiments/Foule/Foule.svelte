@@ -301,9 +301,9 @@
                 break;
         }
     }
-
+    let sound_scene;
     async function setup() {
-        const sound_scene = await init_foule_sound_scene();
+        sound_scene = await init_foule_sound_scene();
         set_z_position = sound_scene.set_z_position;
         play_interaction_sound = sound_scene.play_interaction_sound;
         start_audio = sound_scene.start_audio;
@@ -333,6 +333,7 @@
                 setInteractive();
 
                 if (ending) {
+                    sound_scene.destroy();
                     dispatch("next");
                 }
             }

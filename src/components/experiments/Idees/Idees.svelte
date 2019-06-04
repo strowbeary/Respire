@@ -177,6 +177,7 @@
                 setTimeout(() => {
                     const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
                     if(all_dismissed) {
+                        audio_scene.destroy();
                         dispatch("next");
                     }
                 }, 2000);
