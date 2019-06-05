@@ -4,7 +4,6 @@
     * */
     import {fly, fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
-    import global_audio_scene_init from "./../global.sound";
 
     /*
     * RESSOURCES
@@ -27,14 +26,11 @@
     let isPointerDown = false;
     let innerHeight;
     let carton;
-    let fade_out_sand;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: sandVerticalImg = `url(${SandVertical})`;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
-    global_audio_scene_init.then(global_audio_scene => {
-            fade_out_sand = global_audio_scene.fade_out_sable;
-    });
+
 
     let yStart = 0;
     let yEnd = 0;
@@ -252,7 +248,7 @@
                 <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
                 <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
             </div>
-            {#if ready && fade_out_sand}
+            {#if ready}
                 <div class="icon"
                      bind:this="{icon}"
                      transition:fade>

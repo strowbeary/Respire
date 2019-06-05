@@ -16,6 +16,7 @@
     import lightBackground from "assets/images/light_background.png";
     import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
+    export let global_sound_scene;
 
     const carton_data ={
         titleName: "Dans le brouillard",
@@ -305,7 +306,7 @@
         <span class="hour_number">08:00</span>
     </div>
     <div class="day" style="background-image: url({lightBackground})">
-        {#if opacityDay >= 1}
+        {#if Math.round(opacityDay) === 1}
             <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>
         {/if}
     </div>

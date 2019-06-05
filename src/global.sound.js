@@ -3,6 +3,7 @@ import nappe_sound_url from "assets/sounds/nappe.wav";
 import sable_sound_url from "assets/sounds/sand.wav";
 import audio_test_sound_url from "assets/sounds/test_sonore.wav";
 import {Animate, Easing, Sequence} from "lib/TimingKit";
+import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
 
 export default (async () => {
     const global_scene = await Scene({
@@ -50,15 +51,17 @@ export default (async () => {
 
     return {
         async start() {
-            console.log("Play global");
             return await init_scene.play();
         },
         fade_out_sable() {
             sable_animation = Animate(0.7, 0, Easing.easeInQuad, 0.05);
             sable_animation.start();
         },
+        fade_in_sable() {
+            sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.05);
+            sable_animation.start();
+        },
         fade_in_nappe() {
-            console.log("start_sound");
             sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);
             sable_animation.start();
             nappe_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);
