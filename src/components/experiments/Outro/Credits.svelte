@@ -2,6 +2,7 @@
     import {fly, fade} from 'svelte/transition';
     import logo_gobelins from 'assets/images/outro/logo_gobelins.png';
     import logo_cci from 'assets/images/outro/logo-cciparis.png';
+    import lightBackground from "assets/images/light_background.png";
 
     export let globalSoundScene;
     export let canvasSize;
@@ -13,11 +14,10 @@
 <style>
     .credits_screen {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
-        background-color: black;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        background-size: cover;
         z-index: 2;
         display: flex;
         justify-content: center;
@@ -34,6 +34,7 @@
         font-weight: lighter;
         letter-spacing: calc(1px * var(--scaleFactor));
         font-family: "CormorantGaramond", "sans-serif";
+        mix-blend-mode: difference;
     }
     .credits__text img {
         width: 50%;
@@ -43,9 +44,6 @@
     }
     .credits__text ul {
         list-style-type: none;
-    }
-    .credits__text p, .title__text ul {
-        width: 60%;
     }
     .credits__text li a {
         text-decoration: none;
@@ -64,13 +62,13 @@
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 <div
     class="credits_screen"
-    style="--scaleFactor:{scaleFactor}"
+    style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
     transition:fade>
     <div class="credits__text">
-        <img src="{logo_gobelins}">
-        <img src="{logo_cci}" class="separator">
+        <img src="{logo_gobelins}" alt="gobelins">
+        <img src="{logo_cci}" class="separator" alt="cci">
         <p>Réalisé par :</p>
-        <ul class="">
+        <ul>
             <li>
                 <a href="https://remicaillot.fr"
                    rel="noopener noreferrer"

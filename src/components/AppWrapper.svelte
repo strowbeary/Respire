@@ -1,5 +1,5 @@
 <script>
-   import {onMount} from "svelte"
+   import {onMount} from "svelte";
 
    let height;
    let width;
@@ -17,7 +17,7 @@
 <style>
 	:global(*) {
 	    padding: 0;
-        margin: 0
+        margin: 0;
     }
     :global(body) {
         display: flex;
@@ -27,13 +27,13 @@
         width: 100vw;
         overflow: hidden;
         background-color: black;
+        user-select: none;
     }
     .appWrapper { /* canvas with 9/16 ratio */
         width: 56.25vh;
         height: 100vh;
         max-width: 100vw;
         max-height: 177.78vw;
-        background-color: black;
         overflow: hidden;
     }
 </style>

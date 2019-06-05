@@ -1,5 +1,5 @@
 import { Scene, Sound, Vector3 } from "lib/SoundKit";
-import alarm_clock_sound_url from "assets/sounds/Cauchemar/alam_clock.wav";
+import alarm_clock_sound_url from "assets/sounds/Cauchemar/alarm_clock.wav";
 import preparation_sound_url from "assets/sounds/Cauchemar/STE-005.wav";
 
 export async function init_cauchemar_sound_scene() {
@@ -39,6 +39,9 @@ export async function init_cauchemar_sound_scene() {
         },
         destroy() {
             init_scene.destroy();
+        },
+        set_preparation_volume(volume) {
+            preparation_sound.set_volume(volume);
         }
     }
 

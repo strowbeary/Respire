@@ -24,7 +24,6 @@ function create_position_animation (from, to) {
 export function Idea ({canvasWidth, canvasHeight}, parent) {
 
     idea_number++;
-    console.log(idea_number);
 
     const values = {
         ejection_direction: null,
@@ -71,7 +70,6 @@ export function Idea ({canvasWidth, canvasHeight}, parent) {
     );
 
     function create_child () {
-        console.log("is dismissed", values.dismissed);
         if ((values.self_division < values.allowed_self_division || values.descendants_number === 0) && !values.dismissed) {
             values.ejection_direction = Vector3(0, 1, 0).rotateXY(Math.random() * Math.PI * 2);
             final_position = get_new_final_position();

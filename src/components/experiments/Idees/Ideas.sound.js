@@ -5,6 +5,7 @@ import whisper_03_sound_url from "assets/sounds/Ideas/whipser_03.wav";
 import whisper_04_sound_url from "assets/sounds/Ideas/whipser_04.wav";
 import whisper_05_sound_url from "assets/sounds/Ideas/whipser_05.wav";
 import cours_litterature_sound_url from "assets/sounds/Ideas/cours_litterature.wav";
+import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
 
 export async function init_ideas_sound_scene() {
 
@@ -52,7 +53,7 @@ export async function init_ideas_sound_scene() {
             url: cours_litterature_sound_url,
             volume: 1,
             spacialized: true,
-            position: Vector3(0, 0, 0),
+            position: Vector3(0, -0.6, 0),
             orientation: Vector3(1, 0, 0)
         }),
     );
@@ -65,13 +66,16 @@ export async function init_ideas_sound_scene() {
         init_scene.get_children_by_name("whisper_04"),
         init_scene.get_children_by_name("whisper_05"),
     ];
+    const course_sound = init_scene.get_children_by_name("cours_litterature");
+    const low_pass_filter = course_sound.add_effect(LowPassEffect);
     let current_whisper = 0;
+    low_pass_filter.set_frequency(9000);
     return {
         async start_audio() {
             await init_scene.play();
         },
         play_course() {
-            init_scene.get_children_by_name("cours_litterature").play();
+            course_sound.play();
         },
         play_a_whisper(position) {
             whispers[current_whisper].set_position(position);
@@ -80,6 +84,9 @@ export async function init_ideas_sound_scene() {
         },
         destroy() {
             init_scene.destroy();
+        },
+        set_prof_freq(f) {
+            low_pass_filter.set_frequency(f);
         }
     }
 }

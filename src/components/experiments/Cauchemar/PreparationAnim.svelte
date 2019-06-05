@@ -7,8 +7,10 @@
     /*
     * RESSOURCES
     * */
-    import coffeeImg from 'assets/images/cauchemar/coffee.png';
-    import jeansImg from 'assets/images/cauchemar/jeans.png';
+    import glass_start_img from 'assets/images/cauchemar/glass_start.png';
+    import glass_loop_img from 'assets/images/cauchemar/glass_loop.png';
+    import glass_end_img from 'assets/images/cauchemar/glass_end.png';
+    import jeans_img from 'assets/images/cauchemar/jeans.png';
 
     export let value;
 </script>
@@ -21,12 +23,14 @@
     }
 </style>
 
-{#if value === ""}
-
-{:else if  value === "jeans"}
-    <img src="{jeansImg}" alt="jeans" transition:fade/>
-{:else if value === "coffee"}
-    <img src="{coffeeImg}" alt="coffee" transition:fade/>
-{:else if value === "porte"}
-    <img src="{coffeeImg}" alt="coffee" transition:fade/>
+{#if value === "jeans"}
+    <img src="{jeans_img}" alt="jeans" transition:fade/>
+{:else if value === "glass_start"}
+    <img src="{glass_start_img}" alt="coffee" in:fade/>
+{:else if value === "glass_loop"}
+    <img src="{glass_loop_img}" alt="coffee"/>
+{:else if value === "glass_end"}
+    <img src="{glass_end_img}" alt="coffee" out:fade/>
+{:else if value === "door"}
+    <img src="{jeans_img}" alt="coffee" transition:fade/>
 {/if}

@@ -2,6 +2,7 @@
     import {fly, fade} from 'svelte/transition';
     import global_sound_scene from "./../../../global.sound";
     import {createEventDispatcher} from "svelte";
+    import lightBackground from "assets/images/light_background.png";
 
     const dispatch = createEventDispatcher();
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
@@ -12,6 +13,7 @@
     let title_scene;
 
 
+    let is_ready = true;
     let yStart = 0;
     let yEnd = 0;
     let yCumul = [];
@@ -19,17 +21,20 @@
     let isPointerDown = false;
 
     function onPointerDown(e) {
-        if (e.touches) {
-            yStart = e.touches[0].clientY;
-        } else {
-            yStart = e.clientY;
+        if(is_ready) {
+             if (e.touches) {
+                        yStart = e.touches[0].clientY;
+                    } else {
+                        yStart = e.clientY;
+                    }
+
+                    if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
+                        e.preventDefault();
+                        yLast = parseFloat(getComputedStyle(title_scene).height);
+                        isPointerDown = true;
+                    }
         }
 
-        if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
-            e.preventDefault();
-            yLast = parseFloat(getComputedStyle(title_scene).height);
-            isPointerDown = true;
-        }
     }
 
     function onPointerMove(e) {
@@ -61,8 +66,9 @@
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
+                    dispatch('next');
+                    is_ready= false;
                 });
-                dispatch('next');
             } else {
                 yStart = 0;
                 yEnd = 0;
@@ -74,7 +80,7 @@
 </script>
 
 <style>
-@keyframes wiggle {
+    @keyframes wiggle {
         0%, 100% {
             transform: translate3d(0, 0, 0);
             opacity: 0;
@@ -91,12 +97,11 @@
     }
     .title_screen {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         color: black;
         background-color: white;
+        background-size: cover;
         z-index: 1;
         display: flex;
         justify-content: center;
@@ -152,21 +157,23 @@
 <div
     bind:this="{title_scene}"
     class="title_screen"
-    style="--scaleFactor:{scaleFactor}"
+    style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
     on:mousedown="{onPointerDown}"
-    on:touchstart="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
     on:mousemove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
     on:mouseup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
     transition:fade>
     <div class="title__text">
         <h1>Respire</h1>
         <p>Cette expérience nécessite le port d'un casque</p>
     </div>
-    <div class="icon"
-        bind:this="{icon}"
-        transition:fade>
-        <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
-    </div>
+    {#if is_ready}
+        <div class="icon"
+            bind:this="{icon}"
+            transition:fade>
+            <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+        </div>
+    {/if}
 </div>

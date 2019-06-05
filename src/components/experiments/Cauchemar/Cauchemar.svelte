@@ -7,13 +7,16 @@
     import {createEventDispatcher} from 'svelte';
     import Carton from 'components/Carton.svelte';
     import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
-    import {Animate, Easing, Sequence} from "lib/TimingKit";
+    import {Animate, Easing, Planning, Sequence} from "lib/TimingKit";
     /*
     * RESSOURCES
     * */
     import placeholderVideo from 'assets/videos/placeholder.webm';
+    import cadre from "assets/images/cauchemar/cadre.png";
+    import lightBackground from "assets/images/light_background.png";
     import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
+    export let global_sound_scene;
 
     const carton_data ={
         titleName: "Dans le brouillard",
@@ -105,11 +108,28 @@
                 audio_scene.stop_alarm_clock();
 
                 audio_scene.play_preparation_sound();
-                Sequence()
+                Planning()
                     .add(11827, () => current_preparation_anim = "jeans")
-                    .add(9604, () => current_preparation_anim = "coffee")
-                    .add(19914, () => current_preparation_anim = "")
-                    .add(9337, () => {
+                    .add(21467, () => current_preparation_anim = "")
+                    .add(26431, () => current_preparation_anim = "glass_start")
+                    .add(29884, () => current_preparation_anim = "glass_loop")
+                    .add(35839, () => current_preparation_anim = "glass_end")
+                    .add(40199, () => current_preparation_anim = "")
+                    .add(41425, () => current_preparation_anim = "door")
+                    .add(49609, () => {
+                        current_preparation_anim = "";
+                        const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);
+                        let req_id = null;
+                         (function loop(t) {
+                                audio_scene.set_preparation_volume(volume_preparation_sound_anim.tick());
+                                if(volume_preparation_sound_anim.is_ended_signal) {
+                                    cancelAnimationFrame(req_id);
+                                } else {
+                                    req_id = requestAnimationFrame(loop.bind({}, t + 1))
+                                }
+                            })(0);
+                    })
+                    .add(50682, () => {
                         audio_scene.destroy();
                         dispatch("next");
                     })
@@ -159,14 +179,14 @@
 
     .alarmClock {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         z-index: 0;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: black;
+        top: 0;
     }
 
     .icon {
@@ -219,6 +239,7 @@
         right: 0;
         bottom: 0;
         background-color: #fff;
+        background-size: cover;
         mix-blend-mode: difference;
         z-index: 1;
         opacity: var(--opacityDay);
@@ -233,44 +254,59 @@
         font-size: calc(var(--scaleFactor) * 85px);
         font-family: 'BeatriceDisplayDA', 'serif';
         letter-spacing: 10px;
-        border: solid 1px white;
-        padding: 10px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        padding: 30px;
         filter: blur(1px);
         opacity: calc(1 - var(--opacityDay)*2);
         pointer-events: none;
         z-index: 2;
     }
 
+    @keyframes wink {
+        0%, 100% {
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+
+    .hour_number {
+        animation: wink 1s linear infinite;
+    }
+
     video {
         object-fit: cover;
+        width: 100%;
+        height: 100%;
     }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
-{#if canvasSize.canvasWidth && videoVisibility}
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
+{#if videoVisibility}
     <video
         out:fade
-        width="{canvasSize.canvasWidth}"
-        height="{canvasSize.canvasHeight}"
         bind:this="{videoComponent}"
         src={placeholderVideo}
         on:ended={onFirstVideoEnd}
     ></video>
-{/if}
+{:else}
 <div class="alarmClock"
     out:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
     on:mousemove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
     on:mouseup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
     bind:this="{alarmClock}">
-    <span class="hour">
-        08:00
-    </span>
-    <div class="day">
-        {#if opacityDay >= 1}
+    <div class="hour" style="background-image: url({cadre})">
+        <span class="hour_number">08:00</span>
+    </div>
+    <div class="day" style="background-image: url({lightBackground})">
+        {#if Math.round(opacityDay) === 1}
             <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>
         {/if}
     </div>
@@ -279,9 +315,10 @@
              bind:this="{icon}"
              transition:fade
              on:mousedown="{onPointerDown}"
-             on:touchstart="{onPointerDown}">
+             on:touchstart|passive="{onPointerDown}">
              <div class="icon__line"></div>
              <span class="icon__circle" class:loop="{!isPointerDown}" style="--circleTransform:{circleTransform}"></span>
         </div>
     {/if}
 </div>
+{/if}

@@ -15,6 +15,7 @@
 	import Pill from "assets/images/pilule/Pill.png";
 	import Ticket from "assets/images/pilule/Ticket.png";
 	import backgroundImg from "assets/images/pilule/cours.png";
+	import lightBackground from "assets/images/light_background.png";
 	export let canvasSize;
 
     const carton_data = {
@@ -29,11 +30,6 @@
     export let canvasProps;
     const dispatch = createEventDispatcher();
 
-    const appProperties = {
-       backgroundColor: 0xffffff,
-       antialias: true
-    };
-
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
         filters = PIXI.filters,
@@ -44,7 +40,7 @@
         Graphics = PIXI.Graphics;
 
     let currentScene = "eye";
-    let app, canvasWidth, canvasHeight;
+    let app, canvasWidth, canvasHeight, canvasScale;
     let containerEye = new Container();
     let graphicsEye = new Graphics();
     let containerPill = new Container();
@@ -65,6 +61,7 @@
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
+        canvasScale = canvasHeight/824;
         app.stage.addChild(containerEye);
         app.stage.addChild(containerPill);
 
@@ -104,9 +101,9 @@
     function initCloseEye() {
         graphicsEye.beginFill(0x000000);
         graphicsEye.moveTo(0, 0);
-        graphicsEye.bezierCurveTo(50, -100 * 2, canvasWidth - 50, -100 * 2, canvasWidth, 0);
+        graphicsEye.bezierCurveTo(50 * canvasScale, -100 * 2 * canvasScale, canvasWidth - 50 * canvasScale, -100 * 2 * canvasScale, canvasWidth, 0);
         graphicsEye.moveTo(0, 0);
-        graphicsEye.bezierCurveTo(50, 100 * 2, canvasWidth - 50, 100 * 2, canvasWidth, 0);
+        graphicsEye.bezierCurveTo(50 * canvasScale, 100 * 2 * canvasScale, canvasWidth - 50 * canvasScale, 100 * 2 * canvasScale, canvasWidth, 0);
         graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
         graphicsEye.pivot.set(canvasWidth/2, height/2);
         graphicsEye.scale.set(4);
@@ -346,9 +343,9 @@
            graphicsEye.clear();
            graphicsEye.beginFill(0x000000);
            graphicsEye.moveTo(0, 0);
-           graphicsEye.bezierCurveTo(50, -100 * height, canvasWidth - 50, -100 * height, canvasWidth, 0);
+           graphicsEye.bezierCurveTo(50 * canvasScale, -100 * height * canvasScale, canvasWidth - 50 * canvasScale, -100 * height * canvasScale, canvasWidth, 0);
            graphicsEye.moveTo(0, 0);
-           graphicsEye.bezierCurveTo(50, 100 * height, canvasWidth - 50, 100 * height, canvasWidth, 0);
+           graphicsEye.bezierCurveTo(50 * canvasScale, 100 * height * canvasScale, canvasWidth - 50 * canvasScale, 100 * height * canvasScale, canvasWidth, 0);
            graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
            graphicsEye.pivot.set(canvasWidth/2, height/2);
            graphicsEye.scale.set(scale);
@@ -416,12 +413,24 @@
     }
 
     onDestroy(() => {
-        app.destroy();
+        app.ticker.stop();
     });
 </script>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
+<style>
+    .background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-color: white;
+        z-index: -1;
+    }
+</style>
+
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
     display_carton = false;
     launchClosedEye();
 }}></Carton>
-<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
+<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<Canvas {canvasSize} on:pixiApp="{init}"></Canvas>
