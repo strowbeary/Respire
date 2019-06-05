@@ -114,7 +114,7 @@
     }
     .title__text h1 {
         font-weight: normal;
-        font-size: calc(70px * var(--scaleFactor));;
+        font-size: calc(70px * var(--scaleFactor));
         color: black;
         text-transform: uppercase;
         text-align: center;
@@ -123,13 +123,15 @@
         font-family: 'BeatriceDisplayDA', 'serif';
     }
     .title__text p {
+        position: absolute;
+        bottom: calc(var(--scaleFactor) * 215px);
         width: 60%;
         text-align: center;
         font-size: calc(16px * var(--scaleFactor));
         margin-top: calc(50px  * var(--scaleFactor));
-        font-weight: lighter;
         letter-spacing: calc(1px * var(--scaleFactor));
-        font-family: "CormorantGaramond", "sans-serif";
+        font-family: "TTCommons", "sans-serif";
+        text-transform: uppercase;
     }
     .icon {
         width: 100%;

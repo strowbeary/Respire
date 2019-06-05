@@ -4,9 +4,8 @@
 }
 
 @font-face {
-    font-family: "CormorantGaramond";
-    src: url("assets/fonts/CormorantGaramond-SemiBold.ttf");
-    font-weight: 600;
+    font-family: "TTCommons";
+    src: url("assets/fonts/TTCommons-Regular.woff");
 }
 
 @keyframes falling {

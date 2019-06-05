@@ -143,18 +143,22 @@
         margin-bottom: calc(var(--scaleFactor) * 40px);
         font-family: 'BeatriceDisplayDA', 'serif';
         font-weight: 100;
-        letter-spacing: 1px;
+        letter-spacing: calc(var(--scaleFactor) * 1px);
     }
 
     .carton__timeContext {
         font-size: calc(var(--scaleFactor) * 16px);
         margin-bottom: calc(var(--scaleFactor) * 40px);
-        font-family: 'CormorantGaramond', 'serif';
+        font-family: 'TTCommons', 'serif';
+        text-transform: uppercase;
+        letter-spacing: calc(1px * var(--scaleFactor));
     }
 
     .carton__spaceContext {
         font-size: calc(var(--scaleFactor) * 16px);
-        font-family: 'CormorantGaramond', 'serif';
+        font-family: 'TTCommons', 'serif';
+        text-transform: uppercase;
+        letter-spacing: calc(1px * var(--scaleFactor));
     }
 
     .icon {

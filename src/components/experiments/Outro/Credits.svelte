@@ -31,24 +31,36 @@
         color: white;
         text-align: center;
         font-size: calc(16px * var(--scaleFactor));
-        font-weight: lighter;
         letter-spacing: calc(1px * var(--scaleFactor));
-        font-family: "CormorantGaramond", "sans-serif";
+        font-family: "TTCommons", "sans-serif";
         mix-blend-mode: difference;
     }
     .credits__text img {
         width: 50%;
     }
+    .credits__school {
+        margin-top: calc(30px  * var(--scaleFactor));
+    }
     .separator {
-        margin: calc(30px  * var(--scaleFactor));
+        margin: calc(15px  * var(--scaleFactor));
     }
-    .credits__text ul {
-        list-style-type: none;
-    }
-    .credits__text li a {
+    .list a {
         text-decoration: none;
         color: white;
-        border-bottom: solid 1px white;
+        justify-self: right;
+        position: relative;
+    }
+    .list a:after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background-color: white;
+        bottom: 1px;
+    }
+    .list span {
+        justify-self: left;
     }
     .black {
         position: absolute;
@@ -56,6 +68,12 @@
         height: 100%;
         background-color: black;
         z-index: 1;
+    }
+    .list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: calc(15px  * var(--scaleFactor));
+        grid-row-gap: calc(5px  * var(--scaleFactor));
     }
 </style>
 
@@ -65,30 +83,36 @@
     style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
     transition:fade>
     <div class="credits__text">
-        <img src="{logo_gobelins}" alt="gobelins">
-        <img src="{logo_cci}" class="separator" alt="cci">
-        <p>Réalisé par :</p>
-        <ul>
-            <li>
-                <a href="https://remicaillot.fr"
-                   rel="noopener noreferrer"
-                   target="_blank"> Rémi Caillot</a> - Développement et Son</li>
-            <li>
-                <a href="https://fr.linkedin.com/in/m%C3%A9lanie-ngo-661520118"
-                   rel="noopener noreferrer"
-                   target="_blank"> Mélanie Ngo</a> - Développement UI
-            </li>
-            <li>
-                <a href="https://www.linkedin.com/in/camille-rostoucher-674613113"
-                   rel="noopener noreferrer"
-                   target="_blank"> Camille Rostoucher</a> - Design et Motion</li>
-            <li>
-                <a href="https://www.linkedin.com/in/xindi-yang-55a316a1"
-                   rel="noopener noreferrer"
-                   target="_blank">
-                Xindi Yang </a> - Design, Illu et Motion
-            </li>
-        </ul>
+        <p>RÉALISÉ PAR :</p>
+        <div class="list separator">
+            <a href="https://remicaillot.fr"
+               rel="noopener noreferrer"
+               target="_blank">
+               Rémi CAILLOT
+            </a>
+            <span>Développement & Son</span>
+            <a href="https://fr.linkedin.com/in/m%C3%A9lanie-ngo-661520118"
+               rel="noopener noreferrer"
+               target="_blank"> Mélanie NGO</a>
+            <span>Développement UI</span>
+            <a href="https://www.linkedin.com/in/camille-rostoucher-674613113"
+               rel="noopener noreferrer"
+               target="_blank">
+               Camille ROSTOUCHER
+            </a>
+            <span>Design & Motion</span>
+            <a href="https://www.linkedin.com/in/xindi-yang-55a316a1"
+               rel="noopener noreferrer"
+               target="_blank">
+               Xindi YANG
+            </a>
+            <span>Design, Illu & Motion</span>
+        </div>
+        <div class="credits__school">
+            <img src="{logo_gobelins}" alt="gobelins">
+            <p class="separator">une école de la</p>
+            <img src="{logo_cci}" alt="cci">
+        </div>
     </div>
 </div>
 <div class="black" out:fade></div>
