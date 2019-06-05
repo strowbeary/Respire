@@ -21,8 +21,8 @@ steps:
           path: /var/run/docker.sock
       commands:
         - docker pull registery.remicaillot.fr/respire:latest
-        - docker stop respire || true
-        - docker rm respire || true
+        - docker stop respire
+        - docker rm -f respire
         - docker run --name respire -p 9005:80 --hostname respire.remicaillot.fr -d registery.remicaillot.fr/respire
 volumes:
     - name: dockersock
