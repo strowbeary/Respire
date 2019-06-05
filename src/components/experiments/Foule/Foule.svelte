@@ -41,10 +41,6 @@
     let set_z_position = () => {};
     let play_interaction_sound = () => {};
     let start_audio = () => {};
-    const appProperties = {
-       transparent: true,
-       antialias: true
-    };
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
@@ -192,6 +188,7 @@
                         }
                     });
         } else {
+            dragIcon.initIconAnim(0.7, 0);
             await Promise.all(["P8", "P5", "P6", "P7", "P2"]
                 .reverse()
                 .map(k => people[k])
@@ -328,13 +325,15 @@
             const container_offset = container_anim.tick();
             container.y = container_offset;
             set_z_position(1.5 - 1 / 0.3 * container_offset / canvasHeight);
+
             if(container_anim.is_ended_signal) {
                 container_anim = null;
-                setInteractive();
 
                 if (ending) {
                     sound_scene.destroy();
                     dispatch("next");
+                } else {
+                    setInteractive();
                 }
             }
         }
@@ -366,8 +365,8 @@
     });
 </script>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
     display_carton = false;
     start_audio()
 }}></Carton>
-<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
+<Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

@@ -3,7 +3,7 @@
     * MODULES
     * */
     import {fly, fade} from 'svelte/transition';
-    import { onMount, afterUpdate, createEventDispatcher} from 'svelte';
+    import {createEventDispatcher} from 'svelte';
     import global_audio_scene_init from "./../global.sound";
 
     /*
@@ -21,6 +21,7 @@
     export let ready;
     export let visible;
     export let sandLevel = 0;
+    export let canvasSize;
 
     let icon;
     let isPointerDown = false;
@@ -48,9 +49,9 @@
                 yStart = e.clientY;
             }
 
-            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
+            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + canvasSize.canvasHeight/2) {
                 e.preventDefault();
-                yLast = parseFloat(getComputedStyle(carton).height);
+                yLast = canvasSize.canvasHeight;
                 isPointerDown = true;
             }
         }
@@ -79,9 +80,9 @@
                 yEnd = e.clientY;
             }
 
-            if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
+            if (yEnd < yStart - canvasSize.canvasHeight/10 &&
                 !yCumul.includes(false)) {
-                fade_out_sand();
+                //fade_out_sand();
                 dispatch("next");
             } else {
                 yStart = 0;

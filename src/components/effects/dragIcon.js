@@ -54,7 +54,7 @@ export function DragIcon(container, isVertical, color = 0xFFFFFF) {
             if (iconAnim && iconAnim.is_running) {
                 interactiveIcon.alpha = iconAnim.tick();
             }
-            if (slideAnim && slideAnim.is_running) {
+            if (slideAnim && slideAnim.is_running && interactiveIcon.alpha > 0) {
                 const p = slideAnim.tick();
                 draw(finalPosition * p);
             } else {

@@ -32,16 +32,12 @@
 
     let icon;
     let isPointerDown = false;
-    let circleTransformValue = 0;
-    let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
     let mort;
     let open_door = true;
     let blurValue = 0;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
-    $: opacityDay = circleTransformValue / (200 * scaleFactor);
 
     let yStart = 0;
     let yEnd = 0;
@@ -57,8 +53,8 @@
                 yStart = e.clientY;
             }
 
-            if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
-                yLast = parseFloat(getComputedStyle(mort).height);
+            if (icon && yStart > parseFloat(getComputedStyle(mort).top) + canvasSize.canvasHeight/2) {
+                yLast = canvasSize.canvasHeight;
                 isPointerDown = true;
             }
         }
@@ -86,7 +82,7 @@
             } else {
                 yEnd = e.clientY;
             }
-            if (yEnd < yStart - parseFloat(getComputedStyle(mort).height)/10 &&
+            if (yEnd < yStart - canvasSize.canvasHeight/10 &&
                 !yCumul.includes(false)) {
                 speedUp = true;
                 speedOut = false;
@@ -357,7 +353,7 @@
     }
 </style>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
     display_carton = false;
     startAnimation();
 }}></Carton>

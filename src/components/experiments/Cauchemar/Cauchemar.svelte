@@ -266,7 +266,7 @@
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
 {#if videoVisibility}
     <video
         out:fade

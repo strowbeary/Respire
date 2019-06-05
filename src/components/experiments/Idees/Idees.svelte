@@ -35,10 +35,6 @@
     let is_ready = false;
 
     export let canvasProps;
-    const appProperties = {
-       transparent: true,
-       antialias: true
-    };
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
@@ -67,15 +63,13 @@
 
     let dragIcon;
     let audio_scene;
-    async function init(data) {
+    function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
         dragIcon = DragIcon(app.stage);
         loadImages();
-
-
     }
 
     function setInteractive(sprite, controller) {
@@ -287,6 +281,6 @@
     }
 </style>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
 <div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
-<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
+<Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

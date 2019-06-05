@@ -30,11 +30,6 @@
     export let canvasProps;
     const dispatch = createEventDispatcher();
 
-    const appProperties = {
-       transparent: true,
-       antialias: true
-    };
-
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
         filters = PIXI.filters,
@@ -418,7 +413,7 @@
     }
 
     onDestroy(() => {
-        app.destroy();
+        app.ticker.stop();
     });
 </script>
 
@@ -433,9 +428,9 @@
     }
 </style>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
     display_carton = false;
     launchClosedEye();
 }}></Carton>
 <div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
-<Canvas {appProperties} {canvasSize} on:pixiApp="{init}"></Canvas>
+<Canvas {canvasSize} on:pixiApp="{init}"></Canvas>
