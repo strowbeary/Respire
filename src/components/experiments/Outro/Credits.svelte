@@ -31,7 +31,7 @@
         color: white;
         text-align: center;
         font-size: calc(16px * var(--scaleFactor));
-        letter-spacing: calc(1px * var(--scaleFactor));
+        letter-spacing: 2px;
         font-family: "TTCommons", "sans-serif";
         mix-blend-mode: difference;
     }

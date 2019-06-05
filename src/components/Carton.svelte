@@ -143,7 +143,7 @@
         margin-bottom: calc(var(--scaleFactor) * 40px);
         font-family: 'BeatriceDisplayDA', 'serif';
         font-weight: 100;
-        letter-spacing: calc(var(--scaleFactor) * 1px);
+        letter-spacing: 2px;
     }
 
     .carton__timeContext {
@@ -151,14 +151,14 @@
         margin-bottom: calc(var(--scaleFactor) * 40px);
         font-family: 'TTCommons', 'serif';
         text-transform: uppercase;
-        letter-spacing: calc(1px * var(--scaleFactor));
+        letter-spacing: 2px;
     }
 
     .carton__spaceContext {
         font-size: calc(var(--scaleFactor) * 16px);
         font-family: 'TTCommons', 'serif';
         text-transform: uppercase;
-        letter-spacing: calc(1px * var(--scaleFactor));
+        letter-spacing: 2px;
     }
 
     .icon {

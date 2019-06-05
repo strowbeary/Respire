@@ -118,8 +118,8 @@
         color: black;
         text-transform: uppercase;
         text-align: center;
-        letter-spacing: calc(12px  * var(--scaleFactor));
-        transform: translateX(calc(12px  * var(--scaleFactor)));
+        letter-spacing: 12px;
+        transform: translateX(12px);
         font-family: 'BeatriceDisplayDA', 'serif';
     }
     .title__text p {
@@ -129,7 +129,7 @@
         text-align: center;
         font-size: calc(16px * var(--scaleFactor));
         margin-top: calc(50px  * var(--scaleFactor));
-        letter-spacing: calc(1px * var(--scaleFactor));
+        letter-spacing: 2px;
         font-family: "TTCommons", "sans-serif";
         text-transform: uppercase;
     }

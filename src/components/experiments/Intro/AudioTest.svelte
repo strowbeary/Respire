@@ -66,7 +66,7 @@
     .audio_text {
         position: absolute;
         font-size: calc(16px * var(--scaleFactor));
-        letter-spacing: calc(1px * var(--scaleFactor));
+        letter-spacing: 2px;
         font-family: "TTCommons", "sans-serif";
         text-transform: uppercase;
         top: 75%;
@@ -83,10 +83,10 @@
 
     @keyframes glow {
         0%, 100% {
-          text-shadow: 0 0 2px grey;
+          text-shadow: 0 0 2px black;
         }
         50% {
-          text-shadow: 0 0 0 grey;
+          text-shadow: 0 0 0 black;
         }
     }
 

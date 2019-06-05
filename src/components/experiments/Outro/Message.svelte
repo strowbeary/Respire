@@ -47,7 +47,7 @@
         width: 50%;
         text-align: center;
         font-size: calc(16px * var(--scaleFactor));
-        letter-spacing: calc(1px * var(--scaleFactor));
+        letter-spacing: 2px;
         font-family: "TTCommons", "sans-serif";
         text-transform: uppercase;
         line-height: calc(24px * var(--scaleFactor));
@@ -57,7 +57,7 @@
         font-size: calc(50px * var(--scaleFactor));
         line-height: calc(50px * var(--scaleFactor));
         text-transform: uppercase;
-        letter-spacing: calc(10px * var(--scaleFactor));
+        letter-spacing: 10px;
         font-family: 'BeatriceDisplayDA', 'serif';
         filter: blur(1px);
     }
