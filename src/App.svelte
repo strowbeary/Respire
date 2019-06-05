@@ -14,7 +14,7 @@
     import Message from 'components/experiments/Outro/Message.svelte';
     import Credits from 'components/experiments/Outro/Credits.svelte';
 
-    const components = [TitleScreen, AudioTest, Pilule, Mort, Message, Credits];
+    const components = [TitleScreen, /*AudioTest,Cauchemar, Foule, */ Idees, Pilule, Mort, Message, Credits];
     let index = 0;
 
     function next(){

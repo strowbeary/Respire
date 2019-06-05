@@ -55,6 +55,7 @@
 
     let blurAnim = Animate(0, 0, Easing.easeInOutQuad, 0.01);
     let blurValue = 0;
+    let current_freq = 9000;
     const imgAssets = {
         idea_image
     };
@@ -171,9 +172,10 @@
         setInteractive(sprite, controller);
 
         line_event_bus.addEventListener("death", e => {
+        current_freq += 296;
+        audio_scene.set_prof_freq(current_freq);
             blurValue -= 0.5;
             const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
-            console.log("all dismissed", all_dismissed);
             if(all_dismissed) {
                 setTimeout(() => {
                     const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
@@ -186,6 +188,8 @@
         });
 
         blurValue += 0.5;
+        current_freq -= 296;
+        audio_scene.set_prof_freq(current_freq);
 
 
         audio_scene.play_a_whisper(Vector3(
@@ -204,6 +208,7 @@
             canvasHeight
         )));
         line_event_bus.addEventListener("divide", e => {
+
             audio_scene.play_a_whisper(Vector3(
                 e.detail.new_child.final_position.x,
                 0,
@@ -221,6 +226,8 @@
             )));
 
             blurValue += 0.5;
+            current_freq -= 296;
+            audio_scene.set_prof_freq(current_freq);
             const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
             new_sprite.interactive = true;
             setInteractive(new_sprite, e.detail.new_child);
@@ -267,7 +274,7 @@
         display_carton = false;
         audio_scene.play_course();
         Sequence()
-            .add(8000, () => create_initial_idea(RIGHT, 200))
+            .add(13000, () => create_initial_idea(RIGHT, 200))
             .add(2000, () => create_initial_idea(LEFT, 500))
             .add(3000, () => create_initial_idea(RIGHT, 800))
             .start();

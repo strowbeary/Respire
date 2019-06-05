@@ -3,6 +3,7 @@ import nappe_sound_url from "assets/sounds/nappe.wav";
 import sable_sound_url from "assets/sounds/sand.wav";
 import audio_test_sound_url from "assets/sounds/test_sonore.wav";
 import {Animate, Easing, Sequence} from "lib/TimingKit";
+import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
 
 export default (async () => {
     const global_scene = await Scene({

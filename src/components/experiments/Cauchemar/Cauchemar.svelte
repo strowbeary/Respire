@@ -288,7 +288,7 @@
         <span class="hour_number">08:00</span>
     </div>
     <div class="day" style="background-image: url({lightBackground})">
-        {#if opacityDay >= 1}
+        {#if Math.round(opacityDay) === 1}
             <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>
         {/if}
     </div>

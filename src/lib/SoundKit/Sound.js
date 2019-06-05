@@ -1,7 +1,5 @@
 import {Vector3} from "./Vector3";
 import {angle_vector, canvas_arrow} from "./utils";
-import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
-
 export function Sound(name, options) {
     options = {
         volume: 1,
@@ -18,16 +16,19 @@ export function Sound(name, options) {
 
     async function init(audio_context, main_node) {
         const gain_node = audio_context.createGain();
-        const effects = [LowPassEffect];
         let panner = null;
+        const effects = [];
 
-        const effect_node = (effects
-            .map(effect => effect(audio_context))
-            .reduce((p_f, c_f, i) => {
-                c_f.connect(p_f);
-            return c_f;
-        }, main_node));
+        let effect_node = effects
+            .reduce((p_f, c_f) => {
+                c_f.filter_node.connect(p_f.filter_node);
+                return c_f;
+            }, {
+                filter_node: main_node
+            }).filter_node;
 
+        const root_node = audio_context.createGain();
+        root_node.connect(effect_node);
         if (options.spacialized) {
             panner = audio_context.createPanner();
             panner.panningModel = 'HRTF';
@@ -39,7 +40,7 @@ export function Sound(name, options) {
             }
 
             gain_node.connect(panner);
-            panner.connect(effect_node);
+            panner.connect(root_node);
 
             panner.setPosition(...options.position.to_array());
             panner.setOrientation(...options.orientation.to_array());
@@ -47,7 +48,7 @@ export function Sound(name, options) {
 
             options.position = Vector3(0, 0, 0);
             options.orientation = Vector3(0, 0, 0);
-            gain_node.connect(effect_node);
+            gain_node.connect(root_node);
         }
         gain_node.gain.setValueAtTime(options.volume, audio_context.currentTime);
 
@@ -92,6 +93,22 @@ export function Sound(name, options) {
             set_loop(loop) {
                 options.loop = loop;
                 source.loop = loop;
+            },
+            add_effect(effect) {
+                const initialized_effect = effect(audio_context);
+                effects.push(initialized_effect);
+
+                root_node.disconnect(effect_node);
+
+                effect_node = effects
+                    .reduce((p_f, c_f) => {
+                        c_f.filter_node.connect(p_f.filter_node);
+                        return c_f;
+                    }, {
+                        filter_node: main_node
+                    }).filter_node;
+                root_node.connect(effect_node);
+                return initialized_effect;
             },
             get name() {
                 return name;
