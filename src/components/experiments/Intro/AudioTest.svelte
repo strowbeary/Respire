@@ -63,6 +63,33 @@
         align-items: center;
     }
 
+    .audio_text {
+        position: absolute;
+        font-size: calc(16px * var(--scaleFactor));
+        letter-spacing: 2px;
+        font-family: "TTCommons", "sans-serif";
+        text-transform: uppercase;
+        top: 75%;
+        text-align: center;
+    }
+
+    .audio_text span {
+        position: relative;
+    }
+
+    .accent {
+        animation: glow 1s ease-in infinite;
+    }
+
+    @keyframes glow {
+        0%, 100% {
+          text-shadow: 0 0 2px black;
+        }
+        50% {
+          text-shadow: 0 0 0 black;
+        }
+    }
+
     .casque {
         width: 100%;
     }
@@ -82,4 +109,9 @@
     {#if right}
         <img src="{CasqueRight}" alt="casque-right" class="casque over" transition:fade/>
     {/if}
+    <p class="audio_text">
+        Vérification sonore
+        <br/>
+        <span class:accent="{left}">Gauche</span> – <span class:accent="{right}">Droite</span>
+    </p>
 </div>
