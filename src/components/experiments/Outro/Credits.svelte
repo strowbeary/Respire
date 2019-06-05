@@ -2,6 +2,7 @@
     import {fly, fade} from 'svelte/transition';
     import logo_gobelins from 'assets/images/outro/logo_gobelins.png';
     import logo_cci from 'assets/images/outro/logo-cciparis.png';
+    import lightBackground from "assets/images/light_background.png";
 
     export let globalSoundScene;
     export let canvasSize;
@@ -13,11 +14,10 @@
 <style>
     .credits_screen {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         background-color: white;
+        background-size: cover;
         z-index: 2;
         display: flex;
         justify-content: center;
@@ -62,7 +62,7 @@
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 <div
     class="credits_screen"
-    style="--scaleFactor:{scaleFactor}"
+    style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
     transition:fade>
     <div class="credits__text">
         <img src="{logo_gobelins}" alt="gobelins">

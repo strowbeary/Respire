@@ -3,7 +3,7 @@
     * MODULES
     * */
     import {fly, fade} from 'svelte/transition';
-    import { onMount, afterUpdate, createEventDispatcher} from 'svelte';
+    import {createEventDispatcher} from 'svelte';
     import global_audio_scene_init from "./../global.sound";
 
     /*
@@ -11,6 +11,7 @@
     * */
     import SandVertical from "assets/images/carton/sand_vertical.png";
     import SandHorizontal from "assets/images/carton/Sand_horizontal_fixed.png";
+    import lightBackground from "assets/images/light_background.png";
 
     const dispatch = createEventDispatcher();
 
@@ -20,6 +21,7 @@
     export let ready;
     export let visible;
     export let sandLevel = 0;
+    export let canvasSize;
 
     let icon;
     let isPointerDown = false;
@@ -47,9 +49,9 @@
                 yStart = e.clientY;
             }
 
-            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + parseFloat(getComputedStyle(carton).height)/2) {
+            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + canvasSize.canvasHeight/2) {
                 e.preventDefault();
-                yLast = parseFloat(getComputedStyle(carton).height);
+                yLast = canvasSize.canvasHeight;
                 isPointerDown = true;
             }
         }
@@ -78,9 +80,9 @@
                 yEnd = e.clientY;
             }
 
-            if (yEnd < yStart - parseFloat(getComputedStyle(carton).height)/10 &&
+            if (yEnd < yStart - canvasSize.canvasHeight/10 &&
                 !yCumul.includes(false)) {
-                fade_out_sand();
+                //fade_out_sand();
                 dispatch("next");
             } else {
                 yStart = 0;
@@ -111,13 +113,12 @@
 
     .carton {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         font-family: 'Arial', 'sans-serif';
         color: black;
         background-color: white;
+        background-size: cover;
         z-index: 2;
         display: flex;
         justify-content: center;
@@ -132,11 +133,10 @@
     }
     .carton__background {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         background-color: white;
+        background-size: cover;
         z-index: 1;
     }
     .carton__titleName {
@@ -236,35 +236,37 @@
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
-    <div class="carton"
-        transition:fade
-        style="--scaleFactor:{scaleFactor}"
-        on:mousedown="{onPointerDown}"
-        on:touchstart="{onPointerDown}"
-        on:mousemove="{onPointerMove}"
-        on:touchmove="{onPointerMove}"
-        on:mouseup="{onPointerUp}"
-        on:touchend="{onPointerUp}"
-        bind:this="{carton}">
-        <div class="carton__text">
-            <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
-            <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
-            <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+    <div out:fade>
+        <div class="carton"
+            in:fade
+            style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
+            on:mousedown="{onPointerDown}"
+            on:touchstart|passive="{onPointerDown}"
+            on:mousemove="{onPointerMove}"
+            on:touchmove|passive="{onPointerMove}"
+            on:mouseup="{onPointerUp}"
+            on:touchend|passive="{onPointerUp}"
+            bind:this="{carton}">
+            <div class="carton__text">
+                <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
+                <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
+                <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+            </div>
+            {#if ready && fade_out_sand}
+                <div class="icon"
+                     bind:this="{icon}"
+                     transition:fade>
+                     <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+                </div>
+            {/if}
+            <div class="sand sand--container" class:fadeIn="{ready}">
+                <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+                <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+                <div class="sand--vertical sand--vertical--top sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+                <div class="sand--vertical sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
+            </div>
+            <img in:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
         </div>
-        {#if ready && fade_out_sand}
-           <div class="icon"
-                bind:this="{icon}"
-                transition:fade>
-                <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
-           </div>
-        {/if}
-        <div class="sand sand--container" class:fadeIn="{ready}">
-            <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            <div class="sand--vertical sand--vertical--top sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            <div class="sand--vertical sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-        </div>
-        <img transition:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
+        <div class="carton__background" style="background-image: url({lightBackground})"></div>
     </div>
-    <div class="carton__background" out:fade></div>
 {/if}

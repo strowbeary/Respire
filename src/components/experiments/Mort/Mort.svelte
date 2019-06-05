@@ -32,16 +32,12 @@
 
     let icon;
     let isPointerDown = false;
-    let circleTransformValue = 0;
-    let circleRadius = 15 * window.innerHeight / 824;
     let innerHeight;
     let mort;
     let open_door = true;
     let blurValue = 0;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    $: circleTransform = `translate3d(${circleTransformValue}px, 0, 0)`;
-    $: opacityDay = circleTransformValue / (200 * scaleFactor);
 
     let yStart = 0;
     let yEnd = 0;
@@ -49,6 +45,7 @@
     let yLast;
 
     function onPointerDown(e) {
+        e.preventDefault();
         if (speedOut) {
             if(e.touches) {
                 yStart = e.touches[0].clientY;
@@ -56,15 +53,15 @@
                 yStart = e.clientY;
             }
 
-            if (icon && yStart > parseFloat(getComputedStyle(mort).top) + parseFloat(getComputedStyle(mort).height)/2) {
-                e.preventDefault();
-                yLast = parseFloat(getComputedStyle(mort).height);
+            if (icon && yStart > parseFloat(getComputedStyle(mort).top) + canvasSize.canvasHeight/2) {
+                yLast = canvasSize.canvasHeight;
                 isPointerDown = true;
             }
         }
     }
 
     function onPointerMove(e) {
+         e.preventDefault();
         if (isPointerDown) {
             let y;
             if (e.touches) {
@@ -78,14 +75,14 @@
     }
 
     function onPointerUp(e) {
+        e.preventDefault();
         if (isPointerDown) {
-            e.preventDefault();
             if (e.type === "touchend") {
                 yEnd = e.changedTouches[0].clientY;
             } else {
                 yEnd = e.clientY;
             }
-            if (yEnd < yStart - parseFloat(getComputedStyle(mort).height)/10 &&
+            if (yEnd < yStart - canvasSize.canvasHeight/10 &&
                 !yCumul.includes(false)) {
                 speedUp = true;
                 speedOut = false;
@@ -159,10 +156,8 @@
 
     .mort {
         position: absolute;
-        width: 56.25vh;
-        height: 100vh;
-        max-width: 100vw;
-        max-height: 177.78vw;
+        width: 100%;
+        height: 100%;
         z-index: 0;
         display: flex;
         justify-content: center;
@@ -358,7 +353,7 @@
     }
 </style>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
     display_carton = false;
     startAnimation();
 }}></Carton>
@@ -366,12 +361,12 @@
     out:fade
     class:mort-anim="{open_door && !display_carton}"
     style="--scaleFactor:{scaleFactor};--canvasWidth:{canvasSize.currentWidth};--translateValue:{translateValue};--blurValue:{blurValue}"
-    on:touchstart="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
     on:mousedown="{onPointerDown}"
     on:mousemove="{onPointerMove}"
-    on:touchmove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
     on:mouseup="{onPointerUp}"
-    on:touchend="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">

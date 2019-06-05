@@ -16,6 +16,7 @@
 	* */
     import idea_image from "assets/images/idees/Idea_small.png";
     import Prof from "assets/images/foule/P3.png";
+    import lightBackground from "assets/images/light_background.png";
     import {Idea} from "./Idea";
     import {Vector3} from "lib/SoundKit";
     import {init_ideas_sound_scene} from "components/experiments/Idees/Ideas.sound";
@@ -35,10 +36,6 @@
     let is_ready = false;
 
     export let canvasProps;
-    const appProperties = {
-       backgroundColor: 0xffffff,
-       antialias: true
-    };
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
@@ -67,15 +64,13 @@
 
     let dragIcon;
     let audio_scene;
-    async function init(data) {
+    function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
         app.stage.addChild(container);
         dragIcon = DragIcon(app.stage);
         loadImages();
-
-
     }
 
     function setInteractive(sprite, controller) {
@@ -278,5 +273,15 @@
     });
 </script>
 
-<Carton {...carton_data} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
-<Canvas {appProperties} {canvasSize} on:pixiApp="{init}" bgColor="white"></Canvas>
+<style>
+    .background {
+        position: absolute;
+        background-size: cover;
+        background-color: white;
+        z-index: -1;
+    }
+</style>
+
+<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
+<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

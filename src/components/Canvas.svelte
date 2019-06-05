@@ -4,7 +4,11 @@ import { afterUpdate } from 'svelte';
 import * as PIXI from "pixi.js";
 
 const dispatch = createEventDispatcher();
-export let appProperties;
+export let appProperties = {
+    transparent: true,
+    antialias: true,
+    legacy: true
+};
 export let canvasSize;
 
 let {currentWidth, canvasWidth, currentHeight, canvasHeight} = canvasSize;
