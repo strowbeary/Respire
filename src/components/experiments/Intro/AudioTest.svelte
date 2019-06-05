@@ -78,18 +78,16 @@
     }
 
     .accent {
-        font-weight: bold;
+        animation: glow 1s ease-in infinite;
     }
 
-    .accent:after {
-        content: "";
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 2px;
-        background-color: black;
-        bottom: 1px;
-        left: 0;
+    @keyframes glow {
+        0%, 100% {
+          text-shadow: 0 0 2px grey;
+        }
+        50% {
+          text-shadow: 0 0 0 grey;
+        }
     }
 
     .casque {
