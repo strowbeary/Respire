@@ -103,10 +103,9 @@
         if (isPointerDown) {
             e.preventDefault();
             if (circleTransformValue === (200 * window.innerHeight / 824 - circleRadius)) {
-                iconVisibility = false;
                 isPointerDown = false;
                 audio_scene.stop_alarm_clock();
-
+                iconVisibility = false;
                 audio_scene.play_preparation_sound();
                 Planning()
                     .add(11827, () => current_preparation_anim = "jeans")

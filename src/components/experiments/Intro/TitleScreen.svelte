@@ -63,11 +63,11 @@
 
             if (yEnd < yStart - parseFloat(getComputedStyle(title_scene).height)/10 &&
                 !yCumul.includes(false)) {
+                is_ready = false;
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
                     dispatch('next');
-                    is_ready= false;
                 });
             } else {
                 yStart = 0;
