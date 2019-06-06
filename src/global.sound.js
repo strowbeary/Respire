@@ -64,7 +64,7 @@ export default (async () => {
         fade_in_nappe() {
             sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);
             sable_animation.start();
-            nappe_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);
+            nappe_animation = Animate(0, 2, Easing.easeInQuad, 0.006);
             nappe_animation.start();
         },
         get audio_test_sound() {

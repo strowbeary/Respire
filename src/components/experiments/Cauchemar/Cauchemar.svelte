@@ -108,13 +108,16 @@
                 iconVisibility = false;
                 audio_scene.play_preparation_sound();
                 Planning()
-                    .add(11827, () => current_preparation_anim = "jeans")
-                    .add(21467, () => current_preparation_anim = "")
-                    .add(26431, () => current_preparation_anim = "glass_start")
-                    .add(29884, () => current_preparation_anim = "glass_loop")
-                    .add(35839, () => current_preparation_anim = "glass_end")
-                    .add(40199, () => current_preparation_anim = "")
+                    .add(5702, () => current_preparation_anim = "bed")
+                    .add(11509, () => current_preparation_anim = "")
+                    .add(12818, () => current_preparation_anim = "jeans")
+                    .add(16776, () => current_preparation_anim = "")
+                    .add(24788, () => current_preparation_anim = "glass_start")
+                    .add(28006, () => current_preparation_anim = "glass_loop")
+                    .add(33945, () => current_preparation_anim = "glass_end")
+                    .add(38209, () => current_preparation_anim = "")
                     .add(41425, () => current_preparation_anim = "door")
+                    .add(49139, () => current_preparation_anim = "door")
                     .add(49609, () => {
                         current_preparation_anim = "";
                         const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);

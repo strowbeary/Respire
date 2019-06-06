@@ -4,8 +4,9 @@ import whisper_02_sound_url from "assets/sounds/Ideas/whipser_02.wav";
 import whisper_03_sound_url from "assets/sounds/Ideas/whipser_03.wav";
 import whisper_04_sound_url from "assets/sounds/Ideas/whipser_04.wav";
 import whisper_05_sound_url from "assets/sounds/Ideas/whipser_05.wav";
-import cours_litterature_sound_url from "assets/sounds/Ideas/cours_litterature.wav";
+import cours_litterature_sound_url from "assets/sounds/Ideas/cours_litterature.flac";
 import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
+import {Easing, Keyframes} from "lib/TimingKit";
 
 export async function init_ideas_sound_scene() {
 
@@ -51,7 +52,7 @@ export async function init_ideas_sound_scene() {
         }),
         Sound("cours_litterature", {
             url: cours_litterature_sound_url,
-            volume: 1,
+            volume: 0.8,
             spacialized: true,
             position: Vector3(0, -0.6, 0),
             orientation: Vector3(1, 0, 0)
@@ -69,7 +70,7 @@ export async function init_ideas_sound_scene() {
     const course_sound = init_scene.get_children_by_name("cours_litterature");
     const low_pass_filter = course_sound.add_effect(LowPassEffect);
     let current_whisper = 0;
-    low_pass_filter.set_frequency(9000);
+    low_pass_filter.set_frequency(20000);
     return {
         async start_audio() {
             await init_scene.play();
@@ -85,8 +86,23 @@ export async function init_ideas_sound_scene() {
         destroy() {
             init_scene.destroy();
         },
-        set_prof_freq(f) {
-            low_pass_filter.set_frequency(f);
+        set_prof_filter_ratio(r) {
+            r = Keyframes([
+                {
+                    t: 0,
+                    value: 0.5
+                },
+                {
+                    t: 0.7,
+                    value: 0.5
+                },
+                {
+                    t: 1,
+                    value: 1
+                }
+            ], Easing.easeInOutQuad)(r);
+            const freq = Math.pow(10, r * 4) * 2;
+            low_pass_filter.set_frequency(freq);
         }
     }
 }

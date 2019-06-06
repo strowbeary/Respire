@@ -1,5 +1,5 @@
 import {Vector3} from "lib/SoundKit";
-import {Animate, Easing, Keyframes, Sequence} from "lib/TimingKit";
+import {Animate, Easing, Sequence} from "lib/TimingKit";
 
 let idea_number = 0;
 const MAX_IDEA = 30;

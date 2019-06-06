@@ -52,7 +52,7 @@
 
     let blurAnim = Animate(0, 0, Easing.easeInOutQuad, 0.01);
     let blurValue = 0;
-    let current_freq = 9000;
+    let current_ratio = 1;
     const imgAssets = {
         idea_image
     };
@@ -75,41 +75,41 @@
     }
 
     function setInteractive(sprite, controller) {
-            let dragging = false;
-            let old_x = 0;
-            let old_y = 0;
+        let dragging = false;
+        let old_x = 0;
+        let old_y = 0;
 
-            function on_end(e) {
-                dragging = false;
-                if(
-                    (controller.values.position.x < 0 || controller.values.position.x > canvasWidth) ||
-                    (controller.values.position.y < 0 || controller.values.position.y > canvasHeight)
-                ) {
-                    controller.kill();
-                }
+        function on_end(e) {
+            dragging = false;
+            if(
+                (controller.values.position.x < 0 || controller.values.position.x > canvasWidth) ||
+                (controller.values.position.y < 0 || controller.values.position.y > canvasHeight)
+            ) {
+                controller.kill();
             }
+        }
 
-            sprite.on('pointerdown', e => {
-                    dragging = true;
+        sprite.on('pointerdown', e => {
+                dragging = true;
+                old_x = e.data.global.x;
+                old_y = e.data.global.y;
+            })
+            .on('pointerup',on_end)
+            .on('pointerupoutside', on_end)
+            .on('pointermove', e => {
+                if (dragging) {
+                    const offset_x = (e.data.global.x - old_x) + controller.values.display_offset.x;
+                    const offset_y = controller.values.display_offset.y - (e.data.global.y - old_y);
                     old_x = e.data.global.x;
                     old_y = e.data.global.y;
-                })
-                .on('pointerup',on_end)
-                .on('pointerupoutside', on_end)
-                .on('pointermove', e => {
-                    if (dragging) {
-                        const offset_x = (e.data.global.x - old_x) + controller.values.display_offset.x;
-                        const offset_y = controller.values.display_offset.y - (e.data.global.y - old_y);
-                        old_x = e.data.global.x;
-                        old_y = e.data.global.y;
-                        controller.set_display_offset(Vector3(
-                            Math.round(offset_x),
-                            Math.round(offset_y),
-                            0
-                        ));
-                    }
-                });
-        }
+                    controller.set_display_offset(Vector3(
+                        Math.round(offset_x),
+                        Math.round(offset_y),
+                        0
+                    ));
+                }
+            });
+    }
 
     async function loadImages() {
         if (!resources[Prof]) {
@@ -167,8 +167,8 @@
         setInteractive(sprite, controller);
 
         line_event_bus.addEventListener("death", e => {
-        current_freq += 296;
-        audio_scene.set_prof_freq(current_freq);
+        current_ratio += 1/30;
+        audio_scene.set_prof_filter_ratio(current_ratio);
             blurValue -= 0.5;
             const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
             if(all_dismissed) {
@@ -183,8 +183,8 @@
         });
 
         blurValue += 0.5;
-        current_freq -= 296;
-        audio_scene.set_prof_freq(current_freq);
+        current_ratio -= 1/30;
+        audio_scene.set_prof_filter_ratio(current_ratio);
 
 
         audio_scene.play_a_whisper(Vector3(
@@ -221,8 +221,8 @@
             )));
 
             blurValue += 0.5;
-            current_freq -= 296;
-            audio_scene.set_prof_freq(current_freq);
+            current_ratio -= 1/30;
+            audio_scene.set_prof_filter_ratio(current_ratio);
             const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
             new_sprite.interactive = true;
             setInteractive(new_sprite, e.detail.new_child);
