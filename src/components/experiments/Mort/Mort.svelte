@@ -11,6 +11,8 @@
     * RESSOURCES
     * */
     import Wallpaper from "assets/images/mort/couloir2.png";
+    import door from "assets/images/mort/door.png";
+    import door_frame from "assets/images/mort/door_frame.png";
     export let canvasSize;
 
     const carton_data ={
@@ -263,15 +265,6 @@
         }
     }
 
-    @keyframes darken {
-        0% {
-            border-color: dimgrey;
-        }
-        100% {
-            border-color: black;
-        }
-    }
-
     @keyframes run {
         0%, 100% {
             transform: translateX(-2%) translateY(-2%);
@@ -286,9 +279,10 @@
 
     .room_door_light {
         position: absolute;
-        width: 20%;
-        height: 20%;
+        width: calc(20% - 2px);
+        height: calc(20% - 2px);
         background: white;
+        border: solid 1px black;
         z-index: 1;
     }
 
@@ -297,12 +291,7 @@
         width: 20%;
         height: 20%;
         background: transparent;
-        border: solid 1px dimgrey;
         z-index: 1;
-    }
-
-    .room_door_frame-light {
-        animation: darken 30s linear forwards;
     }
 
     .room_door_wrapper {
@@ -310,6 +299,7 @@
     }
 
     .room_door_frame {
+        background-size: cover;
         display: grid;
         grid-template-areas:
             "top top top top top top top top"
@@ -321,7 +311,6 @@
 
     .room_door_frame_top {
         grid-area: top;
-        background-color: dimgrey;
     }
 
     .room_door_frame_space {
@@ -330,12 +319,10 @@
 
     .room_door_frame_left {
         grid-area: left;
-        background-color: dimgrey;
     }
 
     .room_door_frame_right {
         grid-area: right;
-        background-color: dimgrey;
     }
 
     .room_door {
@@ -343,7 +330,7 @@
         bottom: 0;
         width: 50%;
         height: 60%;
-        background-color: black;
+        background-size: cover;
     }
 
     .room_door_animation {
@@ -368,9 +355,9 @@
     bind:this="{mort}">
     <div class="room_door_light"></div>
     <div class="room_door_wrapper">
-        <div class="room_door" class:room_door_animation="{!display_carton}" on:animationend="{next}"></div>
+        <div class="room_door" class:room_door_animation="{!display_carton}" on:animationend="{next}" style="background-image: url({door})"></div>
     </div>
-    <div class="room_door_frame" class:room_door_frame-light="{!display_carton}">
+    <div class="room_door_frame" class:room_door_frame-light="{!display_carton}" style="background-image: url({door_frame})">
         <div class="room_door_frame_top">
             <div class="light-door" class:light-anim="{!display_carton}"></div>
         </div>
