@@ -21,7 +21,7 @@
         setTimeout(() => {
             videoVisibility = true;
             videoComponent.play();
-        }, 3000);
+        }, 5000);
     })
 </script>
 
