@@ -103,6 +103,9 @@ export async function init_ideas_sound_scene() {
             ], Easing.easeInOutQuad)(r);
             const freq = Math.pow(10, r * 4) * 2;
             low_pass_filter.set_frequency(freq);
+        },
+        set_prof_volume(v) {
+            course_sound.set_volume(v);
         }
     }
 }

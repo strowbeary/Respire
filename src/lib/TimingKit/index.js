@@ -3,9 +3,9 @@ export function Sequence() {
 
     function start() {
         let scheduled_time = 0;
-        sequence.forEach(step => {
+        sequence.map(step => {
             scheduled_time += step.delay;
-            setTimeout(step.cb, scheduled_time);
+            return setTimeout(step.cb, scheduled_time);
         });
     }
 

@@ -5,7 +5,7 @@
     import {createEventDispatcher, onDestroy} from 'svelte';
     import Canvas from "components/Canvas.svelte";
     import * as PIXI from "pixi.js";
-    import {Animate, Easing} from "lib/TimingKit";
+    import {Animate, Easing, Sequence} from "lib/TimingKit";
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
 	/*
@@ -101,15 +101,16 @@
     function initCloseEye() {
         graphicsEye.beginFill(0x000000);
         graphicsEye.moveTo(0, 0);
-        graphicsEye.bezierCurveTo(50 * canvasScale, -100 * 2 * canvasScale, canvasWidth - 50 * canvasScale, -100 * 2 * canvasScale, canvasWidth, 0);
+        graphicsEye.bezierCurveTo(50 * canvasScale, -100 * 1.5 * canvasScale, canvasWidth - 50 * canvasScale, -100 * 1.5 * canvasScale, canvasWidth, 0);
         graphicsEye.moveTo(0, 0);
-        graphicsEye.bezierCurveTo(50 * canvasScale, 100 * 2 * canvasScale, canvasWidth - 50 * canvasScale, 100 * 2 * canvasScale, canvasWidth, 0);
+        graphicsEye.bezierCurveTo(50 * canvasScale, 100 * 1.5 * canvasScale, canvasWidth - 50 * canvasScale, 100 * 1.5 * canvasScale, canvasWidth, 0);
         graphicsEye.position.set(canvasWidth/2, canvasHeight/2);
-        graphicsEye.pivot.set(canvasWidth/2, height/2);
-        graphicsEye.scale.set(4);
+        graphicsEye.pivot.set(canvasWidth/2, 0);
+        graphicsEye.scale.set(6);
         graphicsEye.endFill();
         background.mask = graphicsEye;
-        background.filters = [new filters.BlurFilter(0, 4)];
+        background.filters = [new filters.BlurFilter()];
+        background.filters[0].blur = 0;
 
         scaleAnim = Animate(6, 1, Easing.bounceOut, 0.0025);
         heightAnim = Animate(1.5, 0, Easing.bounceOut, 0.0025);
@@ -369,9 +370,13 @@
     }
 
     function launchClosedEye() {
-        scaleAnim.start();
-        heightAnim.start();
-        blurAnim.start();
+        Sequence()
+            .add(5000, () => {
+                scaleAnim.start();
+                heightAnim.start();
+                blurAnim.start();
+            })
+            .start();
     }
 
     function launchBlurAnim() {

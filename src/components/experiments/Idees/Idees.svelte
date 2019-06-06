@@ -170,15 +170,28 @@
         current_ratio += 1/30;
         audio_scene.set_prof_filter_ratio(current_ratio);
             blurValue -= 0.5;
-            const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
-            if(all_dismissed) {
-                setTimeout(() => {
-                    const all_dismissed = Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
-                    if(all_dismissed) {
-                        audio_scene.destroy();
+            const all_dismissed = () => Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
+            if(all_dismissed()) {
+                Sequence()
+                    .add(2000, () => {
+                        const volume_prof_sound_anim = Animate(1, 0, Easing.linear, 0.07);
+                        volume_prof_sound_anim.start();
+                        let req_id = null;
+                        (function loop(t) {
+                            audio_scene.set_prof_volume(volume_prof_sound_anim.tick());
+                            if(volume_prof_sound_anim.is_ended_signal) {
+                                cancelAnimationFrame(req_id);
+                            } else {
+                                req_id = requestAnimationFrame(loop.bind({}, t + 1))
+                            }
+                        })(0);
                         dispatch("next");
-                    }
-                }, 2000);
+                    })
+                    .add(1000, () => {
+                        audio_scene.destroy();
+                    })
+                    .start();
+
             }
         });
 
