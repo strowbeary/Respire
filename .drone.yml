@@ -1,5 +1,5 @@
 kind: pipeline
-name: default
+name: production
 
 steps:
     - name: Build website
@@ -7,7 +7,13 @@ steps:
       commands:
           - npm install
           - npm run build
-    - name: Build & push to local docker registery
+    - name: Build docker image & push to local docker registery
+      trigger:
+        branch:
+          - master
+        event:
+          - pull_request
+          - push
       image: plugins/docker
       settings:
           registry: registery.remicaillot.fr
@@ -15,6 +21,11 @@ steps:
           repo: registery.remicaillot.fr/respire
           dockerfile: ./Dockerfile
     - name: Deploy to server
+      trigger:
+        branch:
+          - master
+        event:
+          - push
       image: docker:dind
       volumes:
         - name: dockersock
@@ -28,8 +39,3 @@ volumes:
     - name: dockersock
       host:
           path: /var/run/docker.sock
-trigger:
-    branch:
-        - master
-    event:
-        - push
