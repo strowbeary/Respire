@@ -39,7 +39,7 @@
         width: 50%;
     }
     .credits__school {
-        margin-top: calc(30px  * var(--scaleFactor));
+        margin-top: calc(40px  * var(--scaleFactor));
     }
     .separator {
         margin: calc(15px  * var(--scaleFactor));
