@@ -275,8 +275,23 @@
         }
     }
 
-    .hour_number {
+    .hour_mask {
+       position: relative;
+       color: black;
+    }
+
+    .hour_mask:after {
+        position: absolute;
+        content: ":";
+        display: block;
+        color: white;
+        top: -5px;
+        left: 0;
         animation: wink 1s linear infinite;
+    }
+
+    .hour_number {
+
     }
 
     video {
@@ -305,7 +320,7 @@
     on:touchend|passive="{onPointerUp}"
     bind:this="{alarmClock}">
     <div class="hour" style="background-image: url({cadre})">
-        <span class="hour_number">08:00</span>
+        08<span class="hour_mask">:</span>00
     </div>
     <div class="day" style="background-image: url({lightBackground})">
         <PreparationAnim value="{current_preparation_anim}"></PreparationAnim>
