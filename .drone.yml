@@ -8,11 +8,10 @@ steps:
           - npm install
           - npm run build
     - name: Build docker image & push to local docker registery
-      trigger:
+      when:
         branch:
           - master
         event:
-          - pull_request
           - push
       image: plugins/docker
       settings:
@@ -21,7 +20,7 @@ steps:
           repo: registery.remicaillot.fr/respire
           dockerfile: ./Dockerfile
     - name: Deploy to server
-      trigger:
+      when:
         branch:
           - master
         event:
