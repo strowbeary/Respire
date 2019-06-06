@@ -100,7 +100,9 @@
     }
 </style>
 
-<div class="audio_test" style="background-image: url({lightBackground})"
+<div
+    class="audio_test"
+    style="background-image: url({lightBackground})"
     transition:fade>
     <img src="{Casque}" alt="casque" class="casque"/>
     {#if left}

@@ -14,6 +14,13 @@
     import Message from 'components/experiments/Outro/Message.svelte';
     import Credits from 'components/experiments/Outro/Credits.svelte';
 
+    import bed_img from 'assets/images/cauchemar/bed.png';
+    import glass_start_img from 'assets/images/cauchemar/glass_start.png';
+    import glass_loop_img from 'assets/images/cauchemar/glass_loop.png';
+    import glass_end_img from 'assets/images/cauchemar/glass_end.png';
+    import jeans_img from 'assets/images/cauchemar/jeans.png';
+    import door_img from 'assets/images/cauchemar/door_open.png';
+
     const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees, Pilule, Mort, Message, Credits];
     let index = 0;
 
@@ -37,6 +44,15 @@
     opacity: 0.5;
 }
 </style>
+
+<svelte:head>
+	<link rel="preload" href="{bed_img}" as="image">
+	<link rel="preload" href="{glass_start_img}" as="image">
+	<link rel="preload" href="{glass_loop_img}" as="image">
+	<link rel="preload" href="{glass_end_img}" as="image">
+	<link rel="preload" href="{jeans_img}" as="image">
+	<link rel="preload" href="{door_img}" as="image">
+</svelte:head>
 
 <img class="overlay" src={anim_bg} alt="animated background">
 <AppWrapper let:canvasSize={canvasSize}>

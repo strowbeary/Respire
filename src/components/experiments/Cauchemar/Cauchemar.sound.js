@@ -1,6 +1,6 @@
 import { Scene, Sound, Vector3 } from "lib/SoundKit";
 import alarm_clock_sound_url from "assets/sounds/Cauchemar/alarm_clock.wav";
-import preparation_sound_url from "assets/sounds/Cauchemar/STE-005.wav";
+import preparation_sound_url from "assets/sounds/Cauchemar/STE-005.flac";
 
 export async function init_cauchemar_sound_scene() {
     const scene = await Scene({

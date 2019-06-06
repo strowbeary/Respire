@@ -116,9 +116,8 @@
                     .add(28006, () => current_preparation_anim = "glass_loop")
                     .add(33945, () => current_preparation_anim = "glass_end")
                     .add(38209, () => current_preparation_anim = "")
-                    .add(41425, () => current_preparation_anim = "door")
-                    .add(49139, () => current_preparation_anim = "door")
-                    .add(49609, () => {
+                    .add(42602, () => current_preparation_anim = "door")
+                    .add(45000, () => {
                         current_preparation_anim = "";
                         const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);
                         let req_id = null;
@@ -131,7 +130,7 @@
                                 }
                             })(0);
                     })
-                    .add(50682, () => {
+                    .add(46054, () => {
                         audio_scene.destroy();
                         dispatch("next");
                     })
@@ -288,10 +287,6 @@
         top: -5px;
         left: 0;
         animation: wink 1s linear infinite;
-    }
-
-    .hour_number {
-
     }
 
     video {
