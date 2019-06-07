@@ -36,4 +36,4 @@ $: {
 }
 </script>
 
-<canvas bind:this="{canvas}"></canvas>
+<canvas style="z-index: 1000;" bind:this="{canvas}"></canvas>

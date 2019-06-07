@@ -129,7 +129,7 @@ module.exports = {
 
             // Define runtime caching rules.
             runtimeCaching: [{
-                urlPattern: new RegExp('https://remicaillot.fr/respire'),
+                urlPattern: new RegExp('https://respire.remicaillot.fr/'),
                 // Apply a cache-first strategy.
                 handler: 'StaleWhileRevalidate',
             }],
