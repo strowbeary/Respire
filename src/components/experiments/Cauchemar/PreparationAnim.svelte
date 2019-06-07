@@ -26,7 +26,7 @@
 </style>
 
 {#if value === "bed"}
-    <img src="{bed_img}" alt="jeans" transition:fade/>
+    <img src="{bed_img}" alt="bed" transition:fade/>
 {:else if value === "jeans"}
     <img src="{jeans_img}" alt="jeans" transition:fade/>
 {:else if value === "glass_start"}
