@@ -11,7 +11,7 @@ function createSlideAnim(from_value, to_value) {
     return Animate(from_value, to_value, Easing.easeOutCubic, 0.01);
 }
 
-export function DragIcon(container, isVertical, color = 0xFFFFFF) {
+export function DragIcon(container, canvasScale, isVertical, color = 0xFFFFFF) {
     const interactiveIcon = new Graphics();
     const lineWidth = 100;
     let alpha = 0;
@@ -20,9 +20,10 @@ export function DragIcon(container, isVertical, color = 0xFFFFFF) {
     let slideAnim = createSlideAnim(0, 1);
     let vertical = isVertical;
     let lineColor = color;
+    let scale = canvasScale;
     slideAnim.start();
     interactiveIcon.lineStyle(1, lineColor, 1);
-    interactiveIcon.drawCircle(0, 0, 35);
+    interactiveIcon.drawCircle(0, 0, 35 * scale);
     interactiveIcon.alpha = alpha;
 
     container.addChild(interactiveIcon);
@@ -31,9 +32,9 @@ export function DragIcon(container, isVertical, color = 0xFFFFFF) {
         interactiveIcon.clear();
         interactiveIcon.lineStyle(1, lineColor, 1);
         if (!vertical) {
-            interactiveIcon.drawCircle(newPos, 0, 35);
+            interactiveIcon.drawCircle(newPos, 0, 35 * scale);
         } else {
-            interactiveIcon.drawCircle(0, -newPos, 35);
+            interactiveIcon.drawCircle(0, -newPos, 35 * scale);
         }
     }
 

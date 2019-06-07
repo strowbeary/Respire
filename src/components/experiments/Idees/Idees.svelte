@@ -65,12 +65,14 @@
 
     let dragIcon;
     let audio_scene;
+    let canvasScale;
     function init(data) {
         app = data.detail.app;
         canvasWidth = data.detail.canvasWidth;
         canvasHeight = data.detail.canvasHeight;
+        canvasScale = canvasHeight/824;
         app.stage.addChild(container);
-        dragIcon = DragIcon(app.stage);
+        dragIcon = DragIcon(app.stage, canvasScale);
         loadImages();
     }
 
