@@ -115,7 +115,7 @@
                     .add(33945, () => current_preparation_anim = "glass_end")
                     .add(38209, () => current_preparation_anim = "")
                     .add(42602, () => current_preparation_anim = "door")
-                    .add(45000, () => {
+                    .add(45500, () => {
                         const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);
                         let req_id = null;
                          (function loop(t) {
@@ -127,7 +127,7 @@
                                 }
                             })(0);
                     })
-                    .add(46054, () => {
+                    .add(46500, () => {
                         current_preparation_anim = "";
                         audio_scene.destroy();
                         dispatch("next");

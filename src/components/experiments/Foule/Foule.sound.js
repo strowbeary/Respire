@@ -1,5 +1,6 @@
-import crowd_left_sound_url from "assets/sounds/Foule/crowd_left.wav";
-import crowd_right_sound_url from "assets/sounds/Foule/crowd_right.wav";
+import crowd_global_sound_url from "assets/sounds/Foule/crowd_global01.wav";
+import crowd_left_sound_url from "assets/sounds/Foule/crowd_left_1.wav";
+import crowd_right_sound_url from "assets/sounds/Foule/crowd_right_1.wav";
 import excuse_sound_url from "assets/sounds/Foule/excusez_moi.wav";
 import pardon_sound_url from "assets/sounds/Foule/Pardon.wav";
 import ouch_sound_url from "assets/sounds/Foule/Ouch.wav";
@@ -12,6 +13,10 @@ export async function init_foule_sound_scene() {
     });
 
     scene.add(
+        Sound("crowd_global", {
+            url: crowd_global_sound_url,
+            volume: 0.3,
+        }),
         Sound("crowd_left", {
             url: crowd_left_sound_url,
             volume: 0.3,
@@ -41,12 +46,14 @@ export async function init_foule_sound_scene() {
     );
 
     const init_scene = await scene.init();
+    const crowd_global_sound = init_scene.get_children_by_name("crowd_global");
     const crowd_left_sound = init_scene.get_children_by_name("crowd_left");
     const crowd_right_sound = init_scene.get_children_by_name("crowd_right");
     const ouch_sound = init_scene.get_children_by_name("ouch");
     const pardon_sound = init_scene.get_children_by_name("pardon");
     const excuse_sound = init_scene.get_children_by_name("excuse");
     const sounds = [ouch_sound, pardon_sound, excuse_sound];
+    crowd_global_sound.play();
     crowd_left_sound.play();
     crowd_right_sound.play();
     let sound_to_play = 0;

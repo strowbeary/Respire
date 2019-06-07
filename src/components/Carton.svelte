@@ -250,9 +250,9 @@
             on:touchend|passive="{onPointerUp}"
             bind:this="{carton}">
             <div class="carton__text">
-                <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
-                <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
-                <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
+                <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 2000 }}">{timeContext}</p>
+                <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 2400 }}">{titleName}</h3>
+                <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 2800 }}">{spaceContext}</p>
             </div>
             {#if ready}
                 <div class="icon"
