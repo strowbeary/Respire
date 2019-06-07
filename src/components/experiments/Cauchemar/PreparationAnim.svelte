@@ -23,6 +23,22 @@
         width: 80%;
         user-select: none;
     }
+    @keyframes talalalalala {
+        0% {
+            transform: scale(1);
+        }
+        80% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(5);
+        }
+    }
+    .door {
+        /* duration | timing-function | delay | iteration-count | direction | fill-mode | play-state | name */
+        animation: 1000ms ease-in 2000ms 1 both talalalalala;
+    }
 </style>
 
 {#if value === "bed"}
@@ -36,5 +52,5 @@
 {:else if value === "glass_end"}
     <img src="{glass_end_img}" alt="coffee" out:fade/>
 {:else if value === "door"}
-    <img src="{door_img}" alt="coffee" transition:fade/>
+    <img src="{door_img}" class="door" alt="coffee" transition:fade/>
 {/if}

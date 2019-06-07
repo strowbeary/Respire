@@ -16,3 +16,9 @@
         transform: translate3d(0, 100%, 0);
     }
 }
+
+* {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}

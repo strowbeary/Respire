@@ -21,6 +21,18 @@
     let yLast;
     let isPointerDown = false;
 
+    async function openFullscreen(e) {
+      if (e.requestFullscreen) {
+        await e.requestFullscreen();
+      } else if (e.mozRequestFullScreen) { /* Firefox */
+        await e.mozRequestFullScreen();
+      } else if (e.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+        await e.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) { /* IE/Edge */
+        await e.msRequestFullscreen();
+      }
+    }
+
     function onPointerDown(e) {
         if(is_ready) {
              if (e.touches) {
@@ -67,6 +79,7 @@
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
+                    document.body.requestFullscreen();
                     dispatch('next');
                 });
             } else {
@@ -178,11 +191,11 @@
     class="title_screen"
     style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
     on:mousedown="{onPointerDown}"
-    on:touchstart|passive="{onPointerDown}"
+    on:touchstart="{onPointerDown}"
     on:mousemove="{onPointerMove}"
-    on:touchmove|passive="{onPointerMove}"
+    on:touchmove="{onPointerMove}"
     on:mouseup="{onPointerUp}"
-    on:touchend|passive="{onPointerUp}"
+    on:touchend="{onPointerUp}"
     transition:fade>
     {#if is_ready}
         <div class="title__text" transition:fade>
