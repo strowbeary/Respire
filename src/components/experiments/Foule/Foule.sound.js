@@ -15,7 +15,7 @@ export async function init_foule_sound_scene() {
     scene.add(
         Sound("crowd_global", {
             url: crowd_global_sound_url,
-            volume: 0.3,
+            volume: 0.1,
         }),
         Sound("crowd_left", {
             url: crowd_left_sound_url,
@@ -36,12 +36,15 @@ export async function init_foule_sound_scene() {
         }),
         Sound("ouch", {
             url: ouch_sound_url,
+            volume: 1.3,
         }),
         Sound("excuse", {
             url: excuse_sound_url,
+            volume: 1.3,
         }),
         Sound("pardon", {
             url: pardon_sound_url,
+            volume: 1.3,
         })
     );
 
