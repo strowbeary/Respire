@@ -3,7 +3,7 @@
     import global_sound_scene from "./../../../global.sound";
     import {createEventDispatcher} from "svelte";
     import lightBackground from "assets/images/light_background.png";
-    import glassLoop from "assets/images/cauchemar/glass_loop.png";
+    import loader_img from "assets/images/intro/loader.png";
 
     const dispatch = createEventDispatcher();
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
@@ -184,6 +184,6 @@
             <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
         </div>
     {:else}
-        <img transition:fade class="glassSand" src="{glassLoop}" alt="sand-glass">
+        <img transition:fade class="glassSand" src="{loader_img}" alt="sand-glass">
     {/if}
 </div>
