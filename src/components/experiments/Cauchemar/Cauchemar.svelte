@@ -86,7 +86,6 @@
             }
             let start = icon.getBoundingClientRect().left;
             if (Math.abs(start - x) < 50) {
-                e.preventDefault();
                 isPointerDown = true;
                 updateCirclePosition(e);
             }
@@ -101,7 +100,6 @@
 
     function onPointerUp(e) {
         if (isPointerDown) {
-            e.preventDefault();
             if (circleTransformValue === (200 * window.innerHeight / 824 - circleRadius)) {
                 isPointerDown = false;
                 audio_scene.stop_alarm_clock();

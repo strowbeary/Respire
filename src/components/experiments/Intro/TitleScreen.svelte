@@ -30,7 +30,6 @@
                     }
 
                     if (icon && yStart > parseFloat(getComputedStyle(title_scene).top) + parseFloat(getComputedStyle(title_scene).height)/2) {
-                        e.preventDefault();
                         yLast = parseFloat(getComputedStyle(title_scene).height);
                         isPointerDown = true;
                     }
@@ -54,7 +53,6 @@
 
     function onPointerUp(e) {
         if (isPointerDown) {
-            e.preventDefault();
 
             if (e.type === "touchend") {
                 yEnd = e.changedTouches[0].clientY;

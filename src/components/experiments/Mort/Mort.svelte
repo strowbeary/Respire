@@ -47,7 +47,6 @@
     let yLast;
 
     function onPointerDown(e) {
-        e.preventDefault();
         if (speedOut) {
             if(e.touches) {
                 yStart = e.touches[0].clientY;
@@ -63,7 +62,6 @@
     }
 
     function onPointerMove(e) {
-         e.preventDefault();
         if (isPointerDown) {
             let y;
             if (e.touches) {
@@ -77,7 +75,6 @@
     }
 
     function onPointerUp(e) {
-        e.preventDefault();
         if (isPointerDown) {
             if (e.type === "touchend") {
                 yEnd = e.changedTouches[0].clientY;
