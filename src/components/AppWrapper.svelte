@@ -23,13 +23,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        width: 100vw;
         overflow: hidden;
         background-color: black;
         user-select: none;
     }
     .appWrapper { /* canvas with 9/16 ratio */
+        position: relative;
         width: 56.25vh;
         height: 100vh;
         max-width: 100vw;

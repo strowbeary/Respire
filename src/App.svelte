@@ -35,9 +35,7 @@
     top: 0;
     left: 0;
     right: 0;
-    margin: auto;
-    width: 56.25vh;
-    height: 100vh;
+    bottom: 0;
     mix-blend-mode: difference;
     pointer-events: none;
     z-index: 10000;
@@ -56,8 +54,8 @@
 	<link rel="preload" href="{anim_bg}" as="image">
 </svelte:head>
 
-<img class="overlay" src={anim_bg} alt="animated background">
 <AppWrapper let:canvasSize={canvasSize}>
+    <img class="overlay" src={anim_bg} alt="animated background">
     {#if canvasSize.canvasWidth}
         <svelte:component this={components[index]} on:next="{next}" {canvasSize} globalSoundScene={global_sound_scene}></svelte:component>
     {/if}
