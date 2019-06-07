@@ -158,6 +158,19 @@
 
     .glassSand {
         position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .glassSand img {
+        width: 50%;
+    }
+
+    .glassSand p {
+        position: static;
+        margin-top: calc(30px * var(--scaleFactor));
+        width: auto;
     }
 </style>
 
@@ -173,17 +186,22 @@
     on:mouseup="{onPointerUp}"
     on:touchend|passive="{onPointerUp}"
     transition:fade>
-    <div class="title__text">
-        <h1>Respire</h1>
-        <p>Cette expérience nécessite le port d'un casque</p>
-    </div>
     {#if is_ready}
+        <div class="title__text" transition:fade>
+            <h1>Respire</h1>
+            <p>Cette expérience nécessite le port d'un casque</p>
+        </div>
         <div class="icon"
             bind:this="{icon}"
             transition:fade>
             <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
         </div>
     {:else}
-        <img transition:fade class="glassSand" src="{loader_img}" alt="sand-glass">
+        <div transition:fade class="glassSand">
+            <img src="{loader_img}" alt="sand-glass">
+            <div class="title__text">
+                <p>Chargement...</p>
+            </div>
+        </div>
     {/if}
 </div>
