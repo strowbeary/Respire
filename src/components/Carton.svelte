@@ -230,11 +230,15 @@
     .sand--vertical--top {
         top: -100%;
     }
+
+    .invisible {
+        pointer-events: none;
+    }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
 {#if visible}
-    <div out:fade>
+    <div out:fade class:invisible="{!visible}">
         <div class="carton"
             in:fade
             style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
