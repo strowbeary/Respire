@@ -11,6 +11,7 @@
     import {DragIcon} from "components/effects/dragIcon";
     import Carton from "components/Carton.svelte";
     import PixiApngAndGif from 'pixi-apngandgif'
+    import {carton_visible, carton_ready} from "./../../../stores";
 	/*
 	* RESSOURCES
 	* */
@@ -23,20 +24,14 @@
 
     export let canvasSize;
 
-
     const dispatch = createEventDispatcher();
-
-    const carton_data ={
-        titleName: "Les idées noires",
-        timeContext: "17 heures avant l'examen",
-        spaceContext: "Amphithéâtre"
-    };
-
-    let display_carton = true;
-    let is_ready = false;
     let is_interactions_enabled = false;
 
-    export let canvasProps;
+    const unsubscribe = carton_visible.subscribe(value => {
+       if (!value) {
+           next();
+       }
+    });
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
@@ -49,7 +44,6 @@
     let app, canvasWidth, canvasHeight;
     let container = new Container();
     let prof;
-
 
     let blurAnim = Animate(0, 0, Easing.easeInOutQuad, 0.01);
     let blurValue = 0;
@@ -192,7 +186,7 @@
                                 req_id = requestAnimationFrame(loop.bind({}, t + 1))
                             }
                         })(0);
-                        dispatch("next");
+                        dispatch("next", true);
                     })
                     .add(1000, () => {
                         audio_scene.destroy();
@@ -276,7 +270,7 @@
         audio_scene = await init_ideas_sound_scene();
         await audio_scene.start_audio();
         app.ticker.add(delta => gameLoop(delta));
-        is_ready = true;
+        carton_ready.setToTrue();
     }
 
     function gameLoop() {
@@ -293,7 +287,6 @@
     }
 
     function next() {
-        display_carton = false;
         audio_scene.play_course();
         Sequence()
             .add(13000, () => {
@@ -315,6 +308,7 @@
     }
 
     onDestroy(() => {
+        unsubscribe();
         app.destroy();
     });
 </script>
@@ -328,6 +322,5 @@
     }
 </style>
 
-<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="50" on:next="{next}"></Carton>
 <div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

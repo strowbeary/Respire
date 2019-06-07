@@ -2,7 +2,10 @@
     import TrailSwipe from "components/experiments/Idees/Idees.svelte";
     import anim_bg from "assets/images/animated_background.png";
     import AppWrapper from "components/AppWrapper.svelte";
+    import NewCarton from "components/NewCarton.svelte";
     import global_sound_scene from "./global.sound";
+    import {carton_index, scene_index, carton_visible, carton_ready} from "./stores";
+    import {onMount} from "svelte";
 
     import TitleScreen from "components/experiments/Intro/TitleScreen.svelte";
     import AudioTest from "components/experiments/Intro/AudioTest.svelte";
@@ -11,8 +14,8 @@
     import Idees from "components/experiments/Idees/Idees.svelte";
     import Pilule from "components/experiments/Pilule/Pilule.svelte";
     import Mort from "components/experiments/Mort/Mort.svelte";
-    import Message from 'components/experiments/Outro/Message.svelte';
-    import Credits from 'components/experiments/Outro/Credits.svelte';
+    import Message from "components/experiments/Outro/Message.svelte";
+    import Credits from "components/experiments/Outro/Credits.svelte";
 
     import bed_img from 'assets/images/cauchemar/bed.png';
     import glass_start_img from 'assets/images/cauchemar/glass_start.png';
@@ -22,10 +25,34 @@
     import door_img from 'assets/images/cauchemar/door_open.png';
 
     const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees, Pilule, Mort, Message, Credits];
-    let index = 0;
 
-    function next(){
-        index++;
+    let isCartonVisible = false;
+    carton_visible.subscribe(value => {
+    	 isCartonVisible = value;
+    });
+
+    let index = 0;
+    scene_index.subscribe(value => {
+       index = value;
+    });
+
+    function next(e){
+        if (e.detail) {
+            carton_visible.setToTrue();
+            carton_index.increment();
+        } else {
+            scene_index.increment();
+        }
+    }
+
+    function ready() {
+        if (isCartonVisible) {
+            carton_ready.setToTrue();
+        }
+    }
+
+    function nextScene() {
+        scene_index.increment();
     }
 </script>
 
@@ -57,6 +84,7 @@
 <AppWrapper let:canvasSize={canvasSize}>
     <img class="overlay" src={anim_bg} alt="animated background">
     {#if canvasSize.canvasWidth}
+        <NewCarton {canvasSize} on:nextScene="{nextScene}"></NewCarton>
         <svelte:component this={components[index]} on:next="{next}" {canvasSize} globalSoundScene={global_sound_scene}></svelte:component>
     {/if}
 </AppWrapper>

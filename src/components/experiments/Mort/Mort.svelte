@@ -3,10 +3,11 @@
     * MODULES
     * */
     import {fade} from 'svelte/transition';
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, onMount} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
     import Carton from 'components/Carton.svelte';
     import {Animate, Easing} from 'lib/TimingKit';
+    import {carton_visible, carton_ready} from "./../../../stores";
     /*
     * RESSOURCES
     * */
@@ -15,13 +16,18 @@
     import door_frame from "assets/images/mort/door_frame.png";
     export let canvasSize;
 
-    const carton_data ={
-        titleName: "Dernière ligne droite",
-        timeContext: "5 minutes avant l'examen",
-        spaceContext: "Couloir de la fac"
-    };
     let display_carton = true;
-    let is_ready = true;
+    const unsubscribe = carton_visible.subscribe((value) => {
+        if (!value) {
+            display_carton = false;
+            startAnimation();
+        }
+    });
+
+    onMount(() => {
+       carton_ready.setToTrue();
+    });
+
     let iconVisibility = true;
     let anim;
     let translateValue = 0;
@@ -338,10 +344,6 @@
     }
 </style>
 
-<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="10" on:next={() => {
-    display_carton = false;
-    startAnimation();
-}}></Carton>
 <div class="mort"
     out:fade
     class:mort-anim="{open_door && !display_carton}"
