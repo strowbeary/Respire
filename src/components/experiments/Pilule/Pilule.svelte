@@ -212,7 +212,7 @@
                       }
                   }
               });
-        dragIcon = DragIcon(containerPill, true, 0x000000);
+        dragIcon = DragIcon(containerPill, canvasScale, true, 0x000000);
         dragIcon.setDirection(1);
         dragIcon.setPosition(sprite.x, sprite.y);
     }
