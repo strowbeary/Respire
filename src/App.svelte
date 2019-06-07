@@ -21,7 +21,7 @@
     import jeans_img from 'assets/images/cauchemar/jeans.png';
     import door_img from 'assets/images/cauchemar/door_open.png';
 
-    const components = [TitleScreen, AudioTest, Cauchemar, Foule, Idees,  Pilule, Mort, Message, Credits];
+    const components = [TitleScreen,/* AudioTest, Cauchemar, Foule,*/ Idees,  Pilule, Mort, Message, Credits];
     let index = 0;
 
     function next(){
@@ -52,6 +52,8 @@
 	<link rel="preload" href="{glass_end_img}" as="image">
 	<link rel="preload" href="{jeans_img}" as="image">
 	<link rel="preload" href="{door_img}" as="image">
+	<link rel="preload" href="{anim_bg}" as="image">
+	<link rel="preload" href="{anim_bg}" as="image">
 </svelte:head>
 
 <img class="overlay" src={anim_bg} alt="animated background">

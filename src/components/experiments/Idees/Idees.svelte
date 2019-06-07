@@ -34,6 +34,7 @@
 
     let display_carton = true;
     let is_ready = false;
+    let is_interactions_enabled = false;
 
     export let canvasProps;
 
@@ -141,10 +142,10 @@
 
     const LEFT = -1;
     const RIGHT = 1;
-
+    let drag_icon_visible = true;
     function create_initial_idea(side, height) {
         const sprite = generateAnimatedSprite(imgAssets["idea_image"]);
-        sprite.interactive = true;
+        sprite.interactive = is_interactions_enabled;
         const line_event_bus = new EventTarget();
         const controller = Idea(
             {canvasWidth, canvasHeight},
@@ -165,8 +166,12 @@
         );
 
         setInteractive(sprite, controller);
-
         line_event_bus.addEventListener("death", e => {
+        if(drag_icon_visible) {
+            dragIcon.initIconAnim(0.7, 0);
+            dragIcon.startIconAnim();
+            drag_icon_visible = false;
+        }
         current_ratio += 1/30;
         audio_scene.set_prof_filter_ratio(current_ratio);
             blurValue -= 0.5;
@@ -237,7 +242,7 @@
             current_ratio -= 1/30;
             audio_scene.set_prof_filter_ratio(current_ratio);
             const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
-            new_sprite.interactive = true;
+            new_sprite.interactive = is_interactions_enabled;
             setInteractive(new_sprite, e.detail.new_child);
             Ideas.push({
                 controller: e.detail.new_child,
@@ -250,6 +255,11 @@
             sprite
         });
         container.addChild(sprite);
+        return Vector3(
+            controller.final_position.x,
+            controller.final_position.y,
+            0
+        );
     }
 
     async function setup() {
@@ -276,15 +286,29 @@
         });
         prof.filters[0].blur = blurValue;
 
+        dragIcon.loop();
+
     }
 
     function next() {
         display_carton = false;
         audio_scene.play_course();
         Sequence()
-            .add(13000, () => create_initial_idea(RIGHT, 200))
+            .add(13000, () => {
+                const pos = create_initial_idea(RIGHT, 200);
+                dragIcon.setDirection(RIGHT);
+                dragIcon.setPosition(...pos.to_array());
+                dragIcon.initIconAnim(0, 0.7);
+            })
             .add(2000, () => create_initial_idea(LEFT, 500))
             .add(3000, () => create_initial_idea(RIGHT, 800))
+            .add(2000, () => {
+                dragIcon.startIconAnim();
+                is_interactions_enabled = true;
+                Ideas.forEach(idea => {
+                    idea.sprite.interactive = true;
+                })
+            })
             .start();
     }
 
