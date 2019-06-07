@@ -1,27 +1,35 @@
 <script>
-    import {fly, fade} from 'svelte/transition';
+    import {fly, fade} from "svelte/transition";
     import {createEventDispatcher, onMount} from "svelte";
-    import placeholderVideo from 'assets/videos/placeholder.webm';
+    import respireLogo from "assets/videos/respire_logo.mp4";
+    import placeholderVideo from "assets/videos/placeholder.webm";
 
     const dispatch = createEventDispatcher();
 
     export let globalSoundScene;
     export let canvasSize;
     let innerHeight;
-    let videoVisibility = false;
+    let videoVisibility = true;
     let videoComponent;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
+    let link = placeholderVideo;
 
     function onVideoEnd() {
-        dispatch("next");
+        if (link !== respireLogo) {
+            videoVisibility = false;
+            link = respireLogo;
+            setTimeout(() => {
+                videoVisibility = true;
+                videoComponent.play();
+            }, 5000);
+        } else {
+            dispatch("next");
+        }
     }
 
     onMount(() => {
-        setTimeout(() => {
-            videoVisibility = true;
-            videoComponent.play();
-        }, 3000);
+        videoComponent.play();
     })
 </script>
 
@@ -100,8 +108,7 @@
         width="{canvasSize.canvasWidth}"
         height="{canvasSize.canvasHeight}"
         bind:this="{videoComponent}"
-        src={placeholderVideo}
+        src={link}
         on:ended={onVideoEnd}
-        muted="true"
     ></video>
 {/if}

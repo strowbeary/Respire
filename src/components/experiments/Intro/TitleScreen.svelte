@@ -3,6 +3,7 @@
     import global_sound_scene from "./../../../global.sound";
     import {createEventDispatcher} from "svelte";
     import lightBackground from "assets/images/light_background.png";
+    import glassLoop from "assets/images/cauchemar/glass_loop.png";
 
     const dispatch = createEventDispatcher();
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
@@ -64,6 +65,7 @@
             if (yEnd < yStart - parseFloat(getComputedStyle(title_scene).height)/10 &&
                 !yCumul.includes(false)) {
                 is_ready = false;
+
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
@@ -153,6 +155,10 @@
     .loopCircle {
         animation: wiggle 1.5s infinite ease-out;
     }
+
+    .glassSand {
+        position: absolute;
+    }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
@@ -177,5 +183,7 @@
             transition:fade>
             <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
         </div>
+    {:else}
+        <img transition:fade class="glassSand" src="{glassLoop}" alt="sand-glass">
     {/if}
 </div>
