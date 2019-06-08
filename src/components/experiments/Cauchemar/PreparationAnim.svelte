@@ -37,7 +37,7 @@
     }
     .door {
         /* duration | timing-function | delay | iteration-count | direction | fill-mode | play-state | name */
-        animation: 1000ms ease-in 2000ms 1 both talalalalala;
+        animation: 1500ms ease-in 2000ms 1 forwards talalalalala;
     }
 </style>
 

@@ -2,29 +2,20 @@
     /*
     * MODULES
     * */
-    import {onMount, afterUpdate} from 'svelte';
-    import {fade} from 'svelte/transition';
-    import {createEventDispatcher} from 'svelte';
-    import Carton from 'components/Carton.svelte';
-    import PreparationAnim from 'components/experiments/Cauchemar/PreparationAnim.svelte';
+    import {fade} from "svelte/transition";
+    import {createEventDispatcher, onDestroy} from "svelte";
+    import PreparationAnim from "components/experiments/Cauchemar/PreparationAnim.svelte";
     import {Animate, Easing, Planning, Sequence} from "lib/TimingKit";
+    import {carton_visible, carton_ready} from "./../../../stores";
     /*
     * RESSOURCES
     * */
-    import placeholderVideo from 'assets/videos/placeholder.webm';
+    import placeholderVideo from "assets/videos/placeholder.webm";
     import cadre from "assets/images/cauchemar/cadre.png";
     import lightBackground from "assets/images/light_background.png";
     import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
     export let canvasSize;
     export let global_sound_scene;
-
-    const carton_data ={
-        titleName: "Dans le brouillard",
-        timeContext: "24 heures avant l'examen",
-        spaceContext: "Chambre"
-    };
-    let display_carton = true;
-    let is_ready = false;
 
     let videoVisibility = true;
     let iconVisibility = true;
@@ -51,12 +42,14 @@
     init_cauchemar_sound_scene().then(a => {
         audio_scene = a;
         audio_scene.start_audio();
-        is_ready = true;
+        carton_ready.setToTrue();
     });
-    async function init() {
-          display_carton = false;
-          videoComponent.play();
-    }
+
+    const unsubscribe = carton_visible.subscribe(value => {
+       if (!value && videoComponent) {
+           videoComponent.play();
+       }
+    });
 
     function updateCirclePosition(e) {
         let x = 0;
@@ -115,7 +108,7 @@
                     .add(33945, () => current_preparation_anim = "glass_end")
                     .add(38209, () => current_preparation_anim = "")
                     .add(42602, () => current_preparation_anim = "door")
-                    .add(45000, () => {
+                    .add(45500, () => {
                         const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);
                         let req_id = null;
                          (function loop(t) {
@@ -127,10 +120,10 @@
                                 }
                             })(0);
                     })
-                    .add(46054, () => {
+                    .add(46500, () => {
                         current_preparation_anim = "";
                         audio_scene.destroy();
-                        dispatch("next");
+                        dispatch("next", true);
                     })
                     .start();
             } else {
@@ -156,9 +149,9 @@
         audio_scene.trigger_alarm_clock();
     }
 
-    function next() {
-        dispatch("next");
-    }
+    onDestroy(() => {
+        unsubscribe();
+    })
 </script>
 
 <style>
@@ -295,7 +288,6 @@
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="80" on:next={init}></Carton>
 {#if videoVisibility}
     <video
         out:fade

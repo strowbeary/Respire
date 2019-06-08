@@ -7,7 +7,7 @@
     import * as PIXI from "pixi.js";
     import {Animate, Easing, Sequence} from "lib/TimingKit";
     import {DragIcon} from "components/effects/dragIcon";
-    import Carton from "components/Carton.svelte";
+    import {carton_visible, carton_ready} from "./../../../stores";
 	/*
 	* RESSOURCES
 	* */
@@ -17,18 +17,12 @@
 	import backgroundImg from "assets/images/pilule/cours.png";
 	import lightBackground from "assets/images/light_background.png";
 	export let canvasSize;
-
-    const carton_data = {
-        titleName: "Noctambule",
-        timeContext: "7 heures avant l'examen",
-        spaceContext: "Chambre"
-    };
-
-    let display_carton = true;
-    let is_ready = false;
-
-    export let canvasProps;
     const dispatch = createEventDispatcher();
+    const unsubscribe = carton_visible.subscribe((value) => {
+        if (!value) {
+            launchClosedEye();
+        }
+    });
 
     let loader = PIXI.loader,
         resources = PIXI.loader.resources,
@@ -95,7 +89,7 @@
         initCloseEye();
 
         app.ticker.add(delta => gameLoop(delta));
-        is_ready = true;
+        carton_ready.setToTrue();
     }
 
     function initCloseEye() {
@@ -361,7 +355,7 @@
            if (success) {
                background.filters[0].blur = 0;
                setTimeout(() => {
-                   dispatch("next")
+                   dispatch("next", true)
                }, 2000);
            } else {
                launchScene();
@@ -418,6 +412,7 @@
     }
 
     onDestroy(() => {
+        unsubscribe();
         app.ticker.stop();
     });
 </script>
@@ -433,9 +428,5 @@
     }
 </style>
 
-<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="30" on:next={() => {
-    display_carton = false;
-    launchClosedEye();
-}}></Carton>
 <div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>
