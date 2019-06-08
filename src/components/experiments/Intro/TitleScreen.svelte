@@ -79,7 +79,6 @@
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
-                    document.body.requestFullscreen();
                     dispatch('next');
                 });
             } else {
@@ -173,14 +172,13 @@
         flex-direction: column;
         align-items: center;
     }
-
     .glassSand img {
         width: 50%;
     }
 
     .glassSand p {
         position: static;
-        margin-top: calc(30px * var(--scaleFactor));
+        margin-top: calc(15px * var(--scaleFactor));
         width: auto;
     }
 </style>
