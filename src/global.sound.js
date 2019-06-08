@@ -2,8 +2,7 @@ import {Scene, Sound, Vector3} from "lib/SoundKit";
 import nappe_sound_url from "assets/sounds/nappe.wav";
 import sable_sound_url from "assets/sounds/sand.wav";
 import audio_test_sound_url from "assets/sounds/test_sonore.wav";
-import {Animate, Easing, Sequence} from "lib/TimingKit";
-import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
+import {Animate, Easing} from "lib/TimingKit";
 
 export default (async () => {
     const global_scene = await Scene({
@@ -62,8 +61,6 @@ export default (async () => {
             sable_animation.start();
         },
         fade_in_nappe() {
-            sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.006);
-            sable_animation.start();
             nappe_animation = Animate(0, 2, Easing.easeInQuad, 0.006);
             nappe_animation.start();
         },

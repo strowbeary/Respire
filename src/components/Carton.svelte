@@ -5,6 +5,7 @@
     import {fly, fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
     import {carton_index, scene_index, carton_visible, carton_ready} from "./../stores";
+    import global_sound_scene from "../global.sound";
     /*
     * RESSOURCES
     * */
@@ -21,6 +22,14 @@
         index = value;
     });
 
+    let fade_out_sand = () => {};
+    let fade_in_sand = () => {};
+    global_sound_scene.then(scene => {
+        fade_out_sand = scene.fade_out_sable;
+        fade_in_sand = scene.fade_in_sable;
+    });
+
+
     let visible;
     let corpusVisible = true;
     carton_visible.subscribe(value => {
@@ -35,6 +44,9 @@
        ready = value;
        if (!corpusVisible) {
            corpusVisible = true;
+       }
+       if(ready) {
+           fade_in_sand();
        }
     });
 
@@ -128,8 +140,8 @@
 
             if (yEnd < yStart - canvasSize.canvasHeight/10 &&
                 !yCumul.includes(false)) {
-                //fade_out_sand();
                 carton_visible.setToFalse();
+                fade_out_sand();
             } else {
                 yStart = 0;
                 yEnd = 0;
@@ -149,6 +161,8 @@
             }
         }
     }
+
+
 </script>
 
 <style>
