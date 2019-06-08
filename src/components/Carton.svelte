@@ -25,7 +25,7 @@
     let corpusVisible = true;
     carton_visible.subscribe(value => {
         visible = value;
-        if (index === 1) {
+        if (index === 1 && visible) {
             corpusVisible = false;
         }
     });
