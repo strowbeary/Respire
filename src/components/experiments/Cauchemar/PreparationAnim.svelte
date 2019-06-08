@@ -32,12 +32,12 @@
         }
         100% {
             opacity: 0;
-            transform: scale(5);
+            transform: scale(6);
         }
     }
     .door {
         /* duration | timing-function | delay | iteration-count | direction | fill-mode | play-state | name */
-        animation: 1500ms ease-in 2000ms 1 forwards talalalalala;
+        animation: 1700ms ease-in 2000ms 1 forwards talalalalala;
     }
 </style>
 

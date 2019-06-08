@@ -99,7 +99,7 @@
                 iconVisibility = false;
                 audio_scene.play_preparation_sound();
                 Planning()
-                    .add(5702, () => current_preparation_anim = "bed")
+                    .add(3002, () => current_preparation_anim = "bed")
                     .add(11509, () => current_preparation_anim = "")
                     .add(12818, () => current_preparation_anim = "jeans")
                     .add(16776, () => current_preparation_anim = "")
@@ -109,7 +109,7 @@
                     .add(38209, () => current_preparation_anim = "")
                     .add(42602, () => current_preparation_anim = "door")
                     .add(45500, () => {
-                        const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.1);
+                        const volume_preparation_sound_anim = Animate(1, 0, Easing.linear, 0.2);
                         let req_id = null;
                          (function loop(t) {
                                 audio_scene.set_preparation_volume(volume_preparation_sound_anim.tick());
@@ -121,7 +121,6 @@
                             })(0);
                     })
                     .add(46500, () => {
-                        current_preparation_anim = "";
                         audio_scene.destroy();
                         dispatch("next", true);
                     })
