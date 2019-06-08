@@ -7,7 +7,6 @@
     import * as PIXI from "pixi.js";
     import {Animate, Easing, Sequence} from "lib/TimingKit";
     import {DragIcon} from "components/effects/dragIcon";
-    import Carton from "components/Carton.svelte";
     import {carton_visible, carton_ready} from "./../../../stores";
 	/*
 	* RESSOURCES

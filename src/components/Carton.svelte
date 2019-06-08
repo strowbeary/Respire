@@ -4,7 +4,7 @@
     * */
     import {fly, fade} from 'svelte/transition';
     import {createEventDispatcher} from 'svelte';
-
+    import {carton_index, scene_index, carton_visible, carton_ready} from "./../stores";
     /*
     * RESSOURCES
     * */
@@ -14,23 +14,75 @@
 
     const dispatch = createEventDispatcher();
 
-    export let timeContext;
-    export let titleName;
-    export let spaceContext;
-    export let ready;
-    export let visible;
-    export let sandLevel = 0;
     export let canvasSize;
+
+    let index;
+    carton_index.subscribe(value => {
+        index = value;
+    });
+
+    let visible;
+    let corpusVisible = true;
+    carton_visible.subscribe(value => {
+        visible = value;
+        if (index === 1) {
+            corpusVisible = false;
+        }
+    });
+
+    let ready;
+    carton_ready.subscribe(value => {
+       ready = value;
+       if (!corpusVisible) {
+           corpusVisible = true;
+       }
+    });
 
     let icon;
     let isPointerDown = false;
     let innerHeight;
     let carton;
 
+    const data = [
+        {
+            titleName: "Dans le brouillard",
+            timeContext: "24 heures avant l'examen",
+            spaceContext: "Chambre",
+            sandLevel: 80
+        },
+        {
+            titleName: "À contre-courant",
+            timeContext: "18 heures avant l'examen",
+            spaceContext: "Amphithéâtre",
+            sandLevel: 70
+        },
+        {
+            titleName: "Les idées noires",
+            timeContext: "17 heures avant l'examen",
+            spaceContext: "Amphithéâtre",
+            sandLevel: 50
+        },
+        {
+            titleName: "Noctambule",
+            timeContext: "7 heures avant l'examen",
+            spaceContext: "Chambre",
+            sandLevel: 30
+        },
+        {
+            titleName: "Dernière ligne droite",
+            timeContext: "5 minutes avant l'examen",
+            spaceContext: "Couloir de la fac",
+            sandLevel: 10
+        }
+    ];
+
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     $: sandVerticalImg = `url(${SandVertical})`;
+    $: titleName = index > -1? data[index]["titleName"] : null;
+    $: timeContext = index > -1? data[index]["timeContext"] : null;
+    $: spaceContext = index > -1? data[index]["spaceContext"] : null;
+    $: sandLevel = index > -1? data[index]["sandLevel"] : 100;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
-
 
     let yStart = 0;
     let yEnd = 0;
@@ -38,7 +90,7 @@
     let yLast;
 
     function onPointerDown(e) {
-        if (visible) {
+        if (ready) {
             if(e.touches) {
                 yStart = e.touches[0].clientY;
             } else {
@@ -79,12 +131,23 @@
             if (yEnd < yStart - canvasSize.canvasHeight/10 &&
                 !yCumul.includes(false)) {
                 //fade_out_sand();
-                dispatch("next");
+                carton_visible.setToFalse();
             } else {
                 yStart = 0;
                 yEnd = 0;
                 isPointerDown = false;
                 yCumul = [];
+            }
+        }
+    }
+
+    function nextScene(e) {
+        if (e.target === carton) {
+            if (visible && !ready) {
+                dispatch("nextScene");
+            } else if (!visible && ready) {
+                carton_ready.setToFalse();
+                isPointerDown = false;
             }
         }
     }
@@ -118,6 +181,9 @@
         z-index: 2;
         display: flex;
         justify-content: center;
+        transition: opacity 1s ease-in;
+        opacity: 0;
+        pointer-events: none;
     }
     .carton__text {
         height: 100%;
@@ -126,14 +192,6 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-    }
-    .carton__background {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-color: white;
-        background-size: cover;
-        z-index: 1;
     }
     .carton__titleName {
         font-size: calc(var(--scaleFactor) * 60px);
@@ -203,7 +261,7 @@
         overflow:hidden;
         z-index: 3;
         opacity: 0;
-        transition: opacity linear 5s;
+        transition: opacity linear 2s;
     }
     .sand--container.fadeIn {
         opacity: 1;
@@ -232,41 +290,45 @@
     .sand--vertical--top {
         top: -100%;
     }
+
+    .visible {
+        pointer-events: all;
+        opacity: 1;
+    }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-{#if visible}
-    <div out:fade>
-        <div class="carton"
-            in:fade
-            style="--scaleFactor:{scaleFactor};background-image: url({lightBackground})"
-            on:mousedown="{onPointerDown}"
-            on:touchstart|passive="{onPointerDown}"
-            on:mousemove="{onPointerMove}"
-            on:touchmove|passive="{onPointerMove}"
-            on:mouseup="{onPointerUp}"
-            on:touchend|passive="{onPointerUp}"
-            bind:this="{carton}">
-            <div class="carton__text">
-                <p class="carton__timeContext" in:fly="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
-                <h3 class="carton__titleName" in:fly="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
-                <p class="carton__spaceContext" in:fly="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
-            </div>
-            {#if ready}
-                <div class="icon"
-                     bind:this="{icon}"
-                     transition:fade>
-                     <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
-                </div>
-            {/if}
-            <div class="sand sand--container" class:fadeIn="{ready}">
-                <div class="sand--vertical sand--vertical--top" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-                <div class="sand--vertical" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-                <div class="sand--vertical sand--vertical--top sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-                <div class="sand--vertical sand--vertical--right" class:falling={ready} style="--sandVerticalImg:{sandVerticalImg}"></div>
-            </div>
-            <img in:fade src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
+<div class="carton"
+    class:visible="{visible}"
+    style="--scaleFactor:{scaleFactor};background-image: url({lightBackground});--sandVerticalImg:{sandVerticalImg}"
+    on:transitionend="{nextScene}"
+    on:mousedown="{onPointerDown}"
+    on:touchstart|passive="{onPointerDown}"
+    on:mousemove="{onPointerMove}"
+    on:touchmove|passive="{onPointerMove}"
+    on:mouseup="{onPointerUp}"
+    on:touchend|passive="{onPointerUp}"
+    bind:this="{carton}">
+    {#if corpusVisible}
+        <div class="carton__text">
+            <p class="carton__timeContext" in:fly|local="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
+            <h3 class="carton__titleName" in:fly|local="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
+            <p class="carton__spaceContext" in:fly|local="{{ y: 20, duration: 1500, delay: 1300 }}">{spaceContext}</p>
         </div>
-        <div class="carton__background" style="background-image: url({lightBackground})"></div>
+    {/if}
+    {#if ready && !isPointerDown}
+        <div class="icon"
+             bind:this="{icon}">
+             <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
+        </div>
+    {/if}
+    <div class="sand sand--container" class:fadeIn="{ready}">
+        <div class="sand--vertical sand--vertical--top falling"></div>
+        <div class="sand--vertical falling"></div>
+        <div class="sand--vertical sand--vertical--top sand--vertical--right falling"></div>
+        <div class="sand--vertical sand--vertical--right falling"></div>
     </div>
-{/if}
+    {#if corpusVisible}
+        <img src="{SandHorizontal}" in:fade|local alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
+    {/if}
+</div>

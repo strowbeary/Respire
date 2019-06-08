@@ -5,7 +5,6 @@
     import {fade} from 'svelte/transition';
     import {createEventDispatcher, onMount} from 'svelte';
     import AppWrapper from 'components/AppWrapper.svelte';
-    import Carton from 'components/Carton.svelte';
     import {Animate, Easing} from 'lib/TimingKit';
     import {carton_visible, carton_ready} from "./../../../stores";
     /*

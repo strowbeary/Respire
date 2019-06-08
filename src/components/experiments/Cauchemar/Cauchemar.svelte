@@ -4,7 +4,6 @@
     * */
     import {fade} from "svelte/transition";
     import {createEventDispatcher, onDestroy} from "svelte";
-    import Carton from "components/Carton.svelte";
     import PreparationAnim from "components/experiments/Cauchemar/PreparationAnim.svelte";
     import {Animate, Easing, Planning, Sequence} from "lib/TimingKit";
     import {carton_visible, carton_ready} from "./../../../stores";

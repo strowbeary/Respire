@@ -2,10 +2,9 @@
     import TrailSwipe from "components/experiments/Idees/Idees.svelte";
     import anim_bg from "assets/images/animated_background.png";
     import AppWrapper from "components/AppWrapper.svelte";
-    import NewCarton from "components/NewCarton.svelte";
+    import Carton from "components/Carton.svelte";
     import global_sound_scene from "./global.sound";
     import {carton_index, scene_index, carton_visible, carton_ready} from "./stores";
-    import {onMount} from "svelte";
 
     import TitleScreen from "components/experiments/Intro/TitleScreen.svelte";
     import AudioTest from "components/experiments/Intro/AudioTest.svelte";
@@ -75,13 +74,12 @@
 	<link rel="preload" href="{jeans_img}" as="image">
 	<link rel="preload" href="{door_img}" as="image">
 	<link rel="preload" href="{anim_bg}" as="image">
-	<link rel="preload" href="{anim_bg}" as="image">
 </svelte:head>
 
 <AppWrapper let:canvasSize={canvasSize}>
     <img class="overlay" src={anim_bg} alt="animated background">
     {#if canvasSize.canvasWidth}
-        <NewCarton {canvasSize} on:nextScene="{nextScene}"></NewCarton>
+        <Carton {canvasSize} on:nextScene="{nextScene}"></Carton>
         <svelte:component this={components[index]} on:next="{next}" {canvasSize} globalSoundScene={global_sound_scene}></svelte:component>
     {/if}
 </AppWrapper>
