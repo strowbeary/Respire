@@ -38,8 +38,8 @@
 
     function next(e){
         if (e.detail) {
-            carton_visible.setToTrue();
             carton_index.increment();
+            carton_visible.setToTrue();
         } else {
             scene_index.increment();
         }
@@ -59,10 +59,7 @@
 <style>
 .overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
     mix-blend-mode: difference;
     pointer-events: none;
     z-index: 10000;

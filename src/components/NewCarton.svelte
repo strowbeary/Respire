@@ -22,13 +22,20 @@
     });
 
     let visible;
+    let corpusVisible = true;
     carton_visible.subscribe(value => {
-       visible = value;
+        visible = value;
+        if (index === 1) {
+            corpusVisible = false;
+        }
     });
 
     let ready;
     carton_ready.subscribe(value => {
        ready = value;
+       if (!corpusVisible) {
+           corpusVisible = true;
+       }
     });
 
     let icon;
@@ -302,7 +309,7 @@
     on:mouseup="{onPointerUp}"
     on:touchend|passive="{onPointerUp}"
     bind:this="{carton}">
-    {#if visible}
+    {#if corpusVisible}
         <div class="carton__text">
             <p class="carton__timeContext" in:fly|local="{{ y: 20, duration: 1500, delay: 500 }}">{timeContext}</p>
             <h3 class="carton__titleName" in:fly|local="{{ y: 20, duration: 1500, delay: 900 }}">{titleName}</h3>
@@ -311,8 +318,7 @@
     {/if}
     {#if ready && !isPointerDown}
         <div class="icon"
-             bind:this="{icon}"
-             transition:fade>
+             bind:this="{icon}">
              <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
         </div>
     {/if}
@@ -322,5 +328,7 @@
         <div class="sand--vertical sand--vertical--top sand--vertical--right falling"></div>
         <div class="sand--vertical sand--vertical--right falling"></div>
     </div>
-    <img src="{SandHorizontal}" alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
+    {#if corpusVisible}
+        <img src="{SandHorizontal}" in:fade|local alt="sand" class="sand sand--horizontal" style="--sandHorizontalLevel:{sandHorizontalLevel}"/>
+    {/if}
 </div>
