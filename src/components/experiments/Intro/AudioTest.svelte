@@ -40,7 +40,7 @@
                     })
                     .add(5000, () => {
                         right = false;
-                        dispatch("next");
+                        dispatch("next", true);
                     })
                     .start();
         });

@@ -21,18 +21,6 @@
     let yLast;
     let isPointerDown = false;
 
-    async function openFullscreen(e) {
-      if (e.requestFullscreen) {
-        await e.requestFullscreen();
-      } else if (e.mozRequestFullScreen) { /* Firefox */
-        await e.mozRequestFullScreen();
-      } else if (e.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-        await e.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        await e.msRequestFullscreen();
-      }
-    }
-
     function onPointerDown(e) {
         if(is_ready) {
              if (e.touches) {
@@ -79,8 +67,7 @@
                 globalSoundScene.then(async scene => {
                     await scene.start();
                     scene.fade_in_nappe();
-                    document.body.requestFullscreen();
-                    dispatch('next');
+                    dispatch('next', false);
                 });
             } else {
                 yStart = 0;

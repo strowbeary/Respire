@@ -8,7 +8,7 @@
     import {Animate, Easing} from "lib/TimingKit";
 	import {init_foule_sound_scene} from "components/experiments/Foule/Foule.sound";
     import {DragIcon} from "components/effects/dragIcon";
-    import Carton from "components/Carton.svelte";
+    import {carton_visible, carton_ready} from "./../../../stores";
 	/*
 	* RESSOURCES
 	* */
@@ -26,18 +26,14 @@
     import Xindi from "assets/images/foule/Xindi.png";
 
     const dispatch = createEventDispatcher();
-
-    const carton_data ={
-        titleName: "À contre-courant",
-        timeContext: "18 heures avant l'examen",
-        spaceContext: "Amphithéâtre"
-    };
-
-    let display_carton = true;
-    let is_ready = false;
     export let canvasSize;
 
-    export let canvasProps;
+    const unsubscribe = carton_visible.subscribe(value => {
+       if (!value) {
+           start_audio();
+       }
+    });
+
     let set_z_position = () => {};
     let play_interaction_sound = () => {};
     let start_audio = () => {};
@@ -319,7 +315,7 @@
             container.addChild(sprite);
         });
         app.ticker.add(delta => gameLoop(delta));
-        is_ready = true;
+        carton_ready.setToTrue();
     }
 
     function gameLoop() {
@@ -333,7 +329,7 @@
 
                 if (ending) {
                     sound_scene.destroy();
-                    dispatch("next");
+                    dispatch("next", true);
                 } else {
                     setInteractive();
                 }
@@ -357,18 +353,10 @@
         })
     }
 
-    function next() {
-        display_carton = false;
-        start_audio();
-    }
-
     onDestroy(() => {
+        unsubscribe();
         app.destroy();
     });
 </script>
 
-<Carton {...carton_data} {canvasSize} visible={display_carton} ready={is_ready} sandLevel="70" on:next={() => {
-    display_carton = false;
-    start_audio()
-}}></Carton>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>
