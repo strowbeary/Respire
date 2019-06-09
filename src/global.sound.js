@@ -110,6 +110,16 @@ export default (async () => {
             wind_animation.start();
             harp_animation.start();
         },
+        fade_out_nappe() {
+            hum_animation = Animate(3, 0, Easing.easeInQuad, 0.006);
+            earthquake_animation = Animate(0.8, 0, Easing.linear, 0.006);
+            wind_animation = Animate(0.2, 0, Easing.linear, 0.006);
+            harp_animation = Animate(0.2, 0, Easing.linear, 0.006);
+            hum_animation.start();
+            earthquake_animation.start();
+            wind_animation.start();
+            harp_animation.start();
+        },
         get audio_test_sound() {
             return audio_test_sound;
         }

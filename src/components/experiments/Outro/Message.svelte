@@ -3,6 +3,7 @@
     import {createEventDispatcher, onMount} from "svelte";
     import respireLogo from "assets/videos/respire_logo.mp4";
     import placeholderVideo from "assets/videos/placeholder.webm";
+    import global_sound_scene from "../../../global.sound";
 
     const dispatch = createEventDispatcher();
 
@@ -14,6 +15,10 @@
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
     let link = placeholderVideo;
+    let fade_out_nappe = () => {};
+    global_sound_scene.then(scene => {
+            fade_out_nappe = scene.fade_out_nappe;
+        });
 
     function onVideoEnd() {
         if (link !== respireLogo) {
@@ -22,6 +27,7 @@
             setTimeout(() => {
                 videoVisibility = true;
                 videoComponent.play();
+                fade_out_nappe();
             }, 5000);
         } else {
             dispatch("next");
