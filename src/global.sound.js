@@ -5,7 +5,7 @@ import harp_sound_url from "assets/sounds/global/harp.flac";
 import wind_sound_url from "assets/sounds/global/wind.flac";
 import sable_sound_url from "assets/sounds/global/sand.flac";
 import audio_test_sound_url from "assets/sounds/test_sonore.wav";
-import {Animate, Easing} from "lib/TimingKit";
+import {Animate, Easing, Keyframes} from "lib/TimingKit";
 
 export default (async () => {
     const global_scene = await Scene({
@@ -94,15 +94,28 @@ export default (async () => {
             return await init_scene.play();
         },
         fade_out_sable() {
-            sable_animation = Animate(0.7, 0, Easing.easeInQuad, 0.05);
+            sable_animation = Animate(1, 0, Easing.easeInQuad, 0.05);
             sable_animation.start();
         },
         fade_in_sable() {
-            sable_animation = Animate(0, 0.7, Easing.easeInQuad, 0.05);
+            sable_animation = Animate(0, 1, Easing.easeInQuad, 0.05);
             sable_animation.start();
         },
         fade_in_nappe() {
-            hum_animation = Animate(0, 3, Easing.easeInQuad, 0.006);
+            hum_animation = Animate(0, 3, Keyframes([
+                {
+                    t: 0,
+                    value: 0
+                },
+                {
+                    t: 0.003,
+                    value: 0.17
+                },
+                {
+                    t: 1,
+                    value: 1
+                }
+            ], Easing.linear), 0.0001);
             earthquake_animation = Animate(0, 0.8, Easing.linear, 0.0001);
             wind_animation = Animate(0, 0.2, Easing.linear, 0.0001);
             harp_animation = Animate(0, 0.2, Easing.linear, 0.0001);
@@ -113,9 +126,10 @@ export default (async () => {
         },
         fade_out_nappe() {
             hum_animation = Animate(3, 0, Easing.easeInQuad, 0.006);
-            earthquake_animation = Animate(0.8, 0, Easing.linear, 0.006);
-            wind_animation = Animate(0.2, 0, Easing.linear, 0.006);
-            harp_animation = Animate(0.2, 0, Easing.linear, 0.006);
+            earthquake_animation = Animate(0.8, 0, Easing.easeInQuad, 0.006);
+            wind_animation = Animate(0.2, 0, Easing.easeInQuad, 0.006);
+            harp_animation = Animate(0.2, 0, Easing.easeInQuad, 0.006);
+
             hum_animation.start();
             earthquake_animation.start();
             wind_animation.start();
