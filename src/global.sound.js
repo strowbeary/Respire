@@ -129,6 +129,7 @@ export default (async () => {
             earthquake_animation = Animate(0.8, 0, Easing.easeInQuad, 0.006);
             wind_animation = Animate(0.2, 0, Easing.easeInQuad, 0.006);
             harp_animation = Animate(0.2, 0, Easing.easeInQuad, 0.006);
+
             hum_animation.start();
             earthquake_animation.start();
             wind_animation.start();
