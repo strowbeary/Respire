@@ -1,9 +1,9 @@
-import crowd_global_sound_url from "assets/sounds/Foule/crowd_global01.wav";
-import crowd_left_sound_url from "assets/sounds/Foule/crowd_left_1.wav";
-import crowd_right_sound_url from "assets/sounds/Foule/crowd_right_1.wav";
-import excuse_sound_url from "assets/sounds/Foule/excusez_moi.wav";
-import pardon_sound_url from "assets/sounds/Foule/Pardon.wav";
-import ouch_sound_url from "assets/sounds/Foule/Ouch.wav";
+import crowd_global_sound_url from "assets/sounds/Foule/crowd_global01.flac";
+import crowd_left_sound_url from "assets/sounds/Foule/crowd_left_1.flac";
+import crowd_right_sound_url from "assets/sounds/Foule/crowd_right_1.flac";
+import excuse_sound_url from "assets/sounds/Foule/excusez_moi.flac";
+import pardon_sound_url from "assets/sounds/Foule/Pardon.flac";
+import ouch_sound_url from "assets/sounds/Foule/Ouch.flac";
 import { Scene, Sound, Vector3 } from "lib/SoundKit";
 
 export async function init_foule_sound_scene() {

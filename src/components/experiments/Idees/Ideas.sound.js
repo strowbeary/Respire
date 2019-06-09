@@ -1,11 +1,11 @@
 import { Scene, Sound, Vector3 } from "lib/SoundKit";
-import whisper_01_sound_url from "assets/sounds/Ideas/whipser_01.wav";
-import whisper_02_sound_url from "assets/sounds/Ideas/whipser_02.wav";
-import whisper_03_sound_url from "assets/sounds/Ideas/whipser_03.wav";
-import whisper_04_sound_url from "assets/sounds/Ideas/whipser_04.wav";
-import whisper_05_sound_url from "assets/sounds/Ideas/whipser_05.wav";
-import whisper_06_sound_url from "assets/sounds/Ideas/whipser_06.wav";
-import whisper_07_sound_url from "assets/sounds/Ideas/whipser_07.wav";
+import whisper_01_sound_url from "assets/sounds/Ideas/whipser_01.flac";
+import whisper_02_sound_url from "assets/sounds/Ideas/whipser_02.flac";
+import whisper_03_sound_url from "assets/sounds/Ideas/whipser_03.flac";
+import whisper_04_sound_url from "assets/sounds/Ideas/whipser_04.flac";
+import whisper_05_sound_url from "assets/sounds/Ideas/whipser_05.flac";
+import whisper_06_sound_url from "assets/sounds/Ideas/whipser_06.flac";
+import whisper_07_sound_url from "assets/sounds/Ideas/whipser_07.flac";
 import cours_litterature_sound_url from "assets/sounds/Ideas/cours_litterature.flac";
 import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
 import {Easing, Keyframes} from "lib/TimingKit";
