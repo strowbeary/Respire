@@ -48,17 +48,18 @@ export default (async () => {
     );
 
     const init_scene = await global_scene.init();
+
     const hum_sound = init_scene.get_children_by_name("hum");
     const earthquake_sound = init_scene.get_children_by_name("earthquake");
     const wind_sound = init_scene.get_children_by_name("wind");
     const harp_sound = init_scene.get_children_by_name("harp");
     const sable_sound = init_scene.get_children_by_name("sable");
     const audio_test_sound = init_scene.get_children_by_name("audio_test");
+
     hum_sound.play();
     earthquake_sound.play();
     wind_sound.play();
     harp_sound.play();
-
     sable_sound.play();
 
     let req_id = null;
@@ -67,7 +68,9 @@ export default (async () => {
     let wind_animation = Animate(0, 0, t => t, 0.01);
     let harp_animation = Animate(0, 0, t => t, 0.01);
     let sable_animation = Animate(0, 0, t => t, 0.01);
+
     hum_animation.start();
+
     (function loop(t) {
         if(sable_animation.is_running) {
             let volume_sable = sable_animation.tick();
@@ -84,7 +87,6 @@ export default (async () => {
         }
         if(harp_animation.is_running) {
             harp_sound.set_volume(harp_animation.tick());
-
         }
         req_id = requestAnimationFrame(loop.bind({}, t + 1))
     })(0);
@@ -116,7 +118,7 @@ export default (async () => {
                     value: 1
                 }
             ], Easing.linear), 0.0001);
-            earthquake_animation = Animate(0, 0.8, Easing.linear, 0.0001);
+            earthquake_animation = Animate(0, 0.8, Easing.linear, 0.0002);
             wind_animation = Animate(0, 0.2, Easing.linear, 0.0001);
             harp_animation = Animate(0, 0.2, Easing.linear, 0.0001);
             hum_animation.start();
@@ -134,7 +136,6 @@ export default (async () => {
             earthquake_animation.start();
             wind_animation.start();
             harp_animation.start();
-
         },
         get audio_test_sound() {
             return audio_test_sound;
