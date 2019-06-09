@@ -16,11 +16,16 @@
 	import Ticket from "assets/images/pilule/Ticket.png";
 	import backgroundImg from "assets/images/pilule/cours.png";
 	import lightBackground from "assets/images/light_background.png";
+
+    import {init_pillule_sound_scene} from "components/experiments/Pilule/Pillule.sound";
 	export let canvasSize;
     const dispatch = createEventDispatcher();
+    let audio_scene;
+
     const unsubscribe = carton_visible.subscribe((value) => {
         if (!value) {
             launchClosedEye();
+            audio_scene.start_audio();
         }
     });
 
@@ -58,7 +63,6 @@
         canvasScale = canvasHeight/824;
         app.stage.addChild(containerEye);
         app.stage.addChild(containerPill);
-
         loadImages();
     }
 
@@ -70,7 +74,7 @@
        setUpEye();
     }
 
-    function setUpEye() {
+    async function setUpEye() {
         let backgroundColor = new Sprite(Texture.WHITE);
         backgroundColor.tint = 0x000000;
         backgroundColor.height = canvasHeight;
@@ -87,6 +91,8 @@
         containerEye.y = canvasHeight / 2;
 
         initCloseEye();
+
+        audio_scene = await init_pillule_sound_scene();
 
         app.ticker.add(delta => gameLoop(delta));
         carton_ready.setToTrue();
@@ -202,6 +208,8 @@
                           this.data = null;
                           this.interactive = false;
                           success = true;
+                          audio_scene.stop_pills_shake();
+                          audio_scene.fade_in_writing();
                           launchScene();
                       }
                   }
@@ -355,7 +363,8 @@
            if (success) {
                background.filters[0].blur = 0;
                setTimeout(() => {
-                   dispatch("next", true)
+                   dispatch("next", true);
+                   audio_scene.destroy();
                }, 2000);
            } else {
                launchScene();
@@ -369,6 +378,7 @@
                 scaleAnim.start();
                 heightAnim.start();
                 blurAnim.start();
+                audio_scene.fade_out_writing();
             })
             .start();
     }
@@ -399,6 +409,7 @@
                    containerEye.cacheAsBitmap = false;
                    launchBlurAnim();
                } else {
+                   audio_scene.start_pills_shake();
                    currentScene = "pill";
                    containerPill.cacheAsBitmap = false;
                    dragIcon.initIconAnim(0, 0.7);
