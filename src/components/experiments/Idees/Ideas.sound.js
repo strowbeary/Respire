@@ -125,6 +125,6 @@ export async function init_ideas_sound_scene() {
         },
         set_prof_volume(v) {
             course_sound.set_volume(v);
-        }
+        },
     }
 }

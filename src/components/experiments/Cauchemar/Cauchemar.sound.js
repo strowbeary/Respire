@@ -42,7 +42,7 @@ export async function init_cauchemar_sound_scene() {
         },
         set_preparation_volume(volume) {
             preparation_sound.set_volume(volume);
-        }
+        },
     }
 
 }
