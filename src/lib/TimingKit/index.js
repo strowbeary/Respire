@@ -71,7 +71,7 @@ export function Animate(from_value, to_value, easing_function, step) {
                 if (increment <= 1) {
                     const progress = easing_function(increment);
                     const new_value = (1 - progress) * from_value + progress * to_value;
-                    increment = Math.round((increment + step) * 1000) / 1000;
+                    increment = Math.round((increment + step) * 1000000) / 1000000;
                     last_value = new_value;
                     return new_value;
                 } else {
