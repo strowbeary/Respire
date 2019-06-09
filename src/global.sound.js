@@ -84,6 +84,7 @@ export default (async () => {
         }
         if(harp_animation.is_running) {
             harp_sound.set_volume(harp_animation.tick());
+
         }
         req_id = requestAnimationFrame(loop.bind({}, t + 1))
     })(0);
@@ -132,6 +133,7 @@ export default (async () => {
             earthquake_animation.start();
             wind_animation.start();
             harp_animation.start();
+
         },
         get audio_test_sound() {
             return audio_test_sound;
