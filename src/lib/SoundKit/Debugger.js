@@ -126,7 +126,7 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
     const children_folder = inspector.addFolder("Children");
     children.forEach(c => {
         const child_folder = children_folder.addFolder(`${c.name} ${c.options.spacialized ? '(Spacialized)' : ''}`);
-        const volume = child_folder.add(c.options, 'volume', 0, 1, 0.01);
+        const volume = child_folder.add(c.options, 'volume', 0, 1, 0.01).listen();
         volume.onChange(v => {
             c.set_volume(v);
         });
@@ -151,6 +151,7 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
         }
     });
 
+    gui.open();
     (function loop(t) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let non_spacialized_debbuger_id = 0;
