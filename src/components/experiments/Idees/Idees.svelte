@@ -139,6 +139,10 @@
     const RIGHT = 1;
     let drag_icon_visible = true;
     function create_initial_idea(side, height) {
+        const all_dismissed = () => Ideas.reduce((a, {controller}) => {
+            console.log(a);
+            return controller.values.dismissed && a
+        });
         const sprite = generateAnimatedSprite(imgAssets["idea_image"]);
         sprite.interactive = is_interactions_enabled;
         const line_event_bus = new EventTarget();
@@ -168,26 +172,25 @@
             drag_icon_visible = false;
         }
         current_ratio += 1/30;
+
         audio_scene.set_prof_filter_ratio(current_ratio);
             blurValue -= 0.5;
-            const all_dismissed = () => Ideas.reduce((a, {controller}) => controller.values.dismissed && a);
+
             if(all_dismissed()) {
                 Sequence()
                     .add(2000, () => {
-                        if(all_dismissed()) {
-                            const volume_prof_sound_anim = Animate(1, 0, Easing.linear, 0.07);
-                            volume_prof_sound_anim.start();
-                            let req_id = null;
-                            (function loop(t) {
-                                audio_scene.set_prof_volume(volume_prof_sound_anim.tick());
-                                if(volume_prof_sound_anim.is_ended_signal) {
-                                    cancelAnimationFrame(req_id);
-                                } else {
-                                    req_id = requestAnimationFrame(loop.bind({}, t + 1))
-                                }
-                            })(0);
-                            dispatch("next", true);
-                        }
+                        const volume_prof_sound_anim = Animate(1, 0, Easing.linear, 0.07);
+                        volume_prof_sound_anim.start();
+                        let req_id = null;
+                        (function loop(t) {
+                            audio_scene.set_prof_volume(volume_prof_sound_anim.tick());
+                            if(volume_prof_sound_anim.is_ended_signal) {
+                                cancelAnimationFrame(req_id);
+                            } else {
+                                req_id = requestAnimationFrame(loop.bind({}, t + 1))
+                            }
+                        })(0);
+                        dispatch("next", true);
                     })
                     .add(1000, () => {
                         audio_scene.destroy();
@@ -218,34 +221,35 @@
             canvasHeight
         )));
         line_event_bus.addEventListener("divide", e => {
+            if(!all_dismissed()) {
+                audio_scene.play_a_whisper(Vector3(
+                    e.detail.new_child.final_position.x,
+                    0,
+                    e.detail.new_child.final_position.y
+                )
+                .sub(Vector3(
+                    canvasWidth / 2,
+                    0,
+                    canvasHeight / 2
+                ))
+                .divide(Vector3(
+                    canvasWidth,
+                    1,
+                    canvasHeight
+                )));
 
-            audio_scene.play_a_whisper(Vector3(
-                e.detail.new_child.final_position.x,
-                0,
-                e.detail.new_child.final_position.y
-            )
-            .sub(Vector3(
-                canvasWidth / 2,
-                0,
-                canvasHeight / 2
-            ))
-            .divide(Vector3(
-                canvasWidth,
-                1,
-                canvasHeight
-            )));
-
-            blurValue += 0.5;
-            current_ratio -= 1/30;
-            audio_scene.set_prof_filter_ratio(current_ratio);
-            const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
-            new_sprite.interactive = is_interactions_enabled;
-            setInteractive(new_sprite, e.detail.new_child);
-            Ideas.push({
-                controller: e.detail.new_child,
-                sprite: new_sprite
-            });
-            container.addChild(new_sprite);
+                blurValue += 0.5;
+                current_ratio -= 1/30;
+                audio_scene.set_prof_filter_ratio(current_ratio);
+                const new_sprite = generateAnimatedSprite(imgAssets["idea_image"]);
+                new_sprite.interactive = is_interactions_enabled;
+                setInteractive(new_sprite, e.detail.new_child);
+                Ideas.push({
+                    controller: e.detail.new_child,
+                    sprite: new_sprite
+                });
+                container.addChild(new_sprite);
+            }
         });
         Ideas.push({
             controller,
