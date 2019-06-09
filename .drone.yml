@@ -1,5 +1,5 @@
 kind: pipeline
-name: production
+name: default
 
 steps:
     - name: Build website
