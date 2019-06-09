@@ -100,9 +100,17 @@
     let yEnd = 0;
     let yCumul = [];
     let yLast;
+    let canDetectPointer = false;
+
+    let sand;
+    function onSandFall(e) {
+        if (e.target === sand) {
+            canDetectPointer = true;
+        }
+    }
 
     function onPointerDown(e) {
-        if (ready) {
+        if (canDetectPointer) {
             if(e.touches) {
                 yStart = e.touches[0].clientY;
             } else {
@@ -158,6 +166,7 @@
             } else if (!visible && ready) {
                 carton_ready.setToFalse();
                 isPointerDown = false;
+                canDetectPointer = false;
             }
         }
     }
@@ -334,7 +343,7 @@
              <span class="icon__circle" class:loopCircle="{!isPointerDown}"></span>
         </div>
     {/if}
-    <div class="sand sand--container" class:fadeIn="{ready}">
+    <div class="sand sand--container" class:fadeIn="{ready}" on:transitionend="{onSandFall}" bind:this="{sand}">
         <div class="sand--vertical sand--vertical--top falling"></div>
         <div class="sand--vertical falling"></div>
         <div class="sand--vertical sand--vertical--top sand--vertical--right falling"></div>
