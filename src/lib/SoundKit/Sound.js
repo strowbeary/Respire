@@ -165,16 +165,12 @@ export function sound_debugger(ctx, canvas, options, name, non_spacialized_debbu
         ctx.fill();
         ctx.closePath();
     } else {
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-        ctx.ellipse(sound_position.x, sound_position.z, 20, 20, 0, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.closePath();
+        let local_sound_position = Vector3(-20,0,15);
         ctx.beginPath();
         ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.font = "14px 'Fira Sans'";
         ctx.textAlign = "left";
-        ctx.fillText("- " + name, sound_position.x + 25, sound_position.z + 5 + (non_spacialized_debbuger_id * 15));
+        ctx.fillText("- " + name, local_sound_position.x + 25, local_sound_position.z + 5 + (non_spacialized_debbuger_id * 15));
         ctx.fill();
         ctx.closePath();
     }
