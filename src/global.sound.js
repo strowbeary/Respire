@@ -9,7 +9,7 @@ import {Animate, Easing, Keyframes} from "lib/TimingKit";
 
 export default (async () => {
     const global_scene = await Scene({
-        debug: true
+        debug: false
     });
     global_scene.add(
         Sound("hum", {
