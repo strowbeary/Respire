@@ -38,7 +38,7 @@ steps:
     - name: Discord notification
       image: appleboy/drone-discord
       webhook_id: "587664375846797314"
-      webhook_token: "Zc04aQE4dGBxOQcN62fma7X7uwKwV5kacpct_jGo3Uifx7lQCmwARb37HsPv-hgGFeB6:"
+      webhook_token: "Zc04aQE4dGBxOQcN62fma7X7uwKwV5kacpct_jGo3Uifx7lQCmwARb37HsPv-hgGFeB6"
       message: "test"
 
 volumes:
