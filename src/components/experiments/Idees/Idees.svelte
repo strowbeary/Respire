@@ -339,9 +339,11 @@
         position: absolute;
         background-size: cover;
         background-color: white;
+        width: 100%;
+        height: 100%;
         z-index: -1;
     }
 </style>
 
-<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<div class="background" style="background-image: url({lightBackground})"></div>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

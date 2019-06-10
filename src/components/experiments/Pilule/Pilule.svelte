@@ -440,5 +440,5 @@
     }
 </style>
 
-<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<div class="background" style="background-image: url({lightBackground});"></div>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>
