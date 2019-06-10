@@ -40,7 +40,6 @@ let debugger_number = 0;
 export function sk_debugger(audio_context, listener, children, scene_volume) {
     const sk_id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
     const debbuger_index = debugger_number.valueOf();
-    console.log(sk_id, debbuger_index);
     document.body.appendChild(html`
         <style>
             ${() => {
@@ -97,6 +96,9 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
             <div class="inspector"></div>
         </div>
     `);
+
+
+
 
 
     debugger_number++;
@@ -167,8 +169,9 @@ export function sk_debugger(audio_context, listener, children, scene_volume) {
         raf = requestAnimationFrame(loop.bind({}, t + 1));
     })(0);
     return {
-        destroy() {
+        destroy_debugger() {
             cancelAnimationFrame(raf);
+            document.getElementById('sk_helper_' + sk_id).remove();
         }
     }
 

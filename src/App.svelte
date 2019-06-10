@@ -23,7 +23,7 @@
     import jeans_img from 'assets/images/cauchemar/jeans.png';
     import door_img from 'assets/images/cauchemar/door_open.png';
 
-    const components = [TitleScreen, AudioTest, /*Cauchemar, Foule, Idees, */Pilule, Mort, Message, Credits];
+    const components = [TitleScreen, AudioTest, /*Cauchemar, Foule,*/ Idees,Pilule, Mort, Message, Credits];
 
     let isCartonVisible = false;
     carton_visible.subscribe(value => {

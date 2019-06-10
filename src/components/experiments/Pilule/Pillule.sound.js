@@ -1,4 +1,4 @@
-import { Scene, Sound, Vector3 } from "lib/SoundKit";
+import { Scene, Sound } from "lib/SoundKit";
 import loop_sound_url from "assets/sounds/Pillules/Boucle.flac";
 import pop_sound_url from "assets/sounds/Pillules/pop.flac";
 import writing_sound_url from "assets/sounds/Pillules/writing.flac";

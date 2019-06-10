@@ -93,6 +93,18 @@ export function Idea ({canvasWidth, canvasHeight}, parent) {
     for(let i = values.allowed_self_division; i > 0; i--) {
         reproduction_seq.add(4000 + Math.random() * 4000, () => (idea_number < MAX_IDEA) && create_child())
     }
+    function trigger_whisper() {
+        setTimeout(() => {
+            if(idea_number === MAX_IDEA) {
+                values.line_event_bus.dispatchEvent(new CustomEvent("whisper", {
+                    detail: values
+                }));
+            }
+            trigger_whisper();
+        }, 4000 + Math.random() * 6000)
+    }
+
+    reproduction_seq.add(0, trigger_whisper);
     reproduction_seq.start();
 
     function tick (container, sprite) {
