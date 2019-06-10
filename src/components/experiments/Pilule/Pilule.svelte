@@ -293,6 +293,7 @@
             }
 
             if (piluleSprite.animFall_x.is_ended_signal && piluleSprite.animFall_y.is_ended_signal) {
+                audio_scene.pill_fail_sound();
                piluleSprite.animFall_x = null;
                piluleSprite.animFall_y = null;
                piluleSprite.interactive = true;
