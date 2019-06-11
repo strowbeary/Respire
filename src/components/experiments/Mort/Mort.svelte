@@ -24,6 +24,8 @@
             init_mort_sound_scene().then(scene => {
                 scene.start_audio();
                 audio_scene = scene;
+                setTimeout(audio_scene.fade_out_all, 27500);
+                setTimeout(audio_scene.clang, 28000);
             })
         }
     });
@@ -110,9 +112,11 @@
     }
 
     function next() {
-        audio_scene.destroy();
-        open_door = false;
-        dispatch("next");
+        setTimeout(() => {
+            audio_scene.destroy();
+            open_door = false;
+            dispatch("next");
+        }, )
     }
 
     function startAnimation() {

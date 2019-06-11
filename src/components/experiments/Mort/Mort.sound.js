@@ -1,15 +1,16 @@
-import { Scene, Sound, Vector3 } from "lib/SoundKit";
+import { Scene, Sound } from "lib/SoundKit";
 import steps_slow_sound_url from "assets/sounds/Mort/steps_slow.flac";
 import steps_fast_sound_url from "assets/sounds/Mort/steps_fast.flac";
 import breathing_sound_url from "assets/sounds/Mort/breathing.flac";
 import heart_normal_sound_url from "assets/sounds/Mort/Heart beat normal.wav";
 import heart_fast_sound_url from "assets/sounds/Mort/Heart beat fast.wav";
+import door_close_sound_url from "assets/sounds/Mort/door_close.wav";
 import {Animate} from "lib/TimingKit";
 
 export async function init_mort_sound_scene() {
 
     const scene = await Scene({
-        debug: true
+        debug: false
     });
 
     scene.add(
@@ -38,6 +39,10 @@ export async function init_mort_sound_scene() {
             volume: 0,
             loop: true
         }),
+        Sound("door_close", {
+            url: door_close_sound_url,
+            volume: 1.7
+        }),
     );
 
     const init_scene = await scene.init();
@@ -46,6 +51,7 @@ export async function init_mort_sound_scene() {
     const breathing_sound = init_scene.get_children_by_name("breathing");
     const heart_normal_sound = init_scene.get_children_by_name("heart_normal");
     const heart_fast_sound = init_scene.get_children_by_name("heart_fast");
+    const door_close_sound = init_scene.get_children_by_name("door_close");
     steps_slow_sound.play();
     steps_fast_sound.play();
     breathing_sound.play();
@@ -113,6 +119,22 @@ export async function init_mort_sound_scene() {
             breathing_animation.start();
             heart_normal_animation.start();
             heart_fast_animation.start();
+        },
+        fade_out_all() {
+            steps_slow_animation = Animate(steps_slow_sound.options.volume, 0, t => t, 0.015);
+            steps_fast_animation = Animate(steps_fast_sound.options.volume, 0, t => t, 0.015);
+            breathing_animation = Animate(breathing_sound.options.volume, 0, t => t, 0.015);
+            heart_normal_animation = Animate(heart_normal_sound.options.volume, 0, t => t, 0.015);
+            heart_fast_animation = Animate(heart_fast_sound.options.volume, 0, t => t, 0.015);
+
+            steps_slow_animation.start();
+            steps_fast_animation.start();
+            breathing_animation.start();
+            heart_normal_animation.start();
+            heart_fast_animation.start();
+        },
+        clang() {
+            door_close_sound.play();
         }
     }
 }

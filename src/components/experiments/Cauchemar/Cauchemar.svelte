@@ -150,7 +150,7 @@
     let currentTime;
     let alarmStart = false;
     $:{
-        if (currentTime >= 11 && !alarmStart) { //15.14
+        if (currentTime >= 15.14 && !alarmStart) { //15.14
             alarmStart = true;
             audio_scene.trigger_alarm_clock();
         }

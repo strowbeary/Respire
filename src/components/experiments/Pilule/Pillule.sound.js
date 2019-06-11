@@ -11,7 +11,7 @@ import {LowPassEffect} from "lib/SoundKit/effects/LowPassEffect";
 export async function init_pillule_sound_scene() {
 
     const scene = await Scene({
-        debug: true
+        debug: false
     });
 
     scene.add(
