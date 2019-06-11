@@ -293,6 +293,7 @@
             }
 
             if (piluleSprite.animFall_x.is_ended_signal && piluleSprite.animFall_y.is_ended_signal) {
+                audio_scene.pill_fail_sound();
                piluleSprite.animFall_x = null;
                piluleSprite.animFall_y = null;
                piluleSprite.interactive = true;
@@ -439,5 +440,5 @@
     }
 </style>
 
-<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<div class="background" style="background-image: url({lightBackground});"></div>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

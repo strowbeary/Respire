@@ -59,9 +59,15 @@ export async function Scene(options) {
 
         if (options.debug) {
             const {sk_debugger} = await import('./Debugger.js');
-            sk_debugger(audio_context, listener, initialized_children, {
+            const {destroy_debugger} = sk_debugger(audio_context, listener, initialized_children, {
                 options,
                 set_volume
+            });
+            console.log(destroy_debugger);
+            audio_context.addEventListener("statechange", e => {
+                if(e.explicitOriginalTarget.state === "closed") {
+                    destroy_debugger();
+                }
             });
         }
 

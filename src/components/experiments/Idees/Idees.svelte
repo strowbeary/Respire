@@ -146,6 +146,23 @@
         const sprite = generateAnimatedSprite(imgAssets["idea_image"]);
         sprite.interactive = is_interactions_enabled;
         const line_event_bus = new EventTarget();
+        line_event_bus.addEventListener("whisper", e => {
+            audio_scene.play_a_whisper(Vector3(
+                e.detail.position.x,
+                0,
+                e.detail.position.y
+            )
+            .sub(Vector3(
+                canvasWidth / 2,
+                0,
+                canvasHeight / 2
+            ))
+            .divide(Vector3(
+                canvasWidth,
+                1,
+                canvasHeight
+            )));
+        });
         const controller = Idea(
             {canvasWidth, canvasHeight},
             {
@@ -203,7 +220,6 @@
         blurValue += 0.5;
         current_ratio -= 1/30;
         audio_scene.set_prof_filter_ratio(current_ratio);
-
 
         audio_scene.play_a_whisper(Vector3(
             controller.final_position.x,
@@ -323,9 +339,11 @@
         position: absolute;
         background-size: cover;
         background-color: white;
+        width: 100%;
+        height: 100%;
         z-index: -1;
     }
 </style>
 
-<div class="background" style="background-image: url({lightBackground}); width:{Math.floor(canvasSize.canvasWidth)}px; height:{Math.floor(canvasSize.canvasHeight)}px"></div>
+<div class="background" style="background-image: url({lightBackground})"></div>
 <Canvas {canvasSize} on:pixiApp="{init}"></Canvas>

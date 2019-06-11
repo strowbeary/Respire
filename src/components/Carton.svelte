@@ -95,6 +95,7 @@
     $: spaceContext = index > -1? data[index]["spaceContext"] : null;
     $: sandLevel = index > -1? data[index]["sandLevel"] : 100;
     $: sandHorizontalLevel = `translate3d(0, ${sandLevel}%, 0)`;
+    $: height = canvasSize.currentHeight || canvasSize.canvasHeight;
 
     let yStart = 0;
     let yEnd = 0;
@@ -109,8 +110,8 @@
                 yStart = e.clientY;
             }
 
-            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + canvasSize.canvasHeight/2) {
-                yLast = canvasSize.canvasHeight;
+            if (icon && yStart > parseFloat(getComputedStyle(carton).top) + height/2) {
+                yLast = height;
                 isPointerDown = true;
             }
         }
@@ -138,7 +139,7 @@
                 yEnd = e.clientY;
             }
 
-            if (yEnd < yStart - canvasSize.canvasHeight/10 &&
+            if (yEnd < yStart - height/10 &&
                 !yCumul.includes(false)) {
                 carton_visible.setToFalse();
                 fade_out_sand();
