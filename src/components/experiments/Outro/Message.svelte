@@ -2,7 +2,7 @@
     import {fly, fade} from "svelte/transition";
     import {createEventDispatcher, onMount} from "svelte";
     import respireLogo from "assets/videos/respire_logo.mp4";
-    import placeholderVideo from "assets/videos/placeholder.webm";
+    import cauchemarVideo from "assets/videos/cauchemar.mp4";
     import global_sound_scene from "../../../global.sound";
 
     const dispatch = createEventDispatcher();
@@ -14,7 +14,7 @@
     let videoComponent;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    let link = placeholderVideo;
+    let link = cauchemarVideo;
     let fade_out_nappe = () => {};
     global_sound_scene.then(scene => {
             fade_out_nappe = scene.fade_out_nappe;
