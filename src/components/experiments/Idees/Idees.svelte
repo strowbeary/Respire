@@ -22,6 +22,7 @@
     import {init_ideas_sound_scene} from "components/experiments/Idees/Ideas.sound";
 
     export let canvasSize;
+    let dispatched = false;
 
     const dispatch = createEventDispatcher();
     let is_interactions_enabled = false;
@@ -195,7 +196,7 @@
 
             if(all_dismissed()) {
                 setTimeout(() => {
-                    if(all_dismissed()) {
+                    if(!dispatched) {
                         const volume_prof_sound_anim = Animate(1, 0, Easing.linear, 0.07);
                         volume_prof_sound_anim.start();
                         let req_id = null;
@@ -208,6 +209,7 @@
                             }
                         })(0);
                         dispatch("next", true);
+                        dispatched = true;
                         setTimeout(() =>   audio_scene.destroy(), 1000);
                     }
                 }, 2000);
