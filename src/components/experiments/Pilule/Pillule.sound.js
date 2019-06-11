@@ -35,7 +35,7 @@ export async function init_pillule_sound_scene() {
         }),
         Sound("clock", {
             url: clock_sound_url,
-            volume: 1,
+            volume: 0,
             loop: true,
         }),
     );
@@ -53,7 +53,7 @@ export async function init_pillule_sound_scene() {
 
     const low_pass_filter = writing_sound.add_effect(LowPassEffect);
 
-    let clock_animation = Animate(0, 1, Easing.linear, 0.006);
+    let clock_animation = Animate(0, 0.7, Easing.linear, 0.006);
     let writing_animation = Animate(0, 1, Easing.linear, 0.006);
     let writing_lp_animation = Animate(1, 1, Easing.linear, 0);
     let pill_shake_animation = Animate(0, 1, Easing.linear, 0.03);

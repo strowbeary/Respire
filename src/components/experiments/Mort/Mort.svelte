@@ -12,14 +12,19 @@
     * */
     import Wallpaper from "assets/images/mort/couloir2.png";
     import door from "assets/images/mort/door.png";
-    import door_frame from "assets/images/mort/door_frame.png";
+    import door_frame from "assets/images/mort/door_frame.png"; import {init_mort_sound_scene} from "components/experiments/Mort/Mort.sound";
     export let canvasSize;
 
     let display_carton = true;
+    let audio_scene = null;
     const unsubscribe = carton_visible.subscribe((value) => {
         if (!value) {
             display_carton = false;
             startAnimation();
+            init_mort_sound_scene().then(scene => {
+                scene.start_audio();
+                audio_scene = scene;
+            })
         }
     });
 
@@ -105,6 +110,7 @@
     }
 
     function next() {
+        audio_scene.destroy();
         open_door = false;
         dispatch("next");
     }
@@ -120,6 +126,7 @@
             translateValue = anim.tick();
             loop = requestAnimationFrame(translate);
         } else if (speedUp) {
+            audio_scene.go_faster();
             speedUp = false;
             speedUpRunning = true;
             blurValue = 3;
@@ -129,6 +136,7 @@
         } else {
             speedUpRunning = false;
             blurValue = 0;
+            audio_scene.go_slower();
             setTimeout(() => {
                 speedOut = true;
             }, 1000);
