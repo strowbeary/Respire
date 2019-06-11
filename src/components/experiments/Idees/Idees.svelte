@@ -194,8 +194,8 @@
             blurValue -= 0.5;
 
             if(all_dismissed()) {
-                Sequence()
-                    .add(2000, () => {
+                setTimeout(() => {
+                    if(all_dismissed()) {
                         const volume_prof_sound_anim = Animate(1, 0, Easing.linear, 0.07);
                         volume_prof_sound_anim.start();
                         let req_id = null;
@@ -208,12 +208,9 @@
                             }
                         })(0);
                         dispatch("next", true);
-                    })
-                    .add(1000, () => {
-                        audio_scene.destroy();
-                    })
-                    .start();
-
+                        setTimeout(() =>   audio_scene.destroy(), 1000);
+                    }
+                }, 2000);
             }
         });
 

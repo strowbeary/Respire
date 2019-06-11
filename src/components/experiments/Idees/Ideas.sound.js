@@ -94,6 +94,9 @@ export async function init_ideas_sound_scene() {
         async start_audio() {
             await init_scene.play();
         },
+        destroy() {
+            init_scene.destroy();
+        },
         play_course() {
             course_sound.play();
         },
@@ -101,9 +104,6 @@ export async function init_ideas_sound_scene() {
             whispers[current_whisper].set_position(position);
             whispers[current_whisper].play();
             current_whisper = (current_whisper + 1) % whispers.length;
-        },
-        destroy() {
-            init_scene.destroy();
         },
         set_prof_filter_ratio(r) {
             r = Keyframes([

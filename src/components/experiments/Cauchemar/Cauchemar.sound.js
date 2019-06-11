@@ -10,7 +10,7 @@ export async function init_cauchemar_sound_scene() {
     scene.add(
         Sound("alarm_clock", {
             url: alarm_clock_sound_url,
-            volume: 0.8,
+            volume: 0.7,
             loop: true
         }),
         Sound("preparation", {
