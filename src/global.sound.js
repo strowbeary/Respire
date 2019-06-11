@@ -24,12 +24,7 @@ export default (async () => {
         }),
         Sound("wind", {
             url: wind_sound_url,
-            volume: 0.2,
-            loop: true
-        }),
-        Sound("harp", {
-            url: harp_sound_url,
-            volume: 0.2,
+            volume: 0,
             loop: true
         }),
         Sound("sable", {
@@ -52,41 +47,37 @@ export default (async () => {
     const hum_sound = init_scene.get_children_by_name("hum");
     const earthquake_sound = init_scene.get_children_by_name("earthquake");
     const wind_sound = init_scene.get_children_by_name("wind");
-    const harp_sound = init_scene.get_children_by_name("harp");
     const sable_sound = init_scene.get_children_by_name("sable");
     const audio_test_sound = init_scene.get_children_by_name("audio_test");
 
     hum_sound.play();
     earthquake_sound.play();
     wind_sound.play();
-    harp_sound.play();
     sable_sound.play();
 
     let req_id = null;
     let hum_animation = Animate(0, 0, t => t, 0.01);
     let earthquake_animation = Animate(0, 0, t => t, 0.01);
     let wind_animation = Animate(0, 0, t => t, 0.01);
-    let harp_animation = Animate(0, 0, t => t, 0.01);
     let sable_animation = Animate(0, 0, t => t, 0.01);
 
-    hum_animation.start();
+    //hum_animation.start();
 
     (function loop(t) {
         if(sable_animation.is_running) {
             let volume_sable = sable_animation.tick();
             sable_sound.set_volume(volume_sable);
         }
-        if(hum_animation.is_running) {
+        if(hum_animation.is_running) {
             hum_sound.set_volume(hum_animation.tick());
+        } else {
+            console.log("end", hum_animation.tick())
         }
         if(earthquake_animation.is_running) {
             earthquake_sound.set_volume(earthquake_animation.tick());
         }
         if(wind_animation.is_running) {
             wind_sound.set_volume(wind_animation.tick());
-        }
-        if(harp_animation.is_running) {
-            harp_sound.set_volume(harp_animation.tick());
         }
         req_id = requestAnimationFrame(loop.bind({}, t + 1))
     })(0);
@@ -104,38 +95,46 @@ export default (async () => {
             sable_animation.start();
         },
         fade_in_nappe() {
-            hum_animation = Animate(0, 3, Keyframes([
+            hum_animation = Animate(0, 4, Keyframes([
                 {
                     t: 0,
                     value: 0
                 },
                 {
-                    t: 0.003,
-                    value: 0.17
+                    t: 0.2,
+                    value: 0.15
+                },
+                {
+                    t: 0.4,
+                    value: 0.30
+                },
+                {
+                    t: 0.6,
+                    value: 0.45
+                },
+                {
+                    t: 0.8,
+                    value: 0.55
                 },
                 {
                     t: 1,
                     value: 1
                 }
-            ], Easing.linear), 0.0001);
-            earthquake_animation = Animate(0, 0.8, Easing.linear, 0.0002);
-            wind_animation = Animate(0, 0.2, Easing.linear, 0.0001);
-            harp_animation = Animate(0, 0.2, Easing.linear, 0.0001);
+            ], Easing.linear), 0.00025);
+            earthquake_animation = Animate(0, 0.4, Easing.linear, 0.0001);
+            wind_animation = Animate(0, 0.05, Easing.linear, 0.0001);
             hum_animation.start();
             earthquake_animation.start();
             wind_animation.start();
-            harp_animation.start();
         },
         fade_out_nappe() {
-            hum_animation = Animate(3, 0, Easing.easeInQuad, 0.006);
-            earthquake_animation = Animate(0.8, 0, Easing.easeInQuad, 0.006);
-            wind_animation = Animate(0.2, 0, Easing.easeInQuad, 0.006);
-            harp_animation = Animate(0.2, 0, Easing.easeInQuad, 0.006);
+            hum_animation = Animate(4, 0, Easing.easeInQuad, 0.006);
+            earthquake_animation = Animate(0.4, 0, Easing.easeInQuad, 0.006);
+            wind_animation = Animate(0.05, 0, Easing.easeInQuad, 0.006);
 
             hum_animation.start();
             earthquake_animation.start();
             wind_animation.start();
-            harp_animation.start();
         },
         get audio_test_sound() {
             return audio_test_sound;

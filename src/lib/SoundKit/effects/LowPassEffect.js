@@ -5,7 +5,6 @@ export function LowPassEffect(audio_context) {
     return {
         filter_node,
         set_frequency(f) {
-            console.log(f);
             filter_node.frequency.value = f;
         }
     };

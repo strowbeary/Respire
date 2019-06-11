@@ -24,9 +24,11 @@
 
     let fade_out_sand = () => {};
     let fade_in_sand = () => {};
+    let fade_in_nappe = () => {};
     global_sound_scene.then(scene => {
         fade_out_sand = scene.fade_out_sable;
         fade_in_sand = scene.fade_in_sable;
+        fade_in_nappe = scene.fade_in_nappe;
     });
 
 
@@ -36,6 +38,7 @@
         visible = value;
         if (index === 1 && visible) {
             corpusVisible = false;
+            fade_in_nappe();
         }
     });
 

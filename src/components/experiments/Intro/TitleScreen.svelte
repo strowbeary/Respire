@@ -66,7 +66,6 @@
 
                 globalSoundScene.then(async scene => {
                     await scene.start();
-                    scene.fade_in_nappe();
                     dispatch('next', false);
                 });
             } else {
