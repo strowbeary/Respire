@@ -2,7 +2,6 @@
     import {fly, fade} from "svelte/transition";
     import {createEventDispatcher, onMount} from "svelte";
     import respireLogo from "assets/videos/respire_logo.mp4";
-    import cauchemarVideo from "assets/videos/cauchemar.mp4";
     import global_sound_scene from "../../../global.sound";
 
     const dispatch = createEventDispatcher();
@@ -10,32 +9,24 @@
     export let globalSoundScene;
     export let canvasSize;
     let innerHeight;
-    let videoVisibility = true;
+    let isMessageVisible = false;
     let videoComponent;
 
     $: scaleFactor = innerHeight ? innerHeight/824 : window.innerHeight/824;
-    let link = cauchemarVideo;
-    let fade_out_nappe = () => {};
-    global_sound_scene.then(scene => {
-            fade_out_nappe = scene.fade_out_nappe;
-        });
 
     function onVideoEnd() {
-        if (link !== respireLogo) {
-            videoVisibility = false;
-            link = respireLogo;
-            setTimeout(() => {
-                videoVisibility = true;
-                videoComponent.play();
-                fade_out_nappe();
-            }, 5000);
-        } else {
-            dispatch("next");
-        }
+        dispatch("next");
     }
 
     onMount(() => {
-        videoComponent.play();
+        setTimeout(() => {
+            isMessageVisible = true;
+            //TODO ici doit se terminer la crise d'angoisse
+            setTimeout(() => {
+                isMessageVisible = false;
+                videoComponent.play();
+            }, 5000);
+        }, 5000);
     })
 </script>
 
@@ -88,12 +79,12 @@
         width: 100%;
         height: 100%;
         background-color: black;
-        z-index: 1;
+        z-index: -1;
     }
 </style>
 
 <svelte:window bind:innerHeight={innerHeight}></svelte:window>
-{#if !videoVisibility}
+{#if isMessageVisible}
     <div
         class="title_screen"
         style="--scaleFactor:{scaleFactor}"
@@ -106,15 +97,15 @@
             </p>
         </div>
     </div>
-    <div class="black" out:fade></div>
 {/if}
+<div class="black" out:fade></div>
 {#if canvasSize.canvasWidth}
     <video
         out:fade
         width="{canvasSize.canvasWidth}"
         height="{canvasSize.canvasHeight}"
         bind:this="{videoComponent}"
-        src={link}
+        src={respireLogo}
         on:ended={onVideoEnd}
     ></video>
 {/if}
