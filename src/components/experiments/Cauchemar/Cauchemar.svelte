@@ -10,7 +10,7 @@
     /*
     * RESSOURCES
     * */
-    import placeholderVideo from "assets/videos/placeholder.webm";
+    import cauchemarVideo from "assets/videos/cauchemar.mp4";
     import cadre from "assets/images/cauchemar/cadre.png";
     import lightBackground from "assets/images/light_background.png";
     import {init_cauchemar_sound_scene} from "components/experiments/Cauchemar/Cauchemar.sound";
@@ -145,7 +145,15 @@
 
     function onFirstVideoEnd() {
         videoVisibility = false;
-        audio_scene.trigger_alarm_clock();
+    }
+
+    let currentTime;
+    let alarmStart = false;
+    $:{
+        if (currentTime >= 11 && !alarmStart) { //15.14
+            alarmStart = true;
+            audio_scene.trigger_alarm_clock();
+        }
     }
 
     onDestroy(() => {
@@ -291,12 +299,13 @@
     <video
         out:fade
         bind:this="{videoComponent}"
-        src={placeholderVideo}
+        src={cauchemarVideo}
+        bind:currentTime="{currentTime}"
         on:ended={onFirstVideoEnd}
     ></video>
 {:else}
 <div class="alarmClock"
-    out:fade
+    transition:fade
     style="--scaleFactor:{scaleFactor};--opacityDay:{opacityDay}"
     on:mousemove="{onPointerMove}"
     on:touchmove|passive="{onPointerMove}"
